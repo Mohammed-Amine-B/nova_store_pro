@@ -1,0 +1,895 @@
+{
+  "@@locale": "en",
+  "appTitle": "Nova Store",
+  "navDashboard": "Dashboard",
+  "navProducts": "Products",
+  "navCategories": "Categories",
+  "navTodaySales": "Today Sales",
+  "navArchive": "Archive",
+  "navSettings": "Settings",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "close": "Close",
+  "dashboardTitle": "Dashboard",
+  "dashboardSubtitle": "Store overview",
+  "statProducts": "Products",
+  "statCategories": "Categories",
+  "statTodaySales": "Today's Sales",
+  "statLowStock": "Low Stock",
+  "salesCount": "{count} sales",
+  "@salesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lowStockPanelTitle": "Low Stock Products",
+  "lowStockPanelDesc": "{count} products need restocking",
+  "@lowStockPanelDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noLowStockProducts": "No low stock products",
+  "unitsLeft": "{count} left",
+  "@unitsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "productsTitle": "Products",
+  "productsSubtitle": "Your full shop catalogue",
+  "addProduct": "Add Product",
+  "editProduct": "Edit Product",
+  "statTotalProducts": "Total Products",
+  "statTotalUnits": "Total Units In Stock",
+  "statStockValue": "Stock Value",
+  "atBuyPrice": "At buy price",
+  "allProductsPanel": "All Products",
+  "shownOfTotal": "{shown} of {total} shown",
+  "@shownOfTotal": {
+    "placeholders": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "searchProductsHint": "Search name, code, or barcode",
+  "allCategories": "All categories",
+  "filterAll": "All",
+  "filterLowStock": "Low Stock",
+  "filterOutOfStock": "Out of Stock",
+  "colProductName": "Product Name",
+  "colBarcode": "Barcode",
+  "colCategory": "Category",
+  "colSellingPrice": "Selling Price",
+  "colCurrentStock": "Current Stock",
+  "colStatus": "Status",
+  "colActions": "Actions",
+  "statusInStock": "In Stock",
+  "statusLowStock": "Low Stock",
+  "statusOutOfStock": "Out of Stock",
+  "noProductsMatch": "No products match your filters.",
+  "removeProductTitle": "Remove product?",
+  "removeProductMessage": "\"{name}\" will be archived and hidden from the catalogue.",
+  "@removeProductMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "removeAction": "Remove",
+  "productNameLabel": "Name",
+  "productCodeLabel": "Code",
+  "barcodeOptionalLabel": "Barcode (optional)",
+  "categoryOptionalLabel": "Category (optional)",
+  "noneOption": "None",
+  "lowStockThresholdLabel": "Low stock threshold",
+  "unitTypeLabel": "Unit Type",
+  "unitTypePiece": "Piece",
+  "unitTypeKg": "Kilogram (kg)",
+  "unitTypeMeter": "Meter (m)",
+  "productInfoPanel": "Product Information",
+  "minimumStockLabel": "Minimum Stock",
+  "batchesLabel": "Batches",
+  "currentStockLabel": "Current Stock",
+  "sellingPriceLabel": "Selling Price",
+  "notSet": "Not set",
+  "batchesPanelDesc": "FIFO — oldest batch is sold first",
+  "noBatchesYet": "No inventory yet. Use \"Add Stock\" to record the first batch.",
+  "colBatch": "Batch",
+  "colBuyPrice": "Buy Price",
+  "colRemainingQuantity": "Remaining Quantity",
+  "colPurchaseDate": "Purchase Date",
+  "nextOutTag": "NEXT OUT",
+  "quickActionsPanel": "Quick Actions",
+  "addStock": "Add Stock",
+  "viewStockMovements": "View Stock Movements",
+  "quantityLabel": "Quantity",
+  "buyPriceLabel": "Buy Price",
+  "sellingPriceFieldLabel": "Selling Price",
+  "purchaseDateLabel": "Purchase Date",
+  "stockMovementsTitle": "Stock Movements",
+  "noMovementsRecorded": "No movements recorded.",
+  "categoriesTitle": "Categories",
+  "categoriesCount": "{count} categories",
+  "@categoriesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addCategory": "Add Category",
+  "editCategory": "Edit Category",
+  "allCategoriesPanel": "All Categories",
+  "noCategoriesYet": "No categories yet",
+  "categoryProductsCount": "{count} products",
+  "@categoryProductsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categoryNameLabel": "Category Name",
+  "deleteCategoryTitle": "Delete category?",
+  "deleteCategoryMessage": "Delete \"{name}\"? This can't be undone.",
+  "@deleteCategoryMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "todaySalesTitle": "Today Sales",
+  "addProductLabel": "Add Product",
+  "searchToSellHint": "Search a product to sell...",
+  "salesTodayPanel": "Sales Today",
+  "colProduct": "Product",
+  "colQuantity": "Quantity",
+  "colUnitPrice": "Unit Price",
+  "colTotal": "Total",
+  "statRevenue": "Revenue",
+  "statProfit": "Profit",
+  "statSoldItems": "Sold Items",
+  "fifoHint": "FIFO",
+  "totalLabel": "Total",
+  "inStockCount": "{count} in stock",
+  "@inStockCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "addSaleAction": "Add Sale",
+  "enterValidQuantityPrice": "Enter a valid quantity and price",
+  "archiveTitle": "Archive",
+  "archiveSubtitle": "Past trading days",
+  "salesHistoryPanel": "Sales History",
+  "daysRecorded": "{count} days recorded",
+  "@daysRecorded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noArchivedDaysYet": "No archived days yet.",
+  "colDate": "Date",
+  "colSalesCount": "Sales Count",
+  "openAction": "Open",
+  "transactionsCount": "{count} transactions",
+  "@transactionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSalesRecordedToday": "No sales recorded on this day.",
+  "editSaleTitle": "Edit Sale",
+  "saveChanges": "Save Changes",
+  "deleteSaleTitle": "Delete sale",
+  "deleteSaleMessage": "This sale will be removed and its stock restored.",
+  "salesForDate": "Sales — {date}",
+  "@salesForDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "salesPanel": "Sales",
+  "settingsTitle": "Settings",
+  "settingsSubtitle": "App and store preferences",
+  "shopNamePanel": "Shop Name",
+  "shopNamePanelDesc": "Shown in the sidebar and used on receipts",
+  "themePanel": "Theme",
+  "themePanelDesc": "Choose how Nova Store looks",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "System",
+  "languagePanel": "Language",
+  "languagePanelDesc": "Choose the app language",
+  "savedLabel": "Saved",
+  "viewArchived": "View Archived",
+  "viewActive": "View Active",
+  "restoreAction": "Restore",
+  "statusArchived": "Archived",
+  "suppliersTitle": "Suppliers",
+  "suppliersSubtitle": "Vendors you purchase stock from",
+  "newPurchaseAction": "New Purchase",
+  "addSupplier": "Add Supplier",
+  "editSupplier": "Edit Supplier",
+  "statTotalSuppliers": "Total Suppliers",
+  "statTotalPurchased": "Total Purchased",
+  "allSuppliersPanel": "All Suppliers",
+  "searchSuppliersHint": "Search name, location, or phone",
+  "noSuppliersMatch": "No suppliers match your filters.",
+  "colName": "Name",
+  "colLocation": "Location",
+  "colPhone": "Phone",
+  "colOwed": "Owed",
+  "statusActive": "Active",
+  "removeSupplierTitle": "Remove supplier?",
+  "removeSupplierMessage": "\"{name}\" will be archived and hidden from the list.",
+  "@removeSupplierMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "recordPaymentTitle": "Record Payment",
+  "amountLabel": "Amount",
+  "paymentDateLabel": "Payment Date",
+  "noteOptionalLabel": "Note (optional)",
+  "enterValidAmount": "Enter a valid amount",
+  "deletePurchaseTitle": "Delete purchase",
+  "deletePurchaseMessage": "This purchase will be removed and its stock reversed.",
+  "supplierInfoPanel": "Supplier Information",
+  "purchaseHistoryPanel": "Purchase History",
+  "mostRecentFirst": "Most recent first",
+  "noPurchasesYet": "No purchases yet from this supplier.",
+  "colItems": "Items",
+  "colPaid": "Paid",
+  "colRemaining": "Remaining",
+  "editPurchaseTooltip": "Edit Purchase",
+  "paymentsHistoryPanel": "Payments History",
+  "paymentCountDesc": "{count} payment(s)",
+  "@paymentCountDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noPaymentsYet": "No payments recorded yet.",
+  "supplierDetailFallbackTitle": "Supplier Detail",
+  "supplierNoLongerExists": "This supplier no longer exists.",
+  "selectSupplierTitle": "Select Supplier",
+  "searchSuppliersEllipsis": "Search suppliers...",
+  "noSuppliersFound": "No suppliers found.",
+  "newSupplierAction": "New Supplier",
+  "locationOptionalLabel": "Location (optional)",
+  "phoneOptionalLabel": "Phone (optional)",
+  "supplierAddProductsPanel": "Add Products",
+  "searchProductToPurchaseDesc": "Search for a product to purchase",
+  "searchProductToAddHint": "Search a product to add...",
+  "cartPanel": "Cart",
+  "cartLineCountDesc": "{count} line(s)",
+  "@cartLineCountDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noLinesAddedYet": "No lines added yet.",
+  "searchProductAboveToStartPurchase": "Search a product above to start this purchase.",
+  "addLineAction": "Add Line",
+  "summaryPanel": "Summary",
+  "itemsUnitsCount": "{count} units",
+  "@itemsUnitsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "subtotalRow": "Subtotal",
+  "previousDebtRow": "Previous debt to this supplier",
+  "totalDueRow": "Total due",
+  "paymentPanel": "Payment",
+  "toRecordPaymentHintSupplier": "To record a payment, use \"Record Payment\" on the supplier's page.",
+  "amountPaidRow": "Amount paid",
+  "payFullAction": "Pay full",
+  "halfNowAction": "Half now",
+  "confirmPurchaseAction": "Confirm Purchase",
+  "editingPurchaseNum": "Editing purchase #{id}",
+  "@editingPurchaseNum": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "draftNotSaved": "Draft · not saved yet",
+  "supplierOwedSuffix": " · Owed {amount}",
+  "@supplierOwedSuffix": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "sellingPriceRequiredFirstBatch": "Selling Price (required — first stock for this product)",
+  "addAtLeastOneProduct": "Add at least one product to the cart.",
+  "amountPaidRangeError": "Amount paid must be between 0 and the total.",
+  "customersTitle": "Customers",
+  "customersSubtitle": "People you sell to on credit",
+  "newSaleAction": "New Sale",
+  "addCustomer": "Add Customer",
+  "editCustomer": "Edit Customer",
+  "statTotalCustomers": "Total Customers",
+  "statTotalOwed": "Total Owed",
+  "allCustomersPanel": "All Customers",
+  "searchCustomersHint": "Search name or phone",
+  "noCustomersMatch": "No customers match your filters.",
+  "colBalance": "Balance",
+  "viewAction": "View",
+  "removeCustomerTitle": "Remove customer?",
+  "removeCustomerMessage": "\"{name}\" will be archived and hidden from the list.",
+  "@removeCustomerMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newCustomerSaleTitle": "New Customer Sale",
+  "customerInfoPanel": "Customer Information",
+  "memberSinceLabel": "Member Since",
+  "remainingBalanceLabel": "Remaining Balance",
+  "salesHistoryCountDesc": "{count} sale(s)",
+  "@salesHistoryCountDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSalesYetForCustomer": "No sales yet for this customer.",
+  "colMethod": "Method",
+  "viewInvoiceTooltip": "View Invoice",
+  "customerDetailFallbackTitle": "Customer Detail",
+  "customerNoLongerExists": "This customer no longer exists.",
+  "selectCustomerTitle": "Select Customer",
+  "searchCustomersEllipsis": "Search customers...",
+  "noCustomersFound": "No customers found.",
+  "newCustomerAction": "New Customer",
+  "chooseWhoSaleFor": "Choose who this sale is for",
+  "customerAddProductsPanel": "Add products",
+  "addProductsDesc": "Search, scan, or tap a favourite",
+  "frequentlySoldLabel": "FREQUENTLY SOLD",
+  "lowStockLeftSuffix": "Low · {qty} left",
+  "@lowStockLeftSuffix": {
+    "placeholders": {
+      "qty": {
+        "type": "String"
+      }
+    }
+  },
+  "tapProductAboveToStartSale": "Tap a product above to start this sale.",
+  "returnTooltip": "Return",
+  "previousBalanceRow": "Previous balance",
+  "toRecordPaymentHintCustomer": "To record a payment, use \"Record Payment\" on the customer's page.",
+  "confirmSaleAction": "Confirm sale",
+  "editingSaleNum": "Editing sale #{id}",
+  "@editingSaleNum": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "balanceSuffix": " · Balance {amount}",
+  "@balanceSuffix": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentUpdated": "Payment updated.",
+  "amountPaidUpdateRangeError": "Amount paid must be between 0 and the total",
+  "returnsTitle": "Returns",
+  "returnsSubtitle": "History of returned items",
+  "allReturnsPanel": "All Returns",
+  "noReturnsYet": "No returns recorded yet.",
+  "colSaleId": "Sale ID",
+  "colReason": "Reason",
+  "colRefunded": "Refunded",
+  "startReturnTitle": "Start Return",
+  "startReturnSubtitle": "Find the original sale and return items",
+  "findSalePanel": "Find Sale",
+  "recentSalesHint": "Recent sales shown below",
+  "showRecentSalesAction": "Show recent sales",
+  "returnItemsPanel": "Return Items",
+  "enterQtyToReturnDesc": "Enter quantity to return for each item",
+  "productHashLabel": "Product #{id} — {qty} @ {price} DA",
+  "@productHashLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "qty": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "returnQtyLabel": "Return Qty",
+  "reasonLabel": "Reason",
+  "reasonDamaged": "Damaged",
+  "reasonWrongItem": "Wrong Item",
+  "reasonChangedMind": "Changed Mind",
+  "reasonOther": "Other",
+  "enterQtyAtLeastOne": "Enter a quantity for at least one item",
+  "backAction": "Back",
+  "confirmReturnAction": "Confirm Return",
+  "unknownProductLabel": "Unknown",
+  "returnLineDesc": "{name} — {qty} @ {price} DA",
+  "@returnLineDesc": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "qty": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "returnRecordedCashMsg": "Return recorded. Refund {amount} DA in cash.",
+  "@returnRecordedCashMsg": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "returnRecordedDebtMsg": "Return recorded. Debt reduced by {amount} DA.",
+  "@returnRecordedDebtMsg": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsTitle": "Reports",
+  "reportsSubtitle": "Sales performance and exports",
+  "csvExportAction": "CSV",
+  "pdfExportAction": "PDF",
+  "rangeToday": "Today",
+  "rangeWeek": "This Week",
+  "rangeMonth": "This Month",
+  "rangeCustom": "Custom",
+  "revenueTrendPanel": "Revenue Trend",
+  "noSalesInRange": "No sales in this range.",
+  "bestSellingProductsPanel": "Best Selling Products",
+  "colUnitsSold": "Units Sold",
+  "printSavePdfTooltip": "Print / Save PDF",
+  "invoiceHashTitle": "Invoice #{id}",
+  "@invoiceHashTitle": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceSubtitle": "Sale #{id} — {date}",
+  "@invoiceSubtitle": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceSubtitleWithCustomer": "Sale #{id} — {date} — {customer}",
+  "@invoiceSubtitleWithCustomer": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "customer": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceTotalLine": "Total: {amount}",
+  "@invoiceTotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "invoicePaidLine": "Paid: {amount}",
+  "@invoicePaidLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceRemainingLine": "Remaining: {amount}",
+  "@invoiceRemainingLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogTitle": "Activity Log",
+  "activityLogSubtitle": "A history of important business actions",
+  "categoryLabel": "Category",
+  "catAll": "All",
+  "catSale": "Sale",
+  "catPurchase": "Purchase",
+  "catReturn": "Return",
+  "catProduct": "Product",
+  "catCategory": "Category",
+  "catCustomer": "Customer",
+  "catSupplier": "Supplier",
+  "catPayment": "Payment",
+  "entriesPanel": "Entries",
+  "recordsCountDesc": "{count} record(s)",
+  "@recordsCountDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noActivityInRange": "No activity in this range.",
+  "justNow": "Just now",
+  "minutesAgo": "{count}m ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{count}h ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "passwordLabel": "Password",
+  "incorrectPassword": "Incorrect password",
+  "unlockAction": "Unlock",
+  "amountPaidHintLabel": "Amount Paid (leave empty for full price)",
+  "enterValidAmountPaid": "Enter a valid amount paid",
+  "amountPaidExceedsTotal": "Amount paid cannot exceed the total",
+  "ctrlFHint": "Ctrl+F",
+  "cropPhotoTitle": "Crop Photo",
+  "croppingEllipsis": "Cropping...",
+  "cropSaveAction": "Crop & Save",
+  "couldNotCropImage": "Could not crop image: {cause}",
+  "@couldNotCropImage": {
+    "placeholders": {
+      "cause": {
+        "type": "String"
+      }
+    }
+  },
+  "productDetailFallbackTitle": "Product Detail",
+  "productNoLongerExists": "This product no longer exists.",
+  "removePhotoTitle": "Remove photo?",
+  "removePhotoMessage": "The product photo will be permanently deleted.",
+  "noPhotoLabel": "No photo",
+  "changePhotoAction": "Change Photo",
+  "removePhotoAction": "Remove Photo",
+  "batchHashLabel": "Batch #{n}",
+  "@batchHashLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "deletePermanentlyTitle": "Delete permanently?",
+  "deletePermanentlyMessage": "Permanently delete \"{name}\"? This cannot be undone.",
+  "@deletePermanentlyMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deletePermanentlyAction": "Delete Permanently",
+  "securityPanel": "Security",
+  "securityPanelDesc": "Protect the app with a password",
+  "passwordIsSet": "Password is set",
+  "noPasswordSet": "No password set",
+  "changeAction": "Change",
+  "setPasswordAction": "Set Password",
+  "setPasswordDialogTitle": "Set Password",
+  "changePasswordDialogTitle": "Change Password",
+  "currentPasswordLabel": "Current Password",
+  "newPasswordLabel": "New Password",
+  "confirmNewPasswordLabel": "Confirm New Password",
+  "enterNewPassword": "Enter a new password",
+  "passwordsDoNotMatch": "Passwords do not match",
+  "currentPasswordIncorrect": "Current password is incorrect",
+  "removePasswordDialogTitle": "Remove Password",
+  "languageEnglish": "English",
+  "languageArabic": "العربية",
+  "languageFrench": "Français",
+  "customerSalesLabel": "Customer Sales",
+  "invoiceCountDesc": "{count} invoice(s)",
+  "@invoiceCountDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noCustomerSalesYet": "No customer sales recorded yet.",
+  "colCustomer": "Customer",
+  "invoiceAction": "Invoice",
+  "colNote": "Note",
+  "colAmount": "Amount",
+  "remainingOwedLabel": "Remaining Owed",
+  "purchasesLabel": "Purchases",
+  "zeroFullyOnCreditHint": "0 = fully on credit",
+  "saleItemsCount": "{count} item(s)",
+  "@saleItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addAction": "Add",
+  "csvSavedMessage": "Saved: {path}",
+  "@csvSavedMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogSaleCreated": "Sale of {amount} recorded",
+  "@activityLogSaleCreated": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogSaleUpdated": "Sale #{refId} updated",
+  "@activityLogSaleUpdated": {
+    "placeholders": {
+      "refId": {
+        "type": "int"
+      }
+    }
+  },
+  "activityLogSaleDeleted": "Sale #{refId} deleted, stock restored",
+  "@activityLogSaleDeleted": {
+    "placeholders": {
+      "refId": {
+        "type": "int"
+      }
+    }
+  },
+  "activityLogPurchaseCreated": "Purchase of {amount} recorded from {entityName}",
+  "@activityLogPurchaseCreated": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogPurchaseUpdated": "Purchase #{refId} updated",
+  "@activityLogPurchaseUpdated": {
+    "placeholders": {
+      "refId": {
+        "type": "int"
+      }
+    }
+  },
+  "activityLogReturnCreated": "Return recorded for sale #{refId}, refunded {amount}",
+  "@activityLogReturnCreated": {
+    "placeholders": {
+      "refId": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogProductCreated": "Product \"{entityName}\" created",
+  "@activityLogProductCreated": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogProductUpdated": "Product \"{entityName}\" updated",
+  "@activityLogProductUpdated": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogProductDeleted": "Product \"{entityName}\" permanently deleted",
+  "@activityLogProductDeleted": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogProductArchived": "Product \"{entityName}\" archived",
+  "@activityLogProductArchived": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogProductRestored": "Product \"{entityName}\" restored",
+  "@activityLogProductRestored": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogCategoryCreated": "Category \"{entityName}\" created",
+  "@activityLogCategoryCreated": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogCategoryUpdated": "Category \"{entityName}\" updated",
+  "@activityLogCategoryUpdated": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogCategoryDeleted": "Category \"{entityName}\" deleted",
+  "@activityLogCategoryDeleted": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogCustomerCreated": "Customer \"{entityName}\" created",
+  "@activityLogCustomerCreated": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogCustomerUpdated": "Customer \"{entityName}\" updated",
+  "@activityLogCustomerUpdated": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogCustomerArchived": "Customer \"{entityName}\" archived",
+  "@activityLogCustomerArchived": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogCustomerRestored": "Customer \"{entityName}\" restored",
+  "@activityLogCustomerRestored": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogSupplierCreated": "Supplier \"{entityName}\" created",
+  "@activityLogSupplierCreated": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogSupplierUpdated": "Supplier \"{entityName}\" updated",
+  "@activityLogSupplierUpdated": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogSupplierArchived": "Supplier \"{entityName}\" archived",
+  "@activityLogSupplierArchived": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogSupplierRestored": "Supplier \"{entityName}\" restored",
+  "@activityLogSupplierRestored": {
+    "placeholders": {
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogPaymentReceived": "Payment of {amount} recorded — {entityName}",
+  "@activityLogPaymentReceived": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "entityName": {
+        "type": "String"
+      }
+    }
+  },
+  "activityLogSaleCreatedFor": "Sale of {amount} recorded for {entityName}",
+  "@activityLogSaleCreatedFor": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "entityName": {
+        "type": "String"
+      }
+    }
+  }
+}

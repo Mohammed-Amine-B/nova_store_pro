@@ -1,0 +1,86 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import '../../data/database/database.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../widgets/page_header.dart';
+import '../../widgets/sales_day_view.dart';
+import '../../widgets/quick_add_sale_bar.dart';
+
+class TodaySalesScreen extends StatefulWidget {
+  final AppDatabase db;
+  const TodaySalesScreen({super.key, required this.db});
+
+  @override
+  State<TodaySalesScreen> createState() => _TodaySalesScreenState();
+}
+
+class _TodaySalesScreenState extends State<TodaySalesScreen> {
+  final _viewKey = GlobalKey<SalesDayViewState>();
+  final _searchFocusNode = FocusNode();
+  late final DateTime _today = DateTime.now();
+
+  @override
+  void dispose() {
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.keyF &&
+            HardwareKeyboard.instance.isControlPressed) {
+          _searchFocusNode.requestFocus();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            PageHeader(
+              title: l10n.todaySalesTitle,
+              subtitle: DateFormat('EEEE, MMMM d', Localizations.localeOf(context).toString()).format(_today),
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 4,
+                  child: QuickAddSaleBar(
+                    db: widget.db,
+                    date: _today,
+                    focusNode: _searchFocusNode,
+                    minimalHeader: true,
+                    label: l10n.addProductLabel,
+                    onAdded: () => _viewKey.currentState?.reload(),
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  flex: 8,
+                  child: SalesDayView(
+                    key: _viewKey,
+                    db: widget.db,
+                    date: _today,
+                    title: '',
+                    panelTitle: l10n.salesTodayPanel,
+                    compact: true,
+                    dividedMetrics: true,
+                    showTotalFooter: true,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
