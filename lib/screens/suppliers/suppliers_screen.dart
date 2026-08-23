@@ -6,6 +6,7 @@ import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/status_badge.dart';
+import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
 import 'supplier_form_dialog.dart';
 import 'supplier_detail_screen.dart';
@@ -192,10 +193,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
               ),
             ),
             child: rows.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Text(l10n.noSuppliersMatch),
-                  )
+                ? EmptyState(icon: Icons.local_shipping_outlined, title: l10n.noSuppliersMatch)
                 : LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(
@@ -270,7 +268,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                   ),
                                   DataCell(
                                     Text(
-                                      formatMoney(_owed[s.id] ?? 0),
+                                      formatBalance(_owed[s.id] ?? 0).$1,
                                       style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         color: (_owed[s.id] ?? 0) > 0

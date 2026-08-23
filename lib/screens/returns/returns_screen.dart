@@ -4,6 +4,7 @@ import '../../data/repositories/return_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
+import '../../widgets/empty_state.dart';
 
 class ReturnsScreen extends StatefulWidget {
   final AppDatabase db;
@@ -39,7 +40,7 @@ class _ReturnsScreenState extends State<ReturnsScreen> {
                 if (!snapshot.hasData) return const Padding(padding: EdgeInsets.all(32), child: Center(child: CircularProgressIndicator()));
                 final returns = snapshot.data!;
                 if (returns.isEmpty) {
-                  return Padding(padding: const EdgeInsets.all(32), child: Text(l10n.noReturnsYet));
+                  return EmptyState(icon: Icons.history_toggle_off, title: l10n.noReturnsYet);
                 }
                 return LayoutBuilder(
                   builder: (context, constraints) {

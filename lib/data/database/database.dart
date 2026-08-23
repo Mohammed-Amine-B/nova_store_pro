@@ -48,10 +48,34 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-  // Bumped for ActivityLog's structured columns (amount/entityName/refId) replacing description.
-  // Pre-release: no migration needed, dev DBs are just recreated.
+  // Bumped for Settings' password-recovery columns (securityQuestion/securityAnswerHash/recoveryCodeHash).
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
+
+  // Baseline: schema version 9 as of 2026-08-23. All future schema changes must
+  // add a migration step in onUpgrade below — never tell a user to delete their
+  // database again.
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (Migrator m) async {
+          await m.createAll();
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          // Migration steps go here, one `if` block per version jump, added
+          // incrementally as the schema changes in the future.
+          if (from < 10) {
+            await m.addColumn(settings, settings.securityQuestion);
+            await m.addColumn(settings, settings.securityAnswerHash);
+            await m.addColumn(settings, settings.recoveryCodeHash);
+          }
+        },
+        beforeOpen: (details) async {
+          // Optional: enable foreign keys or run startup checks here if needed.
+          // Left as a no-op for now — this app never enforced FK constraints at
+          // the SQLite level, so turning that on retroactively could reject
+          // writes against pre-existing data that predates strict enforcement.
+        },
+      );
 }
 
 QueryExecutor _openConnection() {

@@ -232,7 +232,7 @@ class _InvoiceViewScreenState extends State<InvoiceViewScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('BILL TO', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: _muted)),
+                          Text('BILL TO', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
                           const SizedBox(height: 4),
                           Text(customerName, style: const TextStyle(fontSize: 14)),
                         ],
@@ -241,12 +241,12 @@ class _InvoiceViewScreenState extends State<InvoiceViewScreen> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Row(children: [
-                            const Text('Invoice #  ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: _muted)),
+                            Text('Invoice #  ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
                             Text('INV-${sale.id}', style: const TextStyle(fontSize: 11)),
                           ]),
                           const SizedBox(height: 4),
                           Row(children: [
-                            const Text('Date  ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: _muted)),
+                            Text('Date  ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
                             Text(dateStr, style: const TextStyle(fontSize: 11)),
                           ]),
                         ],
@@ -263,8 +263,8 @@ class _InvoiceViewScreenState extends State<InvoiceViewScreen> {
                       3: FlexColumnWidth(2),
                     },
                     children: [
-                      const TableRow(
-                        decoration: BoxDecoration(color: _headerBg),
+                      TableRow(
+                        decoration: BoxDecoration(color: theme.colorScheme.primary.withValues(alpha: 0.06)),
                         children: [
                           _Cell('QTY', bold: true),
                           _Cell('DESCRIPTION', bold: true),
@@ -295,7 +295,7 @@ class _InvoiceViewScreenState extends State<InvoiceViewScreen> {
                           _totalsRow('Paid', formatMoney(sale.amountPaid)),
                           const SizedBox(height: 6),
                           Container(
-                            color: _headerBg,
+                            color: theme.colorScheme.primary.withValues(alpha: 0.06),
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                             child: remaining > 0
                                 ? _totalsRow('Remaining', formatMoney(remaining), bold: true, color: const Color(0xFFE4572E))
@@ -309,8 +309,8 @@ class _InvoiceViewScreenState extends State<InvoiceViewScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  const Center(
-                    child: Text('Thank you for your business', style: TextStyle(fontSize: 11, color: _muted)),
+                  Center(
+                    child: Text('Thank you for your business', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
                   ),
                 ],
               ),
@@ -355,9 +355,6 @@ class _Cell extends StatelessWidget {
     );
   }
 }
-
-const _muted = Color(0xFF6B7280);
-const _headerBg = Color(0xFFF5F5F5);
 
 final _pdfMuted = PdfColor.fromHex('#6B7280');
 final _pdfTerracotta = PdfColor.fromHex('#E4572E');

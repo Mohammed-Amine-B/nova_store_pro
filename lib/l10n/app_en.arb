@@ -891,5 +891,54 @@
         "type": "String"
       }
     }
-  }
+  },
+  "priceModePerUnit": "Per Unit",
+  "priceModeTotal": "Total Price",
+  "totalPricePaidLabel": "Total Price Paid",
+  "perUnitPreview": "≈ {price} per {unit}",
+  "@perUnitPreview": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "statCustomersOwe": "Customers Owe You",
+  "statOwedToSuppliers": "You Owe Suppliers",
+  "recentActivityPanel": "Recent Activity",
+  "viewAllAction": "View All",
+  "noRecentActivity": "No activity yet.",
+  "navSectionOverview": "OVERVIEW",
+  "navSectionInventory": "INVENTORY",
+  "navSectionSales": "SALES",
+  "navSectionAdmin": "ADMIN",
+  "securityQuestionLabel": "Security Question",
+  "securityAnswerLabel": "Security Answer",
+  "securityQuestionRequired": "Enter a security question",
+  "securityAnswerRequired": "Enter an answer",
+  "forgotPasswordAction": "Forgot password?",
+  "recoveryCodeDialogTitle": "Your Recovery Code",
+  "recoveryCodeSaveWarning": "Save this code somewhere safe — you'll need it if you forget your password again:",
+  "recoveryCodeAckCheckbox": "I've saved this code",
+  "continueAction": "Continue",
+  "recoveryChooseMethodTitle": "Recover Access",
+  "recoveryMethodQuestion": "Answer security question",
+  "recoveryMethodCode": "Enter recovery code",
+  "recoveryCodeFieldLabel": "Recovery Code",
+  "recoveryIncorrectAnswer": "That answer doesn't match",
+  "recoveryIncorrectCode": "That code doesn't match",
+  "recoveryNewPasswordTitle": "Set New Password",
+  "recoveryNotAvailableTitle": "Recovery Not Available",
+  "recoveryNotAvailableMessage": "No security question or recovery code was set up for this installation. Contact technical support for help resetting your password.",
+  "verifyAction": "Verify",
+  "securityQuestionShopName": "What was the name of your first shop or business?",
+  "securityQuestionMotherName": "What is your mother's first name?",
+  "securityQuestionBirthCity": "What city were you born in?",
+  "securityQuestionFirstPet": "What was the name of your first pet?",
+  "securityQuestionFavoriteProduct": "What is your favorite product to sell?",
+  "copyCodeAction": "Copy Code",
+  "codeCopiedMessage": "Code copied to clipboard"
 }

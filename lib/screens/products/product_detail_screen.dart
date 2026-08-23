@@ -10,6 +10,7 @@ import '../../widgets/panel.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/crop_image_dialog.dart';
+import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
 import '../../utils/product_images.dart';
 import 'product_form_dialog.dart';
@@ -314,10 +315,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       title: l10n.batchesLabel,
                       description: l10n.batchesPanelDesc,
                       child: _batches.isEmpty
-                          ? Padding(
-                              padding: const EdgeInsets.all(32),
-                              child: Text(l10n.noBatchesYet),
-                            )
+                          ? EmptyState(icon: Icons.inventory_2_outlined, title: l10n.noBatchesYet)
                           : LayoutBuilder(
                               builder: (context, constraints) {
                                 return SingleChildScrollView(
@@ -738,7 +736,7 @@ class _MovementsDialog extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             final movements = snapshot.data!;
             if (movements.isEmpty)
-              return Center(child: Text(l10n.noMovementsRecorded));
+              return Center(child: EmptyState(icon: Icons.history, title: l10n.noMovementsRecorded));
             return ListView.separated(
               itemCount: movements.length,
               separatorBuilder: (_, __) => const Divider(height: 1),

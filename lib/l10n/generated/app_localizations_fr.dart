@@ -1346,4 +1346,128 @@ class AppLocalizationsFr extends AppLocalizations {
   String activityLogSaleCreatedFor(String amount, String entityName) {
     return 'Vente de $amount enregistrée pour $entityName';
   }
+
+  @override
+  String get priceModePerUnit => 'Par unité';
+
+  @override
+  String get priceModeTotal => 'Prix total';
+
+  @override
+  String get totalPricePaidLabel => 'Prix total payé';
+
+  @override
+  String perUnitPreview(String price, String unit) {
+    return '≈ $price par $unit';
+  }
+
+  @override
+  String get statCustomersOwe => 'Les clients vous doivent';
+
+  @override
+  String get statOwedToSuppliers => 'Vous devez aux fournisseurs';
+
+  @override
+  String get recentActivityPanel => 'Activité récente';
+
+  @override
+  String get viewAllAction => 'Voir tout';
+
+  @override
+  String get noRecentActivity => 'Aucune activité pour l\'instant.';
+
+  @override
+  String get navSectionOverview => 'APERÇU';
+
+  @override
+  String get navSectionInventory => 'INVENTAIRE';
+
+  @override
+  String get navSectionSales => 'VENTES';
+
+  @override
+  String get navSectionAdmin => 'ADMIN';
+
+  @override
+  String get securityQuestionLabel => 'Question de sécurité';
+
+  @override
+  String get securityAnswerLabel => 'Réponse de sécurité';
+
+  @override
+  String get securityQuestionRequired => 'Entrez une question de sécurité';
+
+  @override
+  String get securityAnswerRequired => 'Entrez une réponse';
+
+  @override
+  String get forgotPasswordAction => 'Mot de passe oublié ?';
+
+  @override
+  String get recoveryCodeDialogTitle => 'Votre code de récupération';
+
+  @override
+  String get recoveryCodeSaveWarning =>
+      'Enregistrez ce code en lieu sûr — vous en aurez besoin si vous oubliez à nouveau votre mot de passe :';
+
+  @override
+  String get recoveryCodeAckCheckbox => 'J\'ai enregistré ce code';
+
+  @override
+  String get continueAction => 'Continuer';
+
+  @override
+  String get recoveryChooseMethodTitle => 'Récupérer l\'accès';
+
+  @override
+  String get recoveryMethodQuestion => 'Répondre à la question de sécurité';
+
+  @override
+  String get recoveryMethodCode => 'Entrer le code de récupération';
+
+  @override
+  String get recoveryCodeFieldLabel => 'Code de récupération';
+
+  @override
+  String get recoveryIncorrectAnswer => 'Cette réponse ne correspond pas';
+
+  @override
+  String get recoveryIncorrectCode => 'Ce code ne correspond pas';
+
+  @override
+  String get recoveryNewPasswordTitle => 'Définir un nouveau mot de passe';
+
+  @override
+  String get recoveryNotAvailableTitle => 'Récupération non disponible';
+
+  @override
+  String get recoveryNotAvailableMessage =>
+      'Aucune question de sécurité ni code de récupération n\'a été configuré pour cette installation. Contactez le support technique pour réinitialiser votre mot de passe.';
+
+  @override
+  String get verifyAction => 'Vérifier';
+
+  @override
+  String get securityQuestionShopName =>
+      'Quel était le nom de votre premier magasin ou commerce ?';
+
+  @override
+  String get securityQuestionMotherName => 'Quel est le prénom de votre mère ?';
+
+  @override
+  String get securityQuestionBirthCity => 'Dans quelle ville êtes-vous né(e) ?';
+
+  @override
+  String get securityQuestionFirstPet =>
+      'Quel était le nom de votre premier animal de compagnie ?';
+
+  @override
+  String get securityQuestionFavoriteProduct =>
+      'Quel est votre produit préféré à vendre ?';
+
+  @override
+  String get copyCodeAction => 'Copier le code';
+
+  @override
+  String get codeCopiedMessage => 'Code copié dans le presse-papiers';
 }

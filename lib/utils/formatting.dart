@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 String formatQuantity(double value, String unitType) {
   final unitLabel = switch (unitType) {
     'kg' => 'kg',
@@ -15,7 +17,17 @@ String formatQuantity(double value, String unitType) {
   return unitLabel.isEmpty ? formatted : '$formatted $unitLabel';
 }
 
-String formatMoney(double value) => '${value.toStringAsFixed(2)} DA';
+final _moneyFormat = NumberFormat('#,##0.00');
+
+String formatMoney(double value) => '${_moneyFormat.format(value)} DA';
+
+/// Splits a balance into display text and whether it's a credit (shop owes
+/// them) rather than money owed to the shop. Negative balances are shown as
+/// "Credit: {amount}" instead of a confusing minus sign.
+(String text, bool isCredit) formatBalance(double balance) {
+  if (balance < 0) return ('Credit: ${formatMoney(balance.abs())}', true);
+  return (formatMoney(balance), false);
+}
 
 /// Plain numeric text for editable fields — no unit suffix, no trailing ".0".
 String plainNumber(double value) =>

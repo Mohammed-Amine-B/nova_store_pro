@@ -21,17 +21,20 @@ class ActivityLogRepository {
         ));
   }
 
-  /// Newest first, optionally filtered by category and/or a date range.
+  /// Newest first, optionally filtered by category and/or a date range, and
+  /// optionally capped to the `limit` most recent matching entries.
   Future<List<ActivityLogData>> getEntries({
     String? category,
     DateTime? start,
     DateTime? end,
+    int? limit,
   }) async {
     final query = db.select(db.activityLog)
       ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]);
     if (category != null) query.where((t) => t.category.equals(category));
     if (start != null) query.where((t) => t.createdAt.isBiggerOrEqualValue(start));
     if (end != null) query.where((t) => t.createdAt.isSmallerThanValue(end));
+    if (limit != null) query.limit(limit);
     return query.get();
   }
 }

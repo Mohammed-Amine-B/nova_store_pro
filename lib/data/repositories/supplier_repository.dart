@@ -96,6 +96,17 @@ class SupplierRepository {
     return roundMoney(owed - paid);
   }
 
+  /// Sum of every positive active-supplier owed amount — how much the shop owes suppliers overall.
+  Future<double> getTotalOutstandingOwed() async {
+    final suppliers = await getAllActive();
+    var total = 0.0;
+    for (final s in suppliers) {
+      final owed = await getRemainingOwed(s.id);
+      if (owed > 0) total += owed;
+    }
+    return roundMoney(total);
+  }
+
   Future<void> recordPayment({
     required int supplierId,
     required double amount,

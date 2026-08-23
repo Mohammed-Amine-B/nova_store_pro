@@ -1332,4 +1332,125 @@ class AppLocalizationsAr extends AppLocalizations {
   String activityLogSaleCreatedFor(String amount, String entityName) {
     return 'تم تسجيل عملية بيع بقيمة $amount لـ $entityName';
   }
+
+  @override
+  String get priceModePerUnit => 'بالوحدة';
+
+  @override
+  String get priceModeTotal => 'السعر الإجمالي';
+
+  @override
+  String get totalPricePaidLabel => 'السعر الإجمالي المدفوع';
+
+  @override
+  String perUnitPreview(String price, String unit) {
+    return '≈ $price لكل $unit';
+  }
+
+  @override
+  String get statCustomersOwe => 'الزبائن مدينون لك';
+
+  @override
+  String get statOwedToSuppliers => 'أنت مدين للموردين';
+
+  @override
+  String get recentActivityPanel => 'النشاط الأخير';
+
+  @override
+  String get viewAllAction => 'عرض الكل';
+
+  @override
+  String get noRecentActivity => 'لا يوجد نشاط بعد.';
+
+  @override
+  String get navSectionOverview => 'نظرة عامة';
+
+  @override
+  String get navSectionInventory => 'المخزون';
+
+  @override
+  String get navSectionSales => 'المبيعات';
+
+  @override
+  String get navSectionAdmin => 'الإدارة';
+
+  @override
+  String get securityQuestionLabel => 'سؤال الأمان';
+
+  @override
+  String get securityAnswerLabel => 'إجابة الأمان';
+
+  @override
+  String get securityQuestionRequired => 'أدخل سؤال أمان';
+
+  @override
+  String get securityAnswerRequired => 'أدخل إجابة';
+
+  @override
+  String get forgotPasswordAction => 'نسيت كلمة المرور؟';
+
+  @override
+  String get recoveryCodeDialogTitle => 'رمز الاسترجاع الخاص بك';
+
+  @override
+  String get recoveryCodeSaveWarning =>
+      'احفظ هذا الرمز في مكان آمن — ستحتاجه إذا نسيت كلمة المرور مرة أخرى:';
+
+  @override
+  String get recoveryCodeAckCheckbox => 'لقد حفظت هذا الرمز';
+
+  @override
+  String get continueAction => 'متابعة';
+
+  @override
+  String get recoveryChooseMethodTitle => 'استرجاع الوصول';
+
+  @override
+  String get recoveryMethodQuestion => 'الإجابة عن سؤال الأمان';
+
+  @override
+  String get recoveryMethodCode => 'إدخال رمز الاسترجاع';
+
+  @override
+  String get recoveryCodeFieldLabel => 'رمز الاسترجاع';
+
+  @override
+  String get recoveryIncorrectAnswer => 'هذه الإجابة غير مطابقة';
+
+  @override
+  String get recoveryIncorrectCode => 'هذا الرمز غير مطابق';
+
+  @override
+  String get recoveryNewPasswordTitle => 'تعيين كلمة مرور جديدة';
+
+  @override
+  String get recoveryNotAvailableTitle => 'الاسترجاع غير متاح';
+
+  @override
+  String get recoveryNotAvailableMessage =>
+      'لم يتم إعداد سؤال أمان أو رمز استرجاع لهذا التثبيت. تواصل مع الدعم الفني للمساعدة في إعادة تعيين كلمة المرور.';
+
+  @override
+  String get verifyAction => 'تحقق';
+
+  @override
+  String get securityQuestionShopName => 'ما اسم أول محل أو مشروع تجاري لك؟';
+
+  @override
+  String get securityQuestionMotherName => 'ما هو الاسم الأول لوالدتك؟';
+
+  @override
+  String get securityQuestionBirthCity => 'في أي مدينة وُلدت؟';
+
+  @override
+  String get securityQuestionFirstPet => 'ما اسم أول حيوان أليف لك؟';
+
+  @override
+  String get securityQuestionFavoriteProduct => 'ما هو منتجك المفضل للبيع؟';
+
+  @override
+  String get copyCodeAction => 'نسخ الرمز';
+
+  @override
+  String get codeCopiedMessage => 'تم نسخ الرمز إلى الحافظة';
 }

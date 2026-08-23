@@ -78,47 +78,87 @@ class AppSidebar extends StatelessWidget {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              children: navItemsFor(context).map((item) {
-                final selected = item.index == selectedIndex;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Material(
-                    color: selected ? theme.colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: () => onSelect(item.index),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        child: Row(
-                          children: [
-                            Icon(
-                              item.icon,
-                              size: 20,
-                              color: selected
-                                  ? theme.colorScheme.primary
-                                  : theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              item.label,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: selected
-                                    ? theme.colorScheme.primary
-                                    : theme.colorScheme.onSurface.withValues(alpha: 0.85),
-                                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
+              children: _buildGroupedItems(context),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Groups the flat nav item list into labeled sections purely for display —
+  /// the underlying index/onSelect navigation is completely unaffected.
+  List<Widget> _buildGroupedItems(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final items = {for (final item in navItemsFor(context)) item.index: item};
+
+    final sections = <(String, List<int>)>[
+      (l10n.navSectionOverview, const [0]),
+      (l10n.navSectionInventory, const [1, 2, 4]),
+      (l10n.navSectionSales, const [3, 5, 6, 7]),
+      (l10n.navSectionAdmin, const [8, 9, 10]),
+    ];
+
+    final theme = Theme.of(context);
+    final widgets = <Widget>[];
+    for (var i = 0; i < sections.length; i++) {
+      final (label, indices) = sections[i];
+      final sectionItems = indices.map((idx) => items[idx]).whereType<NavItem>().toList();
+      if (sectionItems.isEmpty) continue;
+      if (i > 0) widgets.add(const SizedBox(height: 16));
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+          child: Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+              letterSpacing: 0.6,
+            ),
+          ),
+        ),
+      );
+      widgets.addAll(sectionItems.map((item) => _navTile(context, item)));
+    }
+    return widgets;
+  }
+
+  Widget _navTile(BuildContext context, NavItem item) {
+    final theme = Theme.of(context);
+    final selected = item.index == selectedIndex;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Material(
+        color: selected ? theme.colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () => onSelect(item.index),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                Icon(
+                  item.icon,
+                  size: 20,
+                  color: selected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  item.label,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: selected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurface.withValues(alpha: 0.85),
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

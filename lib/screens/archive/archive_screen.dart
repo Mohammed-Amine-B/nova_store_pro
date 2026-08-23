@@ -5,6 +5,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/status_badge.dart';
+import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
 import 'sales_day_detail_screen.dart';
 import '../reports/invoice_view_screen.dart';
@@ -89,10 +90,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                   title: l10n.salesHistoryPanel,
                   description: l10n.daysRecorded(days.length),
                   child: days.isEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Text(l10n.noArchivedDaysYet),
-                        )
+                      ? EmptyState(icon: Icons.archive_outlined, title: l10n.noArchivedDaysYet)
                       : LayoutBuilder(
                           builder: (context, constraints) {
                             return SingleChildScrollView(
@@ -144,10 +142,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                   title: l10n.customerSalesLabel,
                   description: l10n.invoiceCountDesc(invoices.length),
                   child: invoices.isEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Text(l10n.noCustomerSalesYet),
-                        )
+                      ? EmptyState(icon: Icons.receipt_long_outlined, title: l10n.noCustomerSalesYet)
                       : LayoutBuilder(
                           builder: (context, constraints) {
                             return SingleChildScrollView(

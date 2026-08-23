@@ -1332,4 +1332,127 @@ class AppLocalizationsEn extends AppLocalizations {
   String activityLogSaleCreatedFor(String amount, String entityName) {
     return 'Sale of $amount recorded for $entityName';
   }
+
+  @override
+  String get priceModePerUnit => 'Per Unit';
+
+  @override
+  String get priceModeTotal => 'Total Price';
+
+  @override
+  String get totalPricePaidLabel => 'Total Price Paid';
+
+  @override
+  String perUnitPreview(String price, String unit) {
+    return '≈ $price per $unit';
+  }
+
+  @override
+  String get statCustomersOwe => 'Customers Owe You';
+
+  @override
+  String get statOwedToSuppliers => 'You Owe Suppliers';
+
+  @override
+  String get recentActivityPanel => 'Recent Activity';
+
+  @override
+  String get viewAllAction => 'View All';
+
+  @override
+  String get noRecentActivity => 'No activity yet.';
+
+  @override
+  String get navSectionOverview => 'OVERVIEW';
+
+  @override
+  String get navSectionInventory => 'INVENTORY';
+
+  @override
+  String get navSectionSales => 'SALES';
+
+  @override
+  String get navSectionAdmin => 'ADMIN';
+
+  @override
+  String get securityQuestionLabel => 'Security Question';
+
+  @override
+  String get securityAnswerLabel => 'Security Answer';
+
+  @override
+  String get securityQuestionRequired => 'Enter a security question';
+
+  @override
+  String get securityAnswerRequired => 'Enter an answer';
+
+  @override
+  String get forgotPasswordAction => 'Forgot password?';
+
+  @override
+  String get recoveryCodeDialogTitle => 'Your Recovery Code';
+
+  @override
+  String get recoveryCodeSaveWarning =>
+      'Save this code somewhere safe — you\'ll need it if you forget your password again:';
+
+  @override
+  String get recoveryCodeAckCheckbox => 'I\'ve saved this code';
+
+  @override
+  String get continueAction => 'Continue';
+
+  @override
+  String get recoveryChooseMethodTitle => 'Recover Access';
+
+  @override
+  String get recoveryMethodQuestion => 'Answer security question';
+
+  @override
+  String get recoveryMethodCode => 'Enter recovery code';
+
+  @override
+  String get recoveryCodeFieldLabel => 'Recovery Code';
+
+  @override
+  String get recoveryIncorrectAnswer => 'That answer doesn\'t match';
+
+  @override
+  String get recoveryIncorrectCode => 'That code doesn\'t match';
+
+  @override
+  String get recoveryNewPasswordTitle => 'Set New Password';
+
+  @override
+  String get recoveryNotAvailableTitle => 'Recovery Not Available';
+
+  @override
+  String get recoveryNotAvailableMessage =>
+      'No security question or recovery code was set up for this installation. Contact technical support for help resetting your password.';
+
+  @override
+  String get verifyAction => 'Verify';
+
+  @override
+  String get securityQuestionShopName =>
+      'What was the name of your first shop or business?';
+
+  @override
+  String get securityQuestionMotherName => 'What is your mother\'s first name?';
+
+  @override
+  String get securityQuestionBirthCity => 'What city were you born in?';
+
+  @override
+  String get securityQuestionFirstPet => 'What was the name of your first pet?';
+
+  @override
+  String get securityQuestionFavoriteProduct =>
+      'What is your favorite product to sell?';
+
+  @override
+  String get copyCodeAction => 'Copy Code';
+
+  @override
+  String get codeCopiedMessage => 'Code copied to clipboard';
 }

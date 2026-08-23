@@ -1,5 +1,53 @@
+import 'package:flutter/material.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'formatting.dart';
+
+/// Icon per activity category, shared by the Activity Log screen and the
+/// Dashboard's recent-activity panel.
+const activityCategoryIcons = {
+  'sale': Icons.point_of_sale_outlined,
+  'purchase': Icons.local_shipping_outlined,
+  'return': Icons.assignment_return_outlined,
+  'product': Icons.inventory_2_outlined,
+  'category': Icons.category_outlined,
+  'customer': Icons.people_outline,
+  'supplier': Icons.local_shipping_outlined,
+  'payment': Icons.payments_outlined,
+};
+
+/// Icon tint per activity action, shared the same way.
+const activityActionColors = {
+  'created': Color(0xFF16A34A),
+  'updated': Color(0xFFF2A93B),
+  'deleted': Color(0xFFE4572E),
+  'archived': Color(0xFFE4572E),
+  'restored': Color(0xFF0E7C7B),
+};
+
+/// Translated label for an activity category key (or 'all').
+String activityCategoryLabel(AppLocalizations l10n, String key) => switch (key) {
+      'all' => l10n.catAll,
+      'sale' => l10n.catSale,
+      'purchase' => l10n.catPurchase,
+      'return' => l10n.catReturn,
+      'product' => l10n.catProduct,
+      'category' => l10n.catCategory,
+      'customer' => l10n.catCustomer,
+      'supplier' => l10n.catSupplier,
+      'payment' => l10n.catPayment,
+      _ => key,
+    };
+
+/// Short relative/absolute timestamp for an activity entry.
+String formatActivityTimestamp(AppLocalizations l10n, DateTime dt) {
+  final now = DateTime.now();
+  final diff = now.difference(dt);
+  if (diff.inMinutes < 1) return l10n.justNow;
+  if (diff.inMinutes < 60) return l10n.minutesAgo(diff.inMinutes);
+  if (diff.inHours < 24 && dt.day == now.day) return l10n.hoursAgo(diff.inHours);
+  return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
+      '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+}
 
 /// Builds the translated, human-readable sentence for one activity log entry
 /// from its structured fields, using the ARB template that matches its

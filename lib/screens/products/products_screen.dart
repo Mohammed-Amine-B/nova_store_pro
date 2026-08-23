@@ -10,6 +10,7 @@ import '../../widgets/panel.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/confirm_dialog.dart';
+import '../../widgets/empty_state.dart';
 import 'product_form_dialog.dart';
 import 'product_detail_screen.dart';
 import '../../widgets/category_chip.dart';
@@ -275,10 +276,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
               ],
             ),
             child: rows.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Text(l10n.noProductsMatch),
-                  )
+                ? EmptyState(icon: Icons.inventory_2_outlined, title: l10n.noProductsMatch)
                 : LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(

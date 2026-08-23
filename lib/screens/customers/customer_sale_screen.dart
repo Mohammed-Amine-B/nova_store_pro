@@ -6,6 +6,7 @@ import '../../data/repositories/report_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/return_dialog.dart';
+import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
 
 class _CartLine {
@@ -239,7 +240,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
       return;
     }
     final amount = _amountPaidController.text.isEmpty ? 0.0 : double.tryParse(_amountPaidController.text);
-    if (amount == null || amount < 0 || amount > _total) {
+    if (amount == null || amount < 0) {
       setState(() => _error = l10n.amountPaidRangeError);
       return;
     }
@@ -248,15 +249,33 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
       _error = null;
     });
     try {
-      await _salesRepo.createSale(
+      final total = _total;
+      final transactionPaid = amount > total ? total : amount;
+      final overpay = amount > total ? amount - total : 0.0;
+      final saleId = await _salesRepo.createSale(
         date: DateTime.now(),
         lines: _lines.map((l) => SaleLineInput(productId: l.product.id, quantity: l.quantity, unitPrice: l.unitPrice)).toList(),
         customerId: widget.customerId,
-        paymentMethod: amount >= _total ? 'cash' : (amount <= 0 ? 'credit' : 'split'),
-        amountPaid: amount,
+        paymentMethod: transactionPaid >= total ? 'cash' : (transactionPaid <= 0 ? 'credit' : 'split'),
+        amountPaid: transactionPaid,
         source: 'customer_sale',
       );
+      if (overpay > 0) {
+        await _customerRepo.recordPayment(
+          customerId: widget.customerId!,
+          amount: overpay,
+          paymentDate: DateTime.now(),
+          note: 'Extra payment from sale #$saleId applied to balance',
+        );
+      }
       if (!mounted) return;
+      if (overpay > 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sale recorded. ${formatMoney(overpay)} extra applied to reduce balance.')),
+        );
+        await Future.delayed(const Duration(milliseconds: 900));
+        if (!mounted) return;
+      }
       Navigator.of(context).pop(true);
     } catch (e) {
       setState(() {
@@ -372,17 +391,10 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
           title: l10n.cartPanel,
           description: l10n.cartLineCountDesc(_lines.length),
           child: _lines.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.all(40),
-                  child: Column(
-                    children: [
-                      Icon(Icons.receipt_long_outlined, size: 40, color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
-                      const SizedBox(height: 12),
-                      Text(l10n.noLinesAddedYet, style: const TextStyle(fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 4),
-                      Text(l10n.tapProductAboveToStartSale, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
-                    ],
-                  ),
+              ? EmptyState(
+                  icon: Icons.receipt_long_outlined,
+                  title: l10n.noLinesAddedYet,
+                  subtitle: l10n.tapProductAboveToStartSale,
                 )
               : LayoutBuilder(
                   builder: (context, constraints) {
@@ -446,7 +458,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                 _SummaryRow(l10n.subtotalRow, formatMoney(_total)),
                 if (!widget.isEditMode) ...[
                   const SizedBox(height: 10),
-                  _SummaryRow(l10n.previousBalanceRow, formatMoney(_previousBalance)),
+                  _SummaryRow(l10n.previousBalanceRow, formatBalance(_previousBalance).$1),
                 ],
                 const SizedBox(height: 14),
                 Divider(color: theme.dividerColor),
@@ -577,7 +589,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                       const SizedBox(width: 8),
                       Text(customer.name, style: const TextStyle(fontWeight: FontWeight.w600)),
                       if (!widget.isEditMode) ...[
-                        Text(l10n.balanceSuffix(formatMoney(_previousBalance)), style: theme.textTheme.bodySmall),
+                        Text(l10n.balanceSuffix(formatBalance(_previousBalance).$1), style: theme.textTheme.bodySmall),
                       ],
                     ],
                   ),

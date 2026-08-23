@@ -8,6 +8,7 @@ import '../../data/database/database.dart';
 import '../../data/repositories/report_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/date_range_dialog.dart';
+import '../../widgets/empty_state.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/stat_card.dart';
@@ -197,7 +198,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               child: SizedBox(
                 height: 220,
                 child: _series.isEmpty
-                    ? Center(child: Text(l10n.noSalesInRange))
+                    ? Center(child: EmptyState(icon: Icons.bar_chart_outlined, title: l10n.noSalesInRange))
                     : BarChart(
                         BarChartData(
                           maxY: maxY,
@@ -236,7 +237,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           Panel(
             title: l10n.bestSellingProductsPanel,
             child: _bestSellers.isEmpty
-                ? Padding(padding: const EdgeInsets.all(32), child: Text(l10n.noSalesInRange))
+                ? EmptyState(icon: Icons.bar_chart_outlined, title: l10n.noSalesInRange)
                 : LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(

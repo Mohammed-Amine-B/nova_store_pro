@@ -5,6 +5,7 @@ import '../../data/repositories/purchase_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/confirm_dialog.dart';
+import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
 import 'supplier_form_dialog.dart';
 import 'new_purchase_screen.dart';
@@ -296,8 +297,10 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                                 Expanded(
                                   child: _HighlightBox(
                                     l10n.remainingOwedLabel,
-                                    formatMoney(_owed),
-                                    color: _owed > 0 ? const Color(0xFFE4572E) : const Color(0xFF16A34A),
+                                    formatBalance(_owed).$1,
+                                    color: formatBalance(_owed).$2 || _owed == 0
+                                        ? const Color(0xFF16A34A)
+                                        : const Color(0xFFE4572E),
                                   ),
                                 ),
                               ],
@@ -311,10 +314,7 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                       title: l10n.purchaseHistoryPanel,
                       description: l10n.mostRecentFirst,
                       child: _purchases.isEmpty
-                          ? Padding(
-                              padding: const EdgeInsets.all(32),
-                              child: Text(l10n.noPurchasesYet),
-                            )
+                          ? EmptyState(icon: Icons.shopping_cart_outlined, title: l10n.noPurchasesYet)
                           : LayoutBuilder(
                               builder: (context, constraints) {
                                 return SingleChildScrollView(
@@ -398,10 +398,7 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                       title: l10n.paymentsHistoryPanel,
                       description: l10n.paymentCountDesc(_payments.length),
                       child: _payments.isEmpty
-                          ? Padding(
-                              padding: const EdgeInsets.all(32),
-                              child: Text(l10n.noPaymentsYet),
-                            )
+                          ? EmptyState(icon: Icons.payments_outlined, title: l10n.noPaymentsYet)
                           : LayoutBuilder(
                               builder: (context, constraints) {
                                 return SingleChildScrollView(

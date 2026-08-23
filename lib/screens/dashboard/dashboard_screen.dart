@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import '../../data/database/database.dart';
 import '../../data/repositories/dashboard_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../utils/activity_log_formatting.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/panel.dart';
+import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
+import '../activity_log/activity_log_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final AppDatabase db;
@@ -86,12 +89,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 child: Column(
                   children: data.lowStockProducts.isEmpty
-                      ? [
-                          Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Text(l10n.noLowStockProducts),
-                          ),
-                        ]
+                      ? [EmptyState(icon: Icons.check_circle_outline, title: l10n.noLowStockProducts)]
                       : data.lowStockProducts
                             .map(
                               (p) => ListTile(
@@ -103,6 +101,72 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             )
                             .toList(),
                 ),
+              ),
+              const SizedBox(height: 24),
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 3.2,
+                children: [
+                  StatCard(
+                    label: l10n.statCustomersOwe,
+                    value: formatMoney(data.customersOwed),
+                    icon: Icons.people_outline,
+                    accentColor: const Color(0xFFE4572E),
+                  ),
+                  StatCard(
+                    label: l10n.statOwedToSuppliers,
+                    value: formatMoney(data.owedToSuppliers),
+                    icon: Icons.local_shipping_outlined,
+                    accentColor: const Color(0xFF0E7C7B),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Panel(
+                title: l10n.recentActivityPanel,
+                actions: TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => ActivityLogScreen(db: widget.db)),
+                  ),
+                  child: Text(l10n.viewAllAction),
+                ),
+                child: data.recentActivity.isEmpty
+                    ? EmptyState(icon: Icons.history_toggle_off, title: l10n.noRecentActivity)
+                    : Column(
+                        children: data.recentActivity.map((entry) {
+                          final color = activityActionColors[entry.action] ?? Theme.of(context).colorScheme.primary;
+                          final icon = activityCategoryIcons[entry.category] ?? Icons.history_edu_outlined;
+                          return ListTile(
+                            leading: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: color.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(icon, size: 18, color: color),
+                            ),
+                            title: Text(formatActivityLogEntry(
+                              l10n,
+                              category: entry.category,
+                              action: entry.action,
+                              amount: entry.amount,
+                              entityName: entry.entityLabel,
+                              refId: entry.refId,
+                            )),
+                            trailing: Text(
+                              formatActivityTimestamp(l10n, entry.createdAt),
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                  ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
               ),
             ],
           ),

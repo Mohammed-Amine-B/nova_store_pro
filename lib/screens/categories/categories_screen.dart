@@ -5,6 +5,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
+import '../../widgets/empty_state.dart';
 
 class CategoriesScreen extends StatefulWidget {
   final AppDatabase db;
@@ -157,10 +158,7 @@ Future<void> _showAddDialog({Category? editing}) async {
               child: Panel(
                 title: l10n.allCategoriesPanel,
                 child: items.isEmpty
-                    ? Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Text(l10n.noCategoriesYet),
-                      )
+                    ? EmptyState(icon: Icons.category_outlined, title: l10n.noCategoriesYet)
                     : ListView.separated(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),

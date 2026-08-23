@@ -8,6 +8,9 @@ class Settings extends Table {
   TextColumn get language => text().withDefault(const Constant('ar'))();
   TextColumn get themeMode => text().withDefault(const Constant('system'))();
   TextColumn get appPasswordHash => text().nullable()(); // null = no password set
+  TextColumn get securityQuestion => text().nullable()();
+  TextColumn get securityAnswerHash => text().nullable()(); // hashed the same way as appPasswordHash
+  TextColumn get recoveryCodeHash => text().nullable()(); // hashed the same way as appPasswordHash
 
   @override
   Set<Column> get primaryKey => {id};

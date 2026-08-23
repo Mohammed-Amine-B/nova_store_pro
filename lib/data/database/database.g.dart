@@ -3658,6 +3658,39 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _securityQuestionMeta = const VerificationMeta(
+    'securityQuestion',
+  );
+  @override
+  late final GeneratedColumn<String> securityQuestion = GeneratedColumn<String>(
+    'security_question',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _securityAnswerHashMeta =
+      const VerificationMeta('securityAnswerHash');
+  @override
+  late final GeneratedColumn<String> securityAnswerHash =
+      GeneratedColumn<String>(
+        'security_answer_hash',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _recoveryCodeHashMeta = const VerificationMeta(
+    'recoveryCodeHash',
+  );
+  @override
+  late final GeneratedColumn<String> recoveryCodeHash = GeneratedColumn<String>(
+    'recovery_code_hash',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3665,6 +3698,9 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     language,
     themeMode,
     appPasswordHash,
+    securityQuestion,
+    securityAnswerHash,
+    recoveryCodeHash,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3708,6 +3744,33 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         ),
       );
     }
+    if (data.containsKey('security_question')) {
+      context.handle(
+        _securityQuestionMeta,
+        securityQuestion.isAcceptableOrUnknown(
+          data['security_question']!,
+          _securityQuestionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('security_answer_hash')) {
+      context.handle(
+        _securityAnswerHashMeta,
+        securityAnswerHash.isAcceptableOrUnknown(
+          data['security_answer_hash']!,
+          _securityAnswerHashMeta,
+        ),
+      );
+    }
+    if (data.containsKey('recovery_code_hash')) {
+      context.handle(
+        _recoveryCodeHashMeta,
+        recoveryCodeHash.isAcceptableOrUnknown(
+          data['recovery_code_hash']!,
+          _recoveryCodeHashMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3737,6 +3800,18 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         DriftSqlType.string,
         data['${effectivePrefix}app_password_hash'],
       ),
+      securityQuestion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}security_question'],
+      ),
+      securityAnswerHash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}security_answer_hash'],
+      ),
+      recoveryCodeHash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}recovery_code_hash'],
+      ),
     );
   }
 
@@ -3752,12 +3827,18 @@ class Setting extends DataClass implements Insertable<Setting> {
   final String language;
   final String themeMode;
   final String? appPasswordHash;
+  final String? securityQuestion;
+  final String? securityAnswerHash;
+  final String? recoveryCodeHash;
   const Setting({
     required this.id,
     required this.shopName,
     required this.language,
     required this.themeMode,
     this.appPasswordHash,
+    this.securityQuestion,
+    this.securityAnswerHash,
+    this.recoveryCodeHash,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3768,6 +3849,15 @@ class Setting extends DataClass implements Insertable<Setting> {
     map['theme_mode'] = Variable<String>(themeMode);
     if (!nullToAbsent || appPasswordHash != null) {
       map['app_password_hash'] = Variable<String>(appPasswordHash);
+    }
+    if (!nullToAbsent || securityQuestion != null) {
+      map['security_question'] = Variable<String>(securityQuestion);
+    }
+    if (!nullToAbsent || securityAnswerHash != null) {
+      map['security_answer_hash'] = Variable<String>(securityAnswerHash);
+    }
+    if (!nullToAbsent || recoveryCodeHash != null) {
+      map['recovery_code_hash'] = Variable<String>(recoveryCodeHash);
     }
     return map;
   }
@@ -3781,6 +3871,15 @@ class Setting extends DataClass implements Insertable<Setting> {
       appPasswordHash: appPasswordHash == null && nullToAbsent
           ? const Value.absent()
           : Value(appPasswordHash),
+      securityQuestion: securityQuestion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(securityQuestion),
+      securityAnswerHash: securityAnswerHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(securityAnswerHash),
+      recoveryCodeHash: recoveryCodeHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(recoveryCodeHash),
     );
   }
 
@@ -3795,6 +3894,11 @@ class Setting extends DataClass implements Insertable<Setting> {
       language: serializer.fromJson<String>(json['language']),
       themeMode: serializer.fromJson<String>(json['themeMode']),
       appPasswordHash: serializer.fromJson<String?>(json['appPasswordHash']),
+      securityQuestion: serializer.fromJson<String?>(json['securityQuestion']),
+      securityAnswerHash: serializer.fromJson<String?>(
+        json['securityAnswerHash'],
+      ),
+      recoveryCodeHash: serializer.fromJson<String?>(json['recoveryCodeHash']),
     );
   }
   @override
@@ -3806,6 +3910,9 @@ class Setting extends DataClass implements Insertable<Setting> {
       'language': serializer.toJson<String>(language),
       'themeMode': serializer.toJson<String>(themeMode),
       'appPasswordHash': serializer.toJson<String?>(appPasswordHash),
+      'securityQuestion': serializer.toJson<String?>(securityQuestion),
+      'securityAnswerHash': serializer.toJson<String?>(securityAnswerHash),
+      'recoveryCodeHash': serializer.toJson<String?>(recoveryCodeHash),
     };
   }
 
@@ -3815,6 +3922,9 @@ class Setting extends DataClass implements Insertable<Setting> {
     String? language,
     String? themeMode,
     Value<String?> appPasswordHash = const Value.absent(),
+    Value<String?> securityQuestion = const Value.absent(),
+    Value<String?> securityAnswerHash = const Value.absent(),
+    Value<String?> recoveryCodeHash = const Value.absent(),
   }) => Setting(
     id: id ?? this.id,
     shopName: shopName ?? this.shopName,
@@ -3823,6 +3933,15 @@ class Setting extends DataClass implements Insertable<Setting> {
     appPasswordHash: appPasswordHash.present
         ? appPasswordHash.value
         : this.appPasswordHash,
+    securityQuestion: securityQuestion.present
+        ? securityQuestion.value
+        : this.securityQuestion,
+    securityAnswerHash: securityAnswerHash.present
+        ? securityAnswerHash.value
+        : this.securityAnswerHash,
+    recoveryCodeHash: recoveryCodeHash.present
+        ? recoveryCodeHash.value
+        : this.recoveryCodeHash,
   );
   Setting copyWithCompanion(SettingsCompanion data) {
     return Setting(
@@ -3833,6 +3952,15 @@ class Setting extends DataClass implements Insertable<Setting> {
       appPasswordHash: data.appPasswordHash.present
           ? data.appPasswordHash.value
           : this.appPasswordHash,
+      securityQuestion: data.securityQuestion.present
+          ? data.securityQuestion.value
+          : this.securityQuestion,
+      securityAnswerHash: data.securityAnswerHash.present
+          ? data.securityAnswerHash.value
+          : this.securityAnswerHash,
+      recoveryCodeHash: data.recoveryCodeHash.present
+          ? data.recoveryCodeHash.value
+          : this.recoveryCodeHash,
     );
   }
 
@@ -3843,14 +3971,25 @@ class Setting extends DataClass implements Insertable<Setting> {
           ..write('shopName: $shopName, ')
           ..write('language: $language, ')
           ..write('themeMode: $themeMode, ')
-          ..write('appPasswordHash: $appPasswordHash')
+          ..write('appPasswordHash: $appPasswordHash, ')
+          ..write('securityQuestion: $securityQuestion, ')
+          ..write('securityAnswerHash: $securityAnswerHash, ')
+          ..write('recoveryCodeHash: $recoveryCodeHash')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, shopName, language, themeMode, appPasswordHash);
+  int get hashCode => Object.hash(
+    id,
+    shopName,
+    language,
+    themeMode,
+    appPasswordHash,
+    securityQuestion,
+    securityAnswerHash,
+    recoveryCodeHash,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3859,7 +3998,10 @@ class Setting extends DataClass implements Insertable<Setting> {
           other.shopName == this.shopName &&
           other.language == this.language &&
           other.themeMode == this.themeMode &&
-          other.appPasswordHash == this.appPasswordHash);
+          other.appPasswordHash == this.appPasswordHash &&
+          other.securityQuestion == this.securityQuestion &&
+          other.securityAnswerHash == this.securityAnswerHash &&
+          other.recoveryCodeHash == this.recoveryCodeHash);
 }
 
 class SettingsCompanion extends UpdateCompanion<Setting> {
@@ -3868,12 +4010,18 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   final Value<String> language;
   final Value<String> themeMode;
   final Value<String?> appPasswordHash;
+  final Value<String?> securityQuestion;
+  final Value<String?> securityAnswerHash;
+  final Value<String?> recoveryCodeHash;
   const SettingsCompanion({
     this.id = const Value.absent(),
     this.shopName = const Value.absent(),
     this.language = const Value.absent(),
     this.themeMode = const Value.absent(),
     this.appPasswordHash = const Value.absent(),
+    this.securityQuestion = const Value.absent(),
+    this.securityAnswerHash = const Value.absent(),
+    this.recoveryCodeHash = const Value.absent(),
   });
   SettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -3881,6 +4029,9 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     this.language = const Value.absent(),
     this.themeMode = const Value.absent(),
     this.appPasswordHash = const Value.absent(),
+    this.securityQuestion = const Value.absent(),
+    this.securityAnswerHash = const Value.absent(),
+    this.recoveryCodeHash = const Value.absent(),
   });
   static Insertable<Setting> custom({
     Expression<int>? id,
@@ -3888,6 +4039,9 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Expression<String>? language,
     Expression<String>? themeMode,
     Expression<String>? appPasswordHash,
+    Expression<String>? securityQuestion,
+    Expression<String>? securityAnswerHash,
+    Expression<String>? recoveryCodeHash,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3895,6 +4049,10 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
       if (language != null) 'language': language,
       if (themeMode != null) 'theme_mode': themeMode,
       if (appPasswordHash != null) 'app_password_hash': appPasswordHash,
+      if (securityQuestion != null) 'security_question': securityQuestion,
+      if (securityAnswerHash != null)
+        'security_answer_hash': securityAnswerHash,
+      if (recoveryCodeHash != null) 'recovery_code_hash': recoveryCodeHash,
     });
   }
 
@@ -3904,6 +4062,9 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Value<String>? language,
     Value<String>? themeMode,
     Value<String?>? appPasswordHash,
+    Value<String?>? securityQuestion,
+    Value<String?>? securityAnswerHash,
+    Value<String?>? recoveryCodeHash,
   }) {
     return SettingsCompanion(
       id: id ?? this.id,
@@ -3911,6 +4072,9 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
       language: language ?? this.language,
       themeMode: themeMode ?? this.themeMode,
       appPasswordHash: appPasswordHash ?? this.appPasswordHash,
+      securityQuestion: securityQuestion ?? this.securityQuestion,
+      securityAnswerHash: securityAnswerHash ?? this.securityAnswerHash,
+      recoveryCodeHash: recoveryCodeHash ?? this.recoveryCodeHash,
     );
   }
 
@@ -3932,6 +4096,15 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     if (appPasswordHash.present) {
       map['app_password_hash'] = Variable<String>(appPasswordHash.value);
     }
+    if (securityQuestion.present) {
+      map['security_question'] = Variable<String>(securityQuestion.value);
+    }
+    if (securityAnswerHash.present) {
+      map['security_answer_hash'] = Variable<String>(securityAnswerHash.value);
+    }
+    if (recoveryCodeHash.present) {
+      map['recovery_code_hash'] = Variable<String>(recoveryCodeHash.value);
+    }
     return map;
   }
 
@@ -3942,7 +4115,10 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
           ..write('shopName: $shopName, ')
           ..write('language: $language, ')
           ..write('themeMode: $themeMode, ')
-          ..write('appPasswordHash: $appPasswordHash')
+          ..write('appPasswordHash: $appPasswordHash, ')
+          ..write('securityQuestion: $securityQuestion, ')
+          ..write('securityAnswerHash: $securityAnswerHash, ')
+          ..write('recoveryCodeHash: $recoveryCodeHash')
           ..write(')'))
         .toString();
   }
@@ -11488,6 +11664,9 @@ typedef $$SettingsTableCreateCompanionBuilder =
       Value<String> language,
       Value<String> themeMode,
       Value<String?> appPasswordHash,
+      Value<String?> securityQuestion,
+      Value<String?> securityAnswerHash,
+      Value<String?> recoveryCodeHash,
     });
 typedef $$SettingsTableUpdateCompanionBuilder =
     SettingsCompanion Function({
@@ -11496,6 +11675,9 @@ typedef $$SettingsTableUpdateCompanionBuilder =
       Value<String> language,
       Value<String> themeMode,
       Value<String?> appPasswordHash,
+      Value<String?> securityQuestion,
+      Value<String?> securityAnswerHash,
+      Value<String?> recoveryCodeHash,
     });
 
 class $$SettingsTableFilterComposer
@@ -11529,6 +11711,21 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<String> get appPasswordHash => $composableBuilder(
     column: $table.appPasswordHash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get securityQuestion => $composableBuilder(
+    column: $table.securityQuestion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get securityAnswerHash => $composableBuilder(
+    column: $table.securityAnswerHash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get recoveryCodeHash => $composableBuilder(
+    column: $table.recoveryCodeHash,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -11566,6 +11763,21 @@ class $$SettingsTableOrderingComposer
     column: $table.appPasswordHash,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get securityQuestion => $composableBuilder(
+    column: $table.securityQuestion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get securityAnswerHash => $composableBuilder(
+    column: $table.securityAnswerHash,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get recoveryCodeHash => $composableBuilder(
+    column: $table.recoveryCodeHash,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableAnnotationComposer
@@ -11591,6 +11803,21 @@ class $$SettingsTableAnnotationComposer
 
   GeneratedColumn<String> get appPasswordHash => $composableBuilder(
     column: $table.appPasswordHash,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get securityQuestion => $composableBuilder(
+    column: $table.securityQuestion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get securityAnswerHash => $composableBuilder(
+    column: $table.securityAnswerHash,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get recoveryCodeHash => $composableBuilder(
+    column: $table.recoveryCodeHash,
     builder: (column) => column,
   );
 }
@@ -11628,12 +11855,18 @@ class $$SettingsTableTableManager
                 Value<String> language = const Value.absent(),
                 Value<String> themeMode = const Value.absent(),
                 Value<String?> appPasswordHash = const Value.absent(),
+                Value<String?> securityQuestion = const Value.absent(),
+                Value<String?> securityAnswerHash = const Value.absent(),
+                Value<String?> recoveryCodeHash = const Value.absent(),
               }) => SettingsCompanion(
                 id: id,
                 shopName: shopName,
                 language: language,
                 themeMode: themeMode,
                 appPasswordHash: appPasswordHash,
+                securityQuestion: securityQuestion,
+                securityAnswerHash: securityAnswerHash,
+                recoveryCodeHash: recoveryCodeHash,
               ),
           createCompanionCallback:
               ({
@@ -11642,12 +11875,18 @@ class $$SettingsTableTableManager
                 Value<String> language = const Value.absent(),
                 Value<String> themeMode = const Value.absent(),
                 Value<String?> appPasswordHash = const Value.absent(),
+                Value<String?> securityQuestion = const Value.absent(),
+                Value<String?> securityAnswerHash = const Value.absent(),
+                Value<String?> recoveryCodeHash = const Value.absent(),
               }) => SettingsCompanion.insert(
                 id: id,
                 shopName: shopName,
                 language: language,
                 themeMode: themeMode,
                 appPasswordHash: appPasswordHash,
+                securityQuestion: securityQuestion,
+                securityAnswerHash: securityAnswerHash,
+                recoveryCodeHash: recoveryCodeHash,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

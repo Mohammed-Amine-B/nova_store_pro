@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/database/database.dart';
 import '../../data/repositories/customer_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../widgets/empty_state.dart';
 import 'customer_form_dialog.dart';
 
 class SelectCustomerDialog extends StatefulWidget {
@@ -77,7 +78,7 @@ class _SelectCustomerDialogState extends State<SelectCustomerDialog> {
                   const SizedBox(height: 8),
                   Expanded(
                     child: _filtered.isEmpty
-                        ? Center(child: Text(l10n.noCustomersFound))
+                        ? Center(child: EmptyState(icon: Icons.people_outline, title: l10n.noCustomersFound))
                         : ListView(
                             children: _filtered.map((c) => ListTile(
                                   leading: CircleAvatar(

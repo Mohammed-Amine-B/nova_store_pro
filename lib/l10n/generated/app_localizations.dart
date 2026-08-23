@@ -2463,6 +2463,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sale of {amount} recorded for {entityName}'**
   String activityLogSaleCreatedFor(String amount, String entityName);
+
+  /// No description provided for @priceModePerUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Per Unit'**
+  String get priceModePerUnit;
+
+  /// No description provided for @priceModeTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Price'**
+  String get priceModeTotal;
+
+  /// No description provided for @totalPricePaidLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Price Paid'**
+  String get totalPricePaidLabel;
+
+  /// No description provided for @perUnitPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {price} per {unit}'**
+  String perUnitPreview(String price, String unit);
+
+  /// No description provided for @statCustomersOwe.
+  ///
+  /// In en, this message translates to:
+  /// **'Customers Owe You'**
+  String get statCustomersOwe;
+
+  /// No description provided for @statOwedToSuppliers.
+  ///
+  /// In en, this message translates to:
+  /// **'You Owe Suppliers'**
+  String get statOwedToSuppliers;
+
+  /// No description provided for @recentActivityPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Activity'**
+  String get recentActivityPanel;
+
+  /// No description provided for @viewAllAction.
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAllAction;
+
+  /// No description provided for @noRecentActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'No activity yet.'**
+  String get noRecentActivity;
+
+  /// No description provided for @navSectionOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'OVERVIEW'**
+  String get navSectionOverview;
+
+  /// No description provided for @navSectionInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'INVENTORY'**
+  String get navSectionInventory;
+
+  /// No description provided for @navSectionSales.
+  ///
+  /// In en, this message translates to:
+  /// **'SALES'**
+  String get navSectionSales;
+
+  /// No description provided for @navSectionAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'ADMIN'**
+  String get navSectionAdmin;
+
+  /// No description provided for @securityQuestionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Question'**
+  String get securityQuestionLabel;
+
+  /// No description provided for @securityAnswerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Answer'**
+  String get securityAnswerLabel;
+
+  /// No description provided for @securityQuestionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a security question'**
+  String get securityQuestionRequired;
+
+  /// No description provided for @securityAnswerRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an answer'**
+  String get securityAnswerRequired;
+
+  /// No description provided for @forgotPasswordAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPasswordAction;
+
+  /// No description provided for @recoveryCodeDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Recovery Code'**
+  String get recoveryCodeDialogTitle;
+
+  /// No description provided for @recoveryCodeSaveWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this code somewhere safe — you\'ll need it if you forget your password again:'**
+  String get recoveryCodeSaveWarning;
+
+  /// No description provided for @recoveryCodeAckCheckbox.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ve saved this code'**
+  String get recoveryCodeAckCheckbox;
+
+  /// No description provided for @continueAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueAction;
+
+  /// No description provided for @recoveryChooseMethodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover Access'**
+  String get recoveryChooseMethodTitle;
+
+  /// No description provided for @recoveryMethodQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer security question'**
+  String get recoveryMethodQuestion;
+
+  /// No description provided for @recoveryMethodCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter recovery code'**
+  String get recoveryMethodCode;
+
+  /// No description provided for @recoveryCodeFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery Code'**
+  String get recoveryCodeFieldLabel;
+
+  /// No description provided for @recoveryIncorrectAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'That answer doesn\'t match'**
+  String get recoveryIncorrectAnswer;
+
+  /// No description provided for @recoveryIncorrectCode.
+  ///
+  /// In en, this message translates to:
+  /// **'That code doesn\'t match'**
+  String get recoveryIncorrectCode;
+
+  /// No description provided for @recoveryNewPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set New Password'**
+  String get recoveryNewPasswordTitle;
+
+  /// No description provided for @recoveryNotAvailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery Not Available'**
+  String get recoveryNotAvailableTitle;
+
+  /// No description provided for @recoveryNotAvailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No security question or recovery code was set up for this installation. Contact technical support for help resetting your password.'**
+  String get recoveryNotAvailableMessage;
+
+  /// No description provided for @verifyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verifyAction;
+
+  /// No description provided for @securityQuestionShopName.
+  ///
+  /// In en, this message translates to:
+  /// **'What was the name of your first shop or business?'**
+  String get securityQuestionShopName;
+
+  /// No description provided for @securityQuestionMotherName.
+  ///
+  /// In en, this message translates to:
+  /// **'What is your mother\'s first name?'**
+  String get securityQuestionMotherName;
+
+  /// No description provided for @securityQuestionBirthCity.
+  ///
+  /// In en, this message translates to:
+  /// **'What city were you born in?'**
+  String get securityQuestionBirthCity;
+
+  /// No description provided for @securityQuestionFirstPet.
+  ///
+  /// In en, this message translates to:
+  /// **'What was the name of your first pet?'**
+  String get securityQuestionFirstPet;
+
+  /// No description provided for @securityQuestionFavoriteProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'What is your favorite product to sell?'**
+  String get securityQuestionFavoriteProduct;
+
+  /// No description provided for @copyCodeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Code'**
+  String get copyCodeAction;
+
+  /// No description provided for @codeCopiedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Code copied to clipboard'**
+  String get codeCopiedMessage;
 }
 
 class _AppLocalizationsDelegate

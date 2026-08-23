@@ -119,4 +119,11 @@ class CustomerRepository {
     result.sort((a, b) => b.balance.compareTo(a.balance));
     return result;
   }
+
+  /// Sum of every positive active-customer balance — how much customers owe the shop overall.
+  Future<double> getTotalOutstandingBalance() async {
+    final all = await getAllWithBalances();
+    final total = all.fold<double>(0, (sum, c) => sum + (c.balance > 0 ? c.balance : 0));
+    return roundMoney(total);
+  }
 }

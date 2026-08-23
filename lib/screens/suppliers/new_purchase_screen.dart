@@ -5,6 +5,7 @@ import '../../data/repositories/purchase_repository.dart';
 import '../../data/repositories/product_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
+import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
 
 class _CartLine {
@@ -113,66 +114,113 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
     final sellingPriceController = TextEditingController(
       text: product.sellingPrice != null ? plainNumber(product.sellingPrice!) : '',
     );
+    var totalPriceMode = false;
 
     return showDialog<(double, double, double?)>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(product.name),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final previewQuantity = double.tryParse(quantityController.text) ?? 0;
+          final previewEnteredPrice = double.tryParse(priceController.text) ?? 0;
+          final showPreview = totalPriceMode && previewQuantity > 0 && previewEnteredPrice > 0;
+          final previewPerUnit = showPreview ? previewEnteredPrice / previewQuantity : 0.0;
+          final unitLabel = product.unitType == 'kg' ? 'kg' : 'm';
+
+          return AlertDialog(
+            title: Text(product.name),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: quantityController,
-                    decoration: InputDecoration(labelText: l10n.quantityLabel),
-                    keyboardType: isPiece
-                        ? TextInputType.number
-                        : const TextInputType.numberWithOptions(decimal: true),
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: quantityController,
+                        decoration: InputDecoration(labelText: l10n.quantityLabel),
+                        keyboardType: isPiece
+                            ? TextInputType.number
+                            : const TextInputType.numberWithOptions(decimal: true),
+                        onChanged: (_) => setDialogState(() {}),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: priceController,
+                        decoration: InputDecoration(
+                          labelText: totalPriceMode ? l10n.totalPricePaidLabel : l10n.buyPriceLabel,
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        onChanged: (_) => setDialogState(() {}),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    controller: priceController,
-                    decoration: InputDecoration(labelText: l10n.buyPriceLabel),
+                if (!isPiece) ...[
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: SegmentedButton<bool>(
+                      segments: [
+                        ButtonSegment(value: false, label: Text(l10n.priceModePerUnit)),
+                        ButtonSegment(value: true, label: Text(l10n.priceModeTotal)),
+                      ],
+                      selected: {totalPriceMode},
+                      onSelectionChanged: (s) => setDialogState(() => totalPriceMode = s.first),
+                      style: SegmentedButton.styleFrom(
+                        selectedBackgroundColor: const Color(0xFF0E7C7B).withValues(alpha: 0.12),
+                        selectedForegroundColor: const Color(0xFF0E7C7B),
+                      ),
+                    ),
+                  ),
+                ],
+                if (showPreview) ...[
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      l10n.perUnitPreview(formatMoney(previewPerUnit), unitLabel),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ),
+                ],
+                if (isFirstBatch) ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: sellingPriceController,
+                    decoration: InputDecoration(labelText: l10n.sellingPriceRequiredFirstBatch),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   ),
-                ),
+                ],
               ],
             ),
-            if (isFirstBatch) ...[
-              const SizedBox(height: 12),
-              TextField(
-                controller: sellingPriceController,
-                decoration: InputDecoration(labelText: l10n.sellingPriceRequiredFirstBatch),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () {
+                  var quantity = double.tryParse(quantityController.text) ?? 0;
+                  if (isPiece) quantity = quantity.roundToDouble();
+                  final enteredPrice = double.tryParse(priceController.text) ?? 0;
+                  if (quantity <= 0 || enteredPrice <= 0) return;
+                  final price = totalPriceMode ? enteredPrice / quantity : enteredPrice;
+                  double? sellingPrice;
+                  if (isFirstBatch) {
+                    sellingPrice = double.tryParse(sellingPriceController.text);
+                    if (sellingPrice == null || sellingPrice <= 0) return;
+                  }
+                  Navigator.pop(context, (quantity, price, sellingPrice));
+                },
+                child: Text(l10n.addLineAction),
               ),
             ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              var quantity = double.tryParse(quantityController.text) ?? 0;
-              if (isPiece) quantity = quantity.roundToDouble();
-              final price = double.tryParse(priceController.text) ?? 0;
-              if (quantity <= 0 || price <= 0) return;
-              double? sellingPrice;
-              if (isFirstBatch) {
-                sellingPrice = double.tryParse(sellingPriceController.text);
-                if (sellingPrice == null || sellingPrice <= 0) return;
-              }
-              Navigator.pop(context, (quantity, price, sellingPrice));
-            },
-            child: Text(l10n.addLineAction),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -253,7 +301,7 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
       return;
     }
     final amount = _amountPaidController.text.isEmpty ? 0.0 : double.tryParse(_amountPaidController.text);
-    if (amount == null || amount < 0 || amount > _total) {
+    if (amount == null || amount < 0) {
       setState(() => _error = l10n.amountPaidRangeError);
       return;
     }
@@ -262,7 +310,10 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
       _error = null;
     });
     try {
-      await _purchaseRepo.createPurchase(
+      final total = _total;
+      final transactionPaid = amount > total ? total : amount;
+      final overpay = amount > total ? amount - total : 0.0;
+      final purchaseId = await _purchaseRepo.createPurchase(
         supplierId: widget.supplierId!,
         purchaseDate: DateTime.now(),
         lines: _lines
@@ -273,9 +324,24 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
                   sellingPrice: l.sellingPrice,
                 ))
             .toList(),
-        amountPaid: amount,
+        amountPaid: transactionPaid,
       );
+      if (overpay > 0) {
+        await _supplierRepo.recordPayment(
+          supplierId: widget.supplierId!,
+          amount: overpay,
+          paymentDate: DateTime.now(),
+          note: 'Extra payment on purchase #$purchaseId applied to balance',
+        );
+      }
       if (!mounted) return;
+      if (overpay > 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Purchase recorded. ${formatMoney(overpay)} extra applied to reduce balance.')),
+        );
+        await Future.delayed(const Duration(milliseconds: 900));
+        if (!mounted) return;
+      }
       Navigator.of(context).pop(true);
     } catch (e) {
       setState(() {
@@ -331,17 +397,10 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
           title: l10n.cartPanel,
           description: l10n.cartLineCountDesc(_lines.length),
           child: _lines.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.all(40),
-                  child: Column(
-                    children: [
-                      Icon(Icons.shopping_cart_outlined, size: 40, color: theme.colorScheme.onSurface.withValues(alpha: 0.2)),
-                      const SizedBox(height: 12),
-                      Text(l10n.noLinesAddedYet, style: const TextStyle(fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 4),
-                      Text(l10n.searchProductAboveToStartPurchase, style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
-                    ],
-                  ),
+              ? EmptyState(
+                  icon: Icons.shopping_cart_outlined,
+                  title: l10n.noLinesAddedYet,
+                  subtitle: l10n.searchProductAboveToStartPurchase,
                 )
               : LayoutBuilder(
                   builder: (context, constraints) {
@@ -394,7 +453,7 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
                 _SummaryRow(l10n.subtotalRow, formatMoney(_total)),
                 if (!widget.isEditMode) ...[
                   const SizedBox(height: 10),
-                  _SummaryRow(l10n.previousDebtRow, formatMoney(_previousOwed)),
+                  _SummaryRow(l10n.previousDebtRow, formatBalance(_previousOwed).$1),
                 ],
                 const SizedBox(height: 14),
                 Divider(color: theme.dividerColor),
@@ -524,7 +583,7 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(supplier.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                      Text(l10n.supplierOwedSuffix(formatMoney(_previousOwed)), style: theme.textTheme.bodySmall),
+                      Text(l10n.supplierOwedSuffix(formatBalance(_previousOwed).$1), style: theme.textTheme.bodySmall),
                     ],
                   ),
                 ),

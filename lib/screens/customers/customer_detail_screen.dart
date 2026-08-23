@@ -6,6 +6,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/status_badge.dart';
+import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
 import 'customer_form_dialog.dart';
 import 'customer_sale_screen.dart';
@@ -181,6 +182,10 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                     setDialogState(() => error = l10n.enterValidAmount);
                     return;
                   }
+                  if (amount > _balance) {
+                    setDialogState(() => error = l10n.amountPaidExceedsTotal);
+                    return;
+                  }
                   await _repo.recordPayment(
                     customerId: _customer!.id,
                     amount: amount,
@@ -271,8 +276,10 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                             const SizedBox(height: 20),
                             _HighlightBox(
                               l10n.remainingBalanceLabel,
-                              formatMoney(_balance),
-                              color: _balance > 0 ? const Color(0xFFE4572E) : const Color(0xFF16A34A),
+                              formatBalance(_balance).$1,
+                              color: formatBalance(_balance).$2 || _balance == 0
+                                  ? const Color(0xFF16A34A)
+                                  : const Color(0xFFE4572E),
                             ),
                           ],
                         ),
@@ -283,10 +290,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                       title: l10n.salesHistoryPanel,
                       description: l10n.salesHistoryCountDesc(_sales.length),
                       child: _sales.isEmpty
-                          ? Padding(
-                              padding: const EdgeInsets.all(32),
-                              child: Text(l10n.noSalesYetForCustomer),
-                            )
+                          ? EmptyState(icon: Icons.receipt_long_outlined, title: l10n.noSalesYetForCustomer)
                           : LayoutBuilder(
                               builder: (context, constraints) {
                                 return SingleChildScrollView(
@@ -394,10 +398,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                       title: l10n.paymentsHistoryPanel,
                       description: l10n.paymentCountDesc(_payments.length),
                       child: _payments.isEmpty
-                          ? Padding(
-                              padding: const EdgeInsets.all(32),
-                              child: Text(l10n.noPaymentsYet),
-                            )
+                          ? EmptyState(icon: Icons.payments_outlined, title: l10n.noPaymentsYet)
                           : LayoutBuilder(
                               builder: (context, constraints) {
                                 return SingleChildScrollView(

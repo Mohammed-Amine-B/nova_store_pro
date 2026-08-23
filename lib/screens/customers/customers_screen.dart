@@ -5,6 +5,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/stat_card.dart';
+import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
 import 'customer_form_dialog.dart';
 import 'customer_detail_screen.dart';
@@ -187,10 +188,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
               ),
             ),
             child: rows.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Text(l10n.noCustomersMatch),
-                  )
+                ? EmptyState(icon: Icons.people_outline, title: l10n.noCustomersMatch)
                 : LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(
@@ -221,6 +219,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                             ],
                             rows: rows.map((cwb) {
                               final c = cwb.customer;
+                              final balanceDisplay = formatBalance(cwb.balance);
                               final balanceColor = cwb.balance > 0
                                   ? const Color(0xFFE4572E)
                                   : const Color(0xFF16A34A);
@@ -257,7 +256,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                   DataCell(Text(c.phone ?? '—')),
                                   DataCell(
                                     Text(
-                                      formatMoney(cwb.balance),
+                                      balanceDisplay.$1,
                                       style: TextStyle(fontWeight: FontWeight.w700, color: balanceColor),
                                     ),
                                   ),

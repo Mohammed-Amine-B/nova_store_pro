@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/database/database.dart';
 import '../../data/repositories/supplier_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../widgets/empty_state.dart';
 import 'supplier_form_dialog.dart';
 
 class SelectSupplierDialog extends StatefulWidget {
@@ -77,7 +78,7 @@ class _SelectSupplierDialogState extends State<SelectSupplierDialog> {
                   const SizedBox(height: 8),
                   Expanded(
                     child: _filtered.isEmpty
-                        ? Center(child: Text(l10n.noSuppliersFound))
+                        ? Center(child: EmptyState(icon: Icons.local_shipping_outlined, title: l10n.noSuppliersFound))
                         : ListView(
                             children: _filtered.map((s) => ListTile(
                                   leading: CircleAvatar(

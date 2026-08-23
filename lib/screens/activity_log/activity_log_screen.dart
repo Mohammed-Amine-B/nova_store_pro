@@ -4,6 +4,7 @@ import '../../data/repositories/activity_log_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../utils/activity_log_formatting.dart';
 import '../../widgets/date_range_dialog.dart';
+import '../../widgets/empty_state.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
 
@@ -20,38 +21,6 @@ const _categories = [
   'supplier',
   'payment',
 ];
-
-String _categoryLabel(AppLocalizations l10n, String key) => switch (key) {
-      'all' => l10n.catAll,
-      'sale' => l10n.catSale,
-      'purchase' => l10n.catPurchase,
-      'return' => l10n.catReturn,
-      'product' => l10n.catProduct,
-      'category' => l10n.catCategory,
-      'customer' => l10n.catCustomer,
-      'supplier' => l10n.catSupplier,
-      'payment' => l10n.catPayment,
-      _ => key,
-    };
-
-const _categoryIcons = {
-  'sale': Icons.point_of_sale_outlined,
-  'purchase': Icons.local_shipping_outlined,
-  'return': Icons.assignment_return_outlined,
-  'product': Icons.inventory_2_outlined,
-  'category': Icons.category_outlined,
-  'customer': Icons.people_outline,
-  'supplier': Icons.local_shipping_outlined,
-  'payment': Icons.payments_outlined,
-};
-
-const _actionColors = {
-  'created': Color(0xFF16A34A),
-  'updated': Color(0xFFF2A93B),
-  'deleted': Color(0xFFE4572E),
-  'archived': Color(0xFFE4572E),
-  'restored': Color(0xFF0E7C7B),
-};
 
 class ActivityLogScreen extends StatefulWidget {
   final AppDatabase db;
@@ -123,16 +92,6 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
     }
   }
 
-  String _formatTimestamp(AppLocalizations l10n, DateTime dt) {
-    final now = DateTime.now();
-    final diff = now.difference(dt);
-    if (diff.inMinutes < 1) return l10n.justNow;
-    if (diff.inMinutes < 60) return l10n.minutesAgo(diff.inMinutes);
-    if (diff.inHours < 24 && dt.day == now.day) return l10n.hoursAgo(diff.inHours);
-    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
-        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -176,7 +135,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                 isDense: true,
               ),
               items: _categories
-                  .map((c) => DropdownMenuItem(value: c, child: Text(_categoryLabel(l10n, c))))
+                  .map((c) => DropdownMenuItem(value: c, child: Text(activityCategoryLabel(l10n, c))))
                   .toList(),
               onChanged: (v) {
                 setState(() => _category = v ?? 'all');
@@ -189,10 +148,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
             title: l10n.entriesPanel,
             description: l10n.recordsCountDesc(_entries.length),
             child: _entries.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Text(l10n.noActivityInRange),
-                  )
+                ? EmptyState(icon: Icons.history_toggle_off, title: l10n.noActivityInRange)
                 : ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -200,8 +156,8 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                     separatorBuilder: (_, __) => Divider(height: 1, color: theme.dividerColor),
                     itemBuilder: (context, index) {
                       final entry = _entries[index];
-                      final color = _actionColors[entry.action] ?? theme.colorScheme.primary;
-                      final icon = _categoryIcons[entry.category] ?? Icons.history_edu_outlined;
+                      final color = activityActionColors[entry.action] ?? theme.colorScheme.primary;
+                      final icon = activityCategoryIcons[entry.category] ?? Icons.history_edu_outlined;
                       return ListTile(
                         leading: Container(
                           width: 36,
@@ -220,9 +176,9 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                           entityName: entry.entityLabel,
                           refId: entry.refId,
                         )),
-                        subtitle: Text(_categoryLabel(l10n, entry.category)),
+                        subtitle: Text(activityCategoryLabel(l10n, entry.category)),
                         trailing: Text(
-                          _formatTimestamp(l10n, entry.createdAt),
+                          formatActivityTimestamp(l10n, entry.createdAt),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                           ),

@@ -4,6 +4,7 @@ import '../../data/repositories/customer_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
+import '../../widgets/empty_state.dart';
 import 'customer_form_dialog.dart';
 import 'customer_sale_screen.dart';
 
@@ -96,10 +97,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                   ),
                   const SizedBox(height: 8),
                   if (_filtered.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(l10n.noCustomersFound),
-                    )
+                    EmptyState(icon: Icons.people_outline, title: l10n.noCustomersFound)
                   else
                     ..._filtered.map((c) => ListTile(
                           leading: CircleAvatar(
