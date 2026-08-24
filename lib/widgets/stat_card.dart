@@ -22,17 +22,34 @@ class StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final accent = accentColor ?? theme.colorScheme.primary;
-    return Card(
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Soft pastel tint of the accent color for the card background — blended
+    // toward white in light mode, toward black in dark mode (so it stays a
+    // muted tint rather than washing out or over-brightening).
+    final tint = isDark ? Color.lerp(accent, Colors.black, 0.75)! : Color.lerp(accent, Colors.white, 0.86)!;
+    // A readable, still color-coded label — darkened in light mode,
+    // lightened in dark mode so it stays legible on the tint above.
+    final labelColor = HSLColor.fromColor(accent).withLightness(isDark ? 0.78 : 0.25).toColor();
+    final badgeColor = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white;
+    final badgeSize = compact ? 32.0 : 36.0;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: tint,
+        borderRadius: BorderRadius.circular(compact ? 14 : 18),
+      ),
       child: Padding(
         padding: EdgeInsets.all(compact ? 14 : 20),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(compact ? 8 : 10),
+              width: badgeSize,
+              height: badgeSize,
               decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(compact ? 8 : 10),
+                color: badgeColor,
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: accent, size: compact ? 16 : 20),
             ),
@@ -43,11 +60,13 @@ class StatCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: (compact ? theme.textTheme.labelSmall : theme.textTheme.bodySmall)?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: labelColor,
+                    fontWeight: FontWeight.w600,
                   )),
                   SizedBox(height: compact ? 2 : 8),
                   Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: (compact ? theme.textTheme.titleLarge : theme.textTheme.headlineMedium)?.copyWith(
                     fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
                   )),
                   if (hint != null) ...[
                     SizedBox(height: compact ? 1 : 4),

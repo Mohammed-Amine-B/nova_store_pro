@@ -58,6 +58,10 @@
   "categoryOptionalLabel": "Catégorie (facultatif)",
   "noneOption": "Aucune",
   "lowStockThresholdLabel": "Seuil de stock faible",
+  "variantSizeLabel": "Taille (facultatif)",
+  "variantSizeHint": "ex. 4mm, Grand, 1kg",
+  "variantsPanel": "Autres tailles",
+  "variantsPanelDesc": "Autres produits dans le même groupe de variantes",
   "unitTypeLabel": "Unité",
   "unitTypePiece": "Pièce",
   "unitTypeKg": "Kilogramme (kg)",
@@ -67,6 +71,7 @@
   "batchesLabel": "Lots",
   "currentStockLabel": "Stock actuel",
   "sellingPriceLabel": "Prix de vente",
+  "costPriceLabel": "Prix de revient",
   "notSet": "Non défini",
   "batchesPanelDesc": "FIFO — le lot le plus ancien est vendu en premier",
   "noBatchesYet": "Aucun stock pour l'instant. Utilisez « Ajouter du stock » pour enregistrer le premier lot.",
@@ -135,6 +140,11 @@
   "themeLight": "Clair",
   "themeDark": "Sombre",
   "themeSystem": "Système",
+  "fontSizePanel": "Taille du texte",
+  "fontSizePanelDesc": "Ajustez la taille du texte dans Nova Store",
+  "fontSizeSmall": "Petit",
+  "fontSizeMedium": "Moyen",
+  "fontSizeLarge": "Grand",
   "languagePanel": "Langue",
   "languagePanelDesc": "Choisissez la langue de l'application",
   "savedLabel": "Enregistré",
@@ -360,6 +370,16 @@
   "customerSalesLabel": "Ventes clients",
   "invoiceCountDesc": "{count} facture(s)",
   "noCustomerSalesYet": "Aucune vente client enregistrée pour l'instant.",
+  "supplierPurchasesLabel": "Achats fournisseurs",
+  "purchaseCountDesc": "{count} achat(s)",
+  "@purchaseCountDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSupplierPurchasesYet": "Aucun achat fournisseur enregistré pour l'instant.",
   "colCustomer": "Client",
   "invoiceAction": "Facture",
   "colNote": "Note",
@@ -432,5 +452,23 @@
   "securityQuestionFirstPet": "Quel était le nom de votre premier animal de compagnie ?",
   "securityQuestionFavoriteProduct": "Quel est votre produit préféré à vendre ?",
   "copyCodeAction": "Copier le code",
-  "codeCopiedMessage": "Code copié dans le presse-papiers"
+  "codeCopiedMessage": "Code copié dans le presse-papiers",
+  "insightsTitle": "Analyses intelligentes",
+  "insightsSubtitle": "Des suggestions basées sur les données d'activité de votre magasin",
+  "statNextWeekEstimate": "Estimation semaine prochaine",
+  "statNextMonthEstimate": "Estimation mois prochain",
+  "todayAnomalyLowMessage": "Le chiffre d'affaires d'aujourd'hui ({today}) est anormalement bas par rapport à votre moyenne récente ({avg}).",
+  "todayAnomalyHighMessage": "Le chiffre d'affaires d'aujourd'hui ({today}) est anormalement élevé par rapport à votre moyenne récente ({avg}).",
+  "reorderSuggestionsPanel": "Suggestions de réapprovisionnement",
+  "reorderSuggestionsDesc": "Produits susceptibles de s'épuiser bientôt, selon le rythme de ventes récent",
+  "colDaysLeft": "Jours restants",
+  "colSuggestedQty": "Qté suggérée",
+  "colSupplier": "Fournisseur",
+  "noReorderSuggestions": "Rien à réapprovisionner pour l'instant.",
+  "stagnantProductsPanel": "Stock à rotation lente",
+  "stagnantProductsDesc": "En stock mais aucune vente depuis 30 jours",
+  "noStagnantProducts": "Aucun stock à rotation lente pour l'instant.",
+  "reorderNoticeMessage": "{count} produits à réapprovisionner bientôt",
+  "suggestedPriceHint": "Suggéré : {price} (basé sur des produits similaires)",
+  "useSuggestionAction": "Utiliser"
 }

@@ -4,7 +4,7 @@ import 'app_colors.dart';
 class AppTheme {
   AppTheme._();
 
-  static const _radius = 8.0; // matches --radius: 0.5rem (8px)
+  static const _radius = 12.0; // soft-pastel redesign: rounder base radius (was 8.0)
 
   static ThemeData get light => _build(
         brightness: Brightness.light,
@@ -89,25 +89,33 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           side: BorderSide(color: border),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
       ),
       dividerColor: border,
       fontFamily: 'Amiri',
-      textTheme: Typography.material2021().black.apply(
+      // Typography.material2021().black only carries colors (its TextStyles
+      // have fontSize: null — Flutter fills real sizes in later, inside
+      // Theme.of(), by merging in .englishLike). We build off .englishLike
+      // directly instead so every style already carries a real fontSize,
+      // which lets main.dart's font-size-preference scaling multiply actual
+      // numbers instead of a null fallback. Numerically these are the exact
+      // values Theme.of() would have injected anyway, so this is a no-op
+      // visually until main.dart applies a non-1.0 scale.
+      textTheme: Typography.material2021().englishLike.apply(
             fontFamily: 'Amiri',
             bodyColor: foreground,
             displayColor: foreground,

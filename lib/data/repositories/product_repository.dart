@@ -54,6 +54,7 @@ class ProductRepository {
     required double minStock,
     required String unitType,
     String? imagePath,
+    String? variantSize,
   }) async {
     final id = await db.into(db.products).insert(ProductsCompanion.insert(
           name: name.trim(),
@@ -63,6 +64,7 @@ class ProductRepository {
           minStock: Value(minStock),
           unitType: Value(unitType),
           imagePath: Value(imagePath),
+          variantSize: Value(variantSize?.trim().isEmpty ?? true ? null : variantSize!.trim()),
         ));
     await _activityLog.log('product', 'created', entityName: name.trim());
     return id;
@@ -78,6 +80,7 @@ class ProductRepository {
     required String unitType,
     double? sellingPrice,
     String? imagePath,
+    String? variantSize,
   }) async {
     final existing = await (db.select(db.products)..where((p) => p.id.equals(id))).getSingleOrNull();
     final oldImagePath = existing?.imagePath;
@@ -92,6 +95,7 @@ class ProductRepository {
         unitType: Value(unitType),
         sellingPrice: sellingPrice != null ? Value(roundMoney(sellingPrice)) : const Value.absent(),
         imagePath: Value(imagePath),
+        variantSize: Value(variantSize?.trim().isEmpty ?? true ? null : variantSize!.trim()),
       ),
     );
 
@@ -183,6 +187,17 @@ class ProductRepository {
 
   Future<Product?> getById(int id) async {
     return (db.select(db.products)..where((p) => p.id.equals(id))).getSingleOrNull();
+  }
+
+  /// All other ACTIVE products sharing the same name (i.e. size/type variants
+  /// of the same item, distinguished by variantSize), excluding excludeId.
+  Future<List<Product>> getVariants(String name, {required int excludeId}) async {
+    return (db.select(db.products)
+          ..where((p) =>
+              p.name.equals(name) &
+              p.isArchived.equals(false) &
+              p.id.equals(excludeId).not()))
+        .get();
   }
 
   /// Oldest first — matches FIFO consumption order.

@@ -3,9 +3,11 @@ import '../../data/database/database.dart';
 import '../../data/repositories/supplier_repository.dart';
 import '../../data/repositories/purchase_repository.dart';
 import '../../data/repositories/product_repository.dart';
+import '../../data/repositories/insights_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/product_thumbnail.dart';
 import '../../utils/formatting.dart';
 
 class _CartLine {
@@ -41,6 +43,7 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
   late final SupplierRepository _supplierRepo = SupplierRepository(widget.db);
   late final PurchaseRepository _purchaseRepo = PurchaseRepository(widget.db);
   late final ProductRepository _productRepo = ProductRepository(widget.db);
+  late final InsightsRepository _insightsRepo = InsightsRepository(widget.db);
 
   Supplier? _supplier;
   Purchase? _existingPurchase;
@@ -125,9 +128,10 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
           final showPreview = totalPriceMode && previewQuantity > 0 && previewEnteredPrice > 0;
           final previewPerUnit = showPreview ? previewEnteredPrice / previewQuantity : 0.0;
           final unitLabel = product.unitType == 'kg' ? 'kg' : 'm';
+          final effectiveBuyPrice = totalPriceMode ? previewPerUnit : previewEnteredPrice;
 
           return AlertDialog(
-            title: Text(product.name),
+            title: Text(productDisplayName(product)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -194,6 +198,36 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
                     decoration: InputDecoration(labelText: l10n.sellingPriceRequiredFirstBatch),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   ),
+                  if (product.categoryId != null && effectiveBuyPrice > 0)
+                    FutureBuilder<double?>(
+                      future: _insightsRepo.suggestSellingPrice(product.categoryId!, effectiveBuyPrice),
+                      builder: (context, snapshot) {
+                        final suggestion = snapshot.data;
+                        if (suggestion == null) return const SizedBox.shrink();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  l10n.suggestedPriceHint(formatMoney(suggestion)),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => setDialogState(
+                                  () => sellingPriceController.text = plainNumber(suggestion),
+                                ),
+                                child: Text(l10n.useSuggestionAction),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                 ],
               ],
             ),
@@ -383,7 +417,8 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
                   const SizedBox(height: 8),
                   ..._productMatches.map((p) => ListTile(
                         dense: true,
-                        title: Text(p.name),
+                        leading: ProductThumbnail(imagePath: p.imagePath, size: 36),
+                        title: Text(productDisplayName(p)),
                         subtitle: Text(p.barcode ?? p.code),
                         onTap: () => _addLine(p),
                       )),
@@ -418,7 +453,7 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
                           ],
                           rows: _lines.map((line) {
                             return DataRow(cells: [
-                              DataCell(Text(line.product.name)),
+                              DataCell(Text(productDisplayName(line.product))),
                               DataCell(Text(formatQuantity(line.quantity, line.product.unitType))),
                               DataCell(Text(formatMoney(line.buyPrice))),
                               DataCell(Text(formatMoney(line.lineTotal), style: const TextStyle(fontWeight: FontWeight.w700))),

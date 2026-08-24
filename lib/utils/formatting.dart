@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import '../data/database/database.dart';
 
 String formatQuantity(double value, String unitType) {
   final unitLabel = switch (unitType) {
@@ -32,3 +33,13 @@ String formatMoney(double value) => '${_moneyFormat.format(value)} DA';
 /// Plain numeric text for editable fields — no unit suffix, no trailing ".0".
 String plainNumber(double value) =>
     value % 1 == 0 ? value.toInt().toString() : value.toString();
+
+/// Product name with its size appended in parentheses if set, e.g. "Screw (4mm)".
+/// Use this instead of raw `product.name` anywhere a product is displayed in a
+/// sale, purchase, or product context.
+String productDisplayName(Product product) {
+  if (product.variantSize == null || product.variantSize!.trim().isEmpty) {
+    return product.name;
+  }
+  return '${product.name} (${product.variantSize})';
+}

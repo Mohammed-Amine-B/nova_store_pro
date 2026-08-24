@@ -16,6 +16,7 @@ import 'product_detail_screen.dart';
 import '../../widgets/category_chip.dart';
 import '../../utils/formatting.dart';
 import '../../utils/product_images.dart';
+import '../../utils/text_scale.dart';
 
 enum StockFilter { all, low, out }
 
@@ -304,8 +305,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             }),
                             columnSpacing: 28,
                             horizontalMargin: 20,
-                            dataRowMinHeight: 56,
-                            dataRowMaxHeight: 64,
+                            dataRowMinHeight: 56 * dataRowScale(context),
+                            dataRowMaxHeight: 64 * dataRowScale(context),
                             columns: [
                               DataColumn(label: Text(l10n.colProductName)),
                               DataColumn(label: Text(l10n.colBarcode)),
@@ -381,7 +382,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                         ),
                                         const SizedBox(width: 10),
                                         Text(
-                                          p.name,
+                                          productDisplayName(p),
                                           style: TextStyle(
                                             color: Theme.of(
                                               context,

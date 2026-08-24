@@ -96,6 +96,10 @@
   "categoryOptionalLabel": "Category (optional)",
   "noneOption": "None",
   "lowStockThresholdLabel": "Low stock threshold",
+  "variantSizeLabel": "Size (optional)",
+  "variantSizeHint": "e.g. 4mm, Large, 1kg",
+  "variantsPanel": "Other Sizes",
+  "variantsPanelDesc": "Other products in the same variant group",
   "unitTypeLabel": "Unit Type",
   "unitTypePiece": "Piece",
   "unitTypeKg": "Kilogram (kg)",
@@ -105,6 +109,7 @@
   "batchesLabel": "Batches",
   "currentStockLabel": "Current Stock",
   "sellingPriceLabel": "Selling Price",
+  "costPriceLabel": "Cost Price",
   "notSet": "Not set",
   "batchesPanelDesc": "FIFO — oldest batch is sold first",
   "noBatchesYet": "No inventory yet. Use \"Add Stock\" to record the first batch.",
@@ -222,6 +227,11 @@
   "themeLight": "Light",
   "themeDark": "Dark",
   "themeSystem": "System",
+  "fontSizePanel": "Font Size",
+  "fontSizePanelDesc": "Adjust text size across Nova Store",
+  "fontSizeSmall": "Small",
+  "fontSizeMedium": "Medium",
+  "fontSizeLarge": "Large",
   "languagePanel": "Language",
   "languagePanelDesc": "Choose the app language",
   "savedLabel": "Saved",
@@ -664,6 +674,16 @@
     }
   },
   "noCustomerSalesYet": "No customer sales recorded yet.",
+  "supplierPurchasesLabel": "Supplier Purchases",
+  "purchaseCountDesc": "{count} purchase(s)",
+  "@purchaseCountDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSupplierPurchasesYet": "No supplier purchases recorded yet.",
   "colCustomer": "Customer",
   "invoiceAction": "Invoice",
   "colNote": "Note",
@@ -940,5 +960,57 @@
   "securityQuestionFirstPet": "What was the name of your first pet?",
   "securityQuestionFavoriteProduct": "What is your favorite product to sell?",
   "copyCodeAction": "Copy Code",
-  "codeCopiedMessage": "Code copied to clipboard"
+  "codeCopiedMessage": "Code copied to clipboard",
+  "insightsTitle": "Smart Insights",
+  "insightsSubtitle": "Data-driven suggestions based on your store's activity",
+  "statNextWeekEstimate": "Next Week Estimate",
+  "statNextMonthEstimate": "Next Month Estimate",
+  "todayAnomalyLowMessage": "Today's revenue ({today}) is unusually low compared to your recent average ({avg}).",
+  "@todayAnomalyLowMessage": {
+    "placeholders": {
+      "today": {
+        "type": "String"
+      },
+      "avg": {
+        "type": "String"
+      }
+    }
+  },
+  "todayAnomalyHighMessage": "Today's revenue ({today}) is unusually high compared to your recent average ({avg}).",
+  "@todayAnomalyHighMessage": {
+    "placeholders": {
+      "today": {
+        "type": "String"
+      },
+      "avg": {
+        "type": "String"
+      }
+    }
+  },
+  "reorderSuggestionsPanel": "Reorder Suggestions",
+  "reorderSuggestionsDesc": "Products likely to run out soon, based on recent sales pace",
+  "colDaysLeft": "Days Left",
+  "colSuggestedQty": "Suggested Qty",
+  "colSupplier": "Supplier",
+  "noReorderSuggestions": "Nothing needs reordering right now.",
+  "stagnantProductsPanel": "Slow-Moving Stock",
+  "stagnantProductsDesc": "In stock but no sales in the last 30 days",
+  "noStagnantProducts": "No slow-moving stock right now.",
+  "reorderNoticeMessage": "{count} products need reordering soon",
+  "@reorderNoticeMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "suggestedPriceHint": "Suggested: {price} (based on similar products)",
+  "@suggestedPriceHint": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "useSuggestionAction": "Use"
 }

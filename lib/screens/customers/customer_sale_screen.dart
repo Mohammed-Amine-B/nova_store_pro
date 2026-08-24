@@ -7,6 +7,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/return_dialog.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/product_thumbnail.dart';
 import '../../utils/formatting.dart';
 
 class _CartLine {
@@ -112,7 +113,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
     return showDialog<(double, double)>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(product.name),
+        title: Text(productDisplayName(product)),
         content: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -317,7 +318,8 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                   const SizedBox(height: 8),
                   ..._productMatches.map((p) => ListTile(
                         dense: true,
-                        title: Text(p.name),
+                        leading: ProductThumbnail(imagePath: p.imagePath, size: 36),
+                        title: Text(productDisplayName(p)),
                         subtitle: Text(p.barcode ?? p.code),
                         trailing: Text(
                           p.sellingPrice != null ? formatMoney(p.sellingPrice!) : '—',
@@ -351,28 +353,37 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                             border: Border.all(color: theme.dividerColor),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(p.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontWeight: FontWeight.w600)),
-                                  ),
-                                  Text(
-                                    p.sellingPrice != null ? formatMoney(p.sellingPrice!) : '—',
-                                    style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF0E7C7B)),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                lowStock ? l10n.lowStockLeftSuffix(formatQuantity(p.stockQuantity, p.unitType)) : l10n.inStockCount(formatQuantity(p.stockQuantity, p.unitType)),
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: lowStock ? const Color(0xFFE4572E) : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                              ProductThumbnail(imagePath: p.imagePath, size: 32),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(productDisplayName(p), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(fontWeight: FontWeight.w600)),
+                                        ),
+                                        Text(
+                                          p.sellingPrice != null ? formatMoney(p.sellingPrice!) : '—',
+                                          style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF0E7C7B)),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      lowStock ? l10n.lowStockLeftSuffix(formatQuantity(p.stockQuantity, p.unitType)) : l10n.inStockCount(formatQuantity(p.stockQuantity, p.unitType)),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: lowStock ? const Color(0xFFE4572E) : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -412,7 +423,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                           ],
                           rows: _lines.map((line) {
                             return DataRow(cells: [
-                              DataCell(Text(line.product.name)),
+                              DataCell(Text(productDisplayName(line.product))),
                               DataCell(Text(formatQuantity(line.quantity, line.product.unitType))),
                               DataCell(Text(formatMoney(line.unitPrice))),
                               DataCell(Text(formatMoney(line.lineTotal), style: const TextStyle(fontWeight: FontWeight.w700))),

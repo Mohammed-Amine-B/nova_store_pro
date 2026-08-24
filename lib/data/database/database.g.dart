@@ -380,6 +380,17 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _variantSizeMeta = const VerificationMeta(
+    'variantSize',
+  );
+  @override
+  late final GeneratedColumn<String> variantSize = GeneratedColumn<String>(
+    'variant_size',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isArchivedMeta = const VerificationMeta(
     'isArchived',
   );
@@ -419,6 +430,7 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     minStock,
     unitType,
     imagePath,
+    variantSize,
     isArchived,
     createdAt,
   ];
@@ -501,6 +513,15 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         imagePath.isAcceptableOrUnknown(data['image_path']!, _imagePathMeta),
       );
     }
+    if (data.containsKey('variant_size')) {
+      context.handle(
+        _variantSizeMeta,
+        variantSize.isAcceptableOrUnknown(
+          data['variant_size']!,
+          _variantSizeMeta,
+        ),
+      );
+    }
     if (data.containsKey('is_archived')) {
       context.handle(
         _isArchivedMeta,
@@ -562,6 +583,10 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.string,
         data['${effectivePrefix}image_path'],
       ),
+      variantSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}variant_size'],
+      ),
       isArchived: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_archived'],
@@ -590,6 +615,7 @@ class Product extends DataClass implements Insertable<Product> {
   final double minStock;
   final String unitType;
   final String? imagePath;
+  final String? variantSize;
   final bool isArchived;
   final DateTime createdAt;
   const Product({
@@ -603,6 +629,7 @@ class Product extends DataClass implements Insertable<Product> {
     required this.minStock,
     required this.unitType,
     this.imagePath,
+    this.variantSize,
     required this.isArchived,
     required this.createdAt,
   });
@@ -626,6 +653,9 @@ class Product extends DataClass implements Insertable<Product> {
     map['unit_type'] = Variable<String>(unitType);
     if (!nullToAbsent || imagePath != null) {
       map['image_path'] = Variable<String>(imagePath);
+    }
+    if (!nullToAbsent || variantSize != null) {
+      map['variant_size'] = Variable<String>(variantSize);
     }
     map['is_archived'] = Variable<bool>(isArchived);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -652,6 +682,9 @@ class Product extends DataClass implements Insertable<Product> {
       imagePath: imagePath == null && nullToAbsent
           ? const Value.absent()
           : Value(imagePath),
+      variantSize: variantSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(variantSize),
       isArchived: Value(isArchived),
       createdAt: Value(createdAt),
     );
@@ -673,6 +706,7 @@ class Product extends DataClass implements Insertable<Product> {
       minStock: serializer.fromJson<double>(json['minStock']),
       unitType: serializer.fromJson<String>(json['unitType']),
       imagePath: serializer.fromJson<String?>(json['imagePath']),
+      variantSize: serializer.fromJson<String?>(json['variantSize']),
       isArchived: serializer.fromJson<bool>(json['isArchived']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -691,6 +725,7 @@ class Product extends DataClass implements Insertable<Product> {
       'minStock': serializer.toJson<double>(minStock),
       'unitType': serializer.toJson<String>(unitType),
       'imagePath': serializer.toJson<String?>(imagePath),
+      'variantSize': serializer.toJson<String?>(variantSize),
       'isArchived': serializer.toJson<bool>(isArchived),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -707,6 +742,7 @@ class Product extends DataClass implements Insertable<Product> {
     double? minStock,
     String? unitType,
     Value<String?> imagePath = const Value.absent(),
+    Value<String?> variantSize = const Value.absent(),
     bool? isArchived,
     DateTime? createdAt,
   }) => Product(
@@ -720,6 +756,7 @@ class Product extends DataClass implements Insertable<Product> {
     minStock: minStock ?? this.minStock,
     unitType: unitType ?? this.unitType,
     imagePath: imagePath.present ? imagePath.value : this.imagePath,
+    variantSize: variantSize.present ? variantSize.value : this.variantSize,
     isArchived: isArchived ?? this.isArchived,
     createdAt: createdAt ?? this.createdAt,
   );
@@ -741,6 +778,9 @@ class Product extends DataClass implements Insertable<Product> {
       minStock: data.minStock.present ? data.minStock.value : this.minStock,
       unitType: data.unitType.present ? data.unitType.value : this.unitType,
       imagePath: data.imagePath.present ? data.imagePath.value : this.imagePath,
+      variantSize: data.variantSize.present
+          ? data.variantSize.value
+          : this.variantSize,
       isArchived: data.isArchived.present
           ? data.isArchived.value
           : this.isArchived,
@@ -761,6 +801,7 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('minStock: $minStock, ')
           ..write('unitType: $unitType, ')
           ..write('imagePath: $imagePath, ')
+          ..write('variantSize: $variantSize, ')
           ..write('isArchived: $isArchived, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -779,6 +820,7 @@ class Product extends DataClass implements Insertable<Product> {
     minStock,
     unitType,
     imagePath,
+    variantSize,
     isArchived,
     createdAt,
   );
@@ -796,6 +838,7 @@ class Product extends DataClass implements Insertable<Product> {
           other.minStock == this.minStock &&
           other.unitType == this.unitType &&
           other.imagePath == this.imagePath &&
+          other.variantSize == this.variantSize &&
           other.isArchived == this.isArchived &&
           other.createdAt == this.createdAt);
 }
@@ -811,6 +854,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<double> minStock;
   final Value<String> unitType;
   final Value<String?> imagePath;
+  final Value<String?> variantSize;
   final Value<bool> isArchived;
   final Value<DateTime> createdAt;
   const ProductsCompanion({
@@ -824,6 +868,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.minStock = const Value.absent(),
     this.unitType = const Value.absent(),
     this.imagePath = const Value.absent(),
+    this.variantSize = const Value.absent(),
     this.isArchived = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
@@ -838,6 +883,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.minStock = const Value.absent(),
     this.unitType = const Value.absent(),
     this.imagePath = const Value.absent(),
+    this.variantSize = const Value.absent(),
     this.isArchived = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : code = Value(code),
@@ -853,6 +899,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<double>? minStock,
     Expression<String>? unitType,
     Expression<String>? imagePath,
+    Expression<String>? variantSize,
     Expression<bool>? isArchived,
     Expression<DateTime>? createdAt,
   }) {
@@ -867,6 +914,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (minStock != null) 'min_stock': minStock,
       if (unitType != null) 'unit_type': unitType,
       if (imagePath != null) 'image_path': imagePath,
+      if (variantSize != null) 'variant_size': variantSize,
       if (isArchived != null) 'is_archived': isArchived,
       if (createdAt != null) 'created_at': createdAt,
     });
@@ -883,6 +931,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<double>? minStock,
     Value<String>? unitType,
     Value<String?>? imagePath,
+    Value<String?>? variantSize,
     Value<bool>? isArchived,
     Value<DateTime>? createdAt,
   }) {
@@ -897,6 +946,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       minStock: minStock ?? this.minStock,
       unitType: unitType ?? this.unitType,
       imagePath: imagePath ?? this.imagePath,
+      variantSize: variantSize ?? this.variantSize,
       isArchived: isArchived ?? this.isArchived,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -935,6 +985,9 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     if (imagePath.present) {
       map['image_path'] = Variable<String>(imagePath.value);
     }
+    if (variantSize.present) {
+      map['variant_size'] = Variable<String>(variantSize.value);
+    }
     if (isArchived.present) {
       map['is_archived'] = Variable<bool>(isArchived.value);
     }
@@ -957,6 +1010,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('minStock: $minStock, ')
           ..write('unitType: $unitType, ')
           ..write('imagePath: $imagePath, ')
+          ..write('variantSize: $variantSize, ')
           ..write('isArchived: $isArchived, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -3691,6 +3745,18 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _fontSizeMeta = const VerificationMeta(
+    'fontSize',
+  );
+  @override
+  late final GeneratedColumn<String> fontSize = GeneratedColumn<String>(
+    'font_size',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('medium'),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3701,6 +3767,7 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     securityQuestion,
     securityAnswerHash,
     recoveryCodeHash,
+    fontSize,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3771,6 +3838,12 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         ),
       );
     }
+    if (data.containsKey('font_size')) {
+      context.handle(
+        _fontSizeMeta,
+        fontSize.isAcceptableOrUnknown(data['font_size']!, _fontSizeMeta),
+      );
+    }
     return context;
   }
 
@@ -3812,6 +3885,10 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         DriftSqlType.string,
         data['${effectivePrefix}recovery_code_hash'],
       ),
+      fontSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}font_size'],
+      )!,
     );
   }
 
@@ -3830,6 +3907,7 @@ class Setting extends DataClass implements Insertable<Setting> {
   final String? securityQuestion;
   final String? securityAnswerHash;
   final String? recoveryCodeHash;
+  final String fontSize;
   const Setting({
     required this.id,
     required this.shopName,
@@ -3839,6 +3917,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     this.securityQuestion,
     this.securityAnswerHash,
     this.recoveryCodeHash,
+    required this.fontSize,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3859,6 +3938,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     if (!nullToAbsent || recoveryCodeHash != null) {
       map['recovery_code_hash'] = Variable<String>(recoveryCodeHash);
     }
+    map['font_size'] = Variable<String>(fontSize);
     return map;
   }
 
@@ -3880,6 +3960,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       recoveryCodeHash: recoveryCodeHash == null && nullToAbsent
           ? const Value.absent()
           : Value(recoveryCodeHash),
+      fontSize: Value(fontSize),
     );
   }
 
@@ -3899,6 +3980,7 @@ class Setting extends DataClass implements Insertable<Setting> {
         json['securityAnswerHash'],
       ),
       recoveryCodeHash: serializer.fromJson<String?>(json['recoveryCodeHash']),
+      fontSize: serializer.fromJson<String>(json['fontSize']),
     );
   }
   @override
@@ -3913,6 +3995,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       'securityQuestion': serializer.toJson<String?>(securityQuestion),
       'securityAnswerHash': serializer.toJson<String?>(securityAnswerHash),
       'recoveryCodeHash': serializer.toJson<String?>(recoveryCodeHash),
+      'fontSize': serializer.toJson<String>(fontSize),
     };
   }
 
@@ -3925,6 +4008,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     Value<String?> securityQuestion = const Value.absent(),
     Value<String?> securityAnswerHash = const Value.absent(),
     Value<String?> recoveryCodeHash = const Value.absent(),
+    String? fontSize,
   }) => Setting(
     id: id ?? this.id,
     shopName: shopName ?? this.shopName,
@@ -3942,6 +4026,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     recoveryCodeHash: recoveryCodeHash.present
         ? recoveryCodeHash.value
         : this.recoveryCodeHash,
+    fontSize: fontSize ?? this.fontSize,
   );
   Setting copyWithCompanion(SettingsCompanion data) {
     return Setting(
@@ -3961,6 +4046,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       recoveryCodeHash: data.recoveryCodeHash.present
           ? data.recoveryCodeHash.value
           : this.recoveryCodeHash,
+      fontSize: data.fontSize.present ? data.fontSize.value : this.fontSize,
     );
   }
 
@@ -3974,7 +4060,8 @@ class Setting extends DataClass implements Insertable<Setting> {
           ..write('appPasswordHash: $appPasswordHash, ')
           ..write('securityQuestion: $securityQuestion, ')
           ..write('securityAnswerHash: $securityAnswerHash, ')
-          ..write('recoveryCodeHash: $recoveryCodeHash')
+          ..write('recoveryCodeHash: $recoveryCodeHash, ')
+          ..write('fontSize: $fontSize')
           ..write(')'))
         .toString();
   }
@@ -3989,6 +4076,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     securityQuestion,
     securityAnswerHash,
     recoveryCodeHash,
+    fontSize,
   );
   @override
   bool operator ==(Object other) =>
@@ -4001,7 +4089,8 @@ class Setting extends DataClass implements Insertable<Setting> {
           other.appPasswordHash == this.appPasswordHash &&
           other.securityQuestion == this.securityQuestion &&
           other.securityAnswerHash == this.securityAnswerHash &&
-          other.recoveryCodeHash == this.recoveryCodeHash);
+          other.recoveryCodeHash == this.recoveryCodeHash &&
+          other.fontSize == this.fontSize);
 }
 
 class SettingsCompanion extends UpdateCompanion<Setting> {
@@ -4013,6 +4102,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   final Value<String?> securityQuestion;
   final Value<String?> securityAnswerHash;
   final Value<String?> recoveryCodeHash;
+  final Value<String> fontSize;
   const SettingsCompanion({
     this.id = const Value.absent(),
     this.shopName = const Value.absent(),
@@ -4022,6 +4112,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     this.securityQuestion = const Value.absent(),
     this.securityAnswerHash = const Value.absent(),
     this.recoveryCodeHash = const Value.absent(),
+    this.fontSize = const Value.absent(),
   });
   SettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -4032,6 +4123,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     this.securityQuestion = const Value.absent(),
     this.securityAnswerHash = const Value.absent(),
     this.recoveryCodeHash = const Value.absent(),
+    this.fontSize = const Value.absent(),
   });
   static Insertable<Setting> custom({
     Expression<int>? id,
@@ -4042,6 +4134,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Expression<String>? securityQuestion,
     Expression<String>? securityAnswerHash,
     Expression<String>? recoveryCodeHash,
+    Expression<String>? fontSize,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -4053,6 +4146,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
       if (securityAnswerHash != null)
         'security_answer_hash': securityAnswerHash,
       if (recoveryCodeHash != null) 'recovery_code_hash': recoveryCodeHash,
+      if (fontSize != null) 'font_size': fontSize,
     });
   }
 
@@ -4065,6 +4159,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Value<String?>? securityQuestion,
     Value<String?>? securityAnswerHash,
     Value<String?>? recoveryCodeHash,
+    Value<String>? fontSize,
   }) {
     return SettingsCompanion(
       id: id ?? this.id,
@@ -4075,6 +4170,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
       securityQuestion: securityQuestion ?? this.securityQuestion,
       securityAnswerHash: securityAnswerHash ?? this.securityAnswerHash,
       recoveryCodeHash: recoveryCodeHash ?? this.recoveryCodeHash,
+      fontSize: fontSize ?? this.fontSize,
     );
   }
 
@@ -4105,6 +4201,9 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     if (recoveryCodeHash.present) {
       map['recovery_code_hash'] = Variable<String>(recoveryCodeHash.value);
     }
+    if (fontSize.present) {
+      map['font_size'] = Variable<String>(fontSize.value);
+    }
     return map;
   }
 
@@ -4118,7 +4217,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
           ..write('appPasswordHash: $appPasswordHash, ')
           ..write('securityQuestion: $securityQuestion, ')
           ..write('securityAnswerHash: $securityAnswerHash, ')
-          ..write('recoveryCodeHash: $recoveryCodeHash')
+          ..write('recoveryCodeHash: $recoveryCodeHash, ')
+          ..write('fontSize: $fontSize')
           ..write(')'))
         .toString();
   }
@@ -7732,6 +7832,7 @@ typedef $$ProductsTableCreateCompanionBuilder =
       Value<double> minStock,
       Value<String> unitType,
       Value<String?> imagePath,
+      Value<String?> variantSize,
       Value<bool> isArchived,
       Value<DateTime> createdAt,
     });
@@ -7747,6 +7848,7 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<double> minStock,
       Value<String> unitType,
       Value<String?> imagePath,
+      Value<String?> variantSize,
       Value<bool> isArchived,
       Value<DateTime> createdAt,
     });
@@ -7896,6 +7998,11 @@ class $$ProductsTableFilterComposer
 
   ColumnFilters<String> get imagePath => $composableBuilder(
     column: $table.imagePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get variantSize => $composableBuilder(
+    column: $table.variantSize,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8087,6 +8194,11 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get variantSize => $composableBuilder(
+    column: $table.variantSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isArchived => $composableBuilder(
     column: $table.isArchived,
     builder: (column) => ColumnOrderings(column),
@@ -8160,6 +8272,11 @@ class $$ProductsTableAnnotationComposer
 
   GeneratedColumn<String> get imagePath =>
       $composableBuilder(column: $table.imagePath, builder: (column) => column);
+
+  GeneratedColumn<String> get variantSize => $composableBuilder(
+    column: $table.variantSize,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<bool> get isArchived => $composableBuilder(
     column: $table.isArchived,
@@ -8337,6 +8454,7 @@ class $$ProductsTableTableManager
                 Value<double> minStock = const Value.absent(),
                 Value<String> unitType = const Value.absent(),
                 Value<String?> imagePath = const Value.absent(),
+                Value<String?> variantSize = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => ProductsCompanion(
@@ -8350,6 +8468,7 @@ class $$ProductsTableTableManager
                 minStock: minStock,
                 unitType: unitType,
                 imagePath: imagePath,
+                variantSize: variantSize,
                 isArchived: isArchived,
                 createdAt: createdAt,
               ),
@@ -8365,6 +8484,7 @@ class $$ProductsTableTableManager
                 Value<double> minStock = const Value.absent(),
                 Value<String> unitType = const Value.absent(),
                 Value<String?> imagePath = const Value.absent(),
+                Value<String?> variantSize = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => ProductsCompanion.insert(
@@ -8378,6 +8498,7 @@ class $$ProductsTableTableManager
                 minStock: minStock,
                 unitType: unitType,
                 imagePath: imagePath,
+                variantSize: variantSize,
                 isArchived: isArchived,
                 createdAt: createdAt,
               ),
@@ -11667,6 +11788,7 @@ typedef $$SettingsTableCreateCompanionBuilder =
       Value<String?> securityQuestion,
       Value<String?> securityAnswerHash,
       Value<String?> recoveryCodeHash,
+      Value<String> fontSize,
     });
 typedef $$SettingsTableUpdateCompanionBuilder =
     SettingsCompanion Function({
@@ -11678,6 +11800,7 @@ typedef $$SettingsTableUpdateCompanionBuilder =
       Value<String?> securityQuestion,
       Value<String?> securityAnswerHash,
       Value<String?> recoveryCodeHash,
+      Value<String> fontSize,
     });
 
 class $$SettingsTableFilterComposer
@@ -11726,6 +11849,11 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<String> get recoveryCodeHash => $composableBuilder(
     column: $table.recoveryCodeHash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fontSize => $composableBuilder(
+    column: $table.fontSize,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -11778,6 +11906,11 @@ class $$SettingsTableOrderingComposer
     column: $table.recoveryCodeHash,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get fontSize => $composableBuilder(
+    column: $table.fontSize,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableAnnotationComposer
@@ -11820,6 +11953,9 @@ class $$SettingsTableAnnotationComposer
     column: $table.recoveryCodeHash,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get fontSize =>
+      $composableBuilder(column: $table.fontSize, builder: (column) => column);
 }
 
 class $$SettingsTableTableManager
@@ -11858,6 +11994,7 @@ class $$SettingsTableTableManager
                 Value<String?> securityQuestion = const Value.absent(),
                 Value<String?> securityAnswerHash = const Value.absent(),
                 Value<String?> recoveryCodeHash = const Value.absent(),
+                Value<String> fontSize = const Value.absent(),
               }) => SettingsCompanion(
                 id: id,
                 shopName: shopName,
@@ -11867,6 +12004,7 @@ class $$SettingsTableTableManager
                 securityQuestion: securityQuestion,
                 securityAnswerHash: securityAnswerHash,
                 recoveryCodeHash: recoveryCodeHash,
+                fontSize: fontSize,
               ),
           createCompanionCallback:
               ({
@@ -11878,6 +12016,7 @@ class $$SettingsTableTableManager
                 Value<String?> securityQuestion = const Value.absent(),
                 Value<String?> securityAnswerHash = const Value.absent(),
                 Value<String?> recoveryCodeHash = const Value.absent(),
+                Value<String> fontSize = const Value.absent(),
               }) => SettingsCompanion.insert(
                 id: id,
                 shopName: shopName,
@@ -11887,6 +12026,7 @@ class $$SettingsTableTableManager
                 securityQuestion: securityQuestion,
                 securityAnswerHash: securityAnswerHash,
                 recoveryCodeHash: recoveryCodeHash,
+                fontSize: fontSize,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

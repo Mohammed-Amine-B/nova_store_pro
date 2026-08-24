@@ -448,6 +448,30 @@ abstract class AppLocalizations {
   /// **'Low stock threshold'**
   String get lowStockThresholdLabel;
 
+  /// No description provided for @variantSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Size (optional)'**
+  String get variantSizeLabel;
+
+  /// No description provided for @variantSizeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 4mm, Large, 1kg'**
+  String get variantSizeHint;
+
+  /// No description provided for @variantsPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Sizes'**
+  String get variantsPanel;
+
+  /// No description provided for @variantsPanelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Other products in the same variant group'**
+  String get variantsPanelDesc;
+
   /// No description provided for @unitTypeLabel.
   ///
   /// In en, this message translates to:
@@ -501,6 +525,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Selling Price'**
   String get sellingPriceLabel;
+
+  /// No description provided for @costPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost Price'**
+  String get costPriceLabel;
 
   /// No description provided for @notSet.
   ///
@@ -909,6 +939,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System'**
   String get themeSystem;
+
+  /// No description provided for @fontSizePanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Font Size'**
+  String get fontSizePanel;
+
+  /// No description provided for @fontSizePanelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust text size across Nova Store'**
+  String get fontSizePanelDesc;
+
+  /// No description provided for @fontSizeSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get fontSizeSmall;
+
+  /// No description provided for @fontSizeMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get fontSizeMedium;
+
+  /// No description provided for @fontSizeLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get fontSizeLarge;
 
   /// No description provided for @languagePanel.
   ///
@@ -2260,6 +2320,24 @@ abstract class AppLocalizations {
   /// **'No customer sales recorded yet.'**
   String get noCustomerSalesYet;
 
+  /// No description provided for @supplierPurchasesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Supplier Purchases'**
+  String get supplierPurchasesLabel;
+
+  /// No description provided for @purchaseCountDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} purchase(s)'**
+  String purchaseCountDesc(int count);
+
+  /// No description provided for @noSupplierPurchasesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No supplier purchases recorded yet.'**
+  String get noSupplierPurchasesYet;
+
   /// No description provided for @colCustomer.
   ///
   /// In en, this message translates to:
@@ -2697,6 +2775,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Code copied to clipboard'**
   String get codeCopiedMessage;
+
+  /// No description provided for @insightsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Insights'**
+  String get insightsTitle;
+
+  /// No description provided for @insightsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Data-driven suggestions based on your store\'s activity'**
+  String get insightsSubtitle;
+
+  /// No description provided for @statNextWeekEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Week Estimate'**
+  String get statNextWeekEstimate;
+
+  /// No description provided for @statNextMonthEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Month Estimate'**
+  String get statNextMonthEstimate;
+
+  /// No description provided for @todayAnomalyLowMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s revenue ({today}) is unusually low compared to your recent average ({avg}).'**
+  String todayAnomalyLowMessage(String today, String avg);
+
+  /// No description provided for @todayAnomalyHighMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s revenue ({today}) is unusually high compared to your recent average ({avg}).'**
+  String todayAnomalyHighMessage(String today, String avg);
+
+  /// No description provided for @reorderSuggestionsPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder Suggestions'**
+  String get reorderSuggestionsPanel;
+
+  /// No description provided for @reorderSuggestionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Products likely to run out soon, based on recent sales pace'**
+  String get reorderSuggestionsDesc;
+
+  /// No description provided for @colDaysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Days Left'**
+  String get colDaysLeft;
+
+  /// No description provided for @colSuggestedQty.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested Qty'**
+  String get colSuggestedQty;
+
+  /// No description provided for @colSupplier.
+  ///
+  /// In en, this message translates to:
+  /// **'Supplier'**
+  String get colSupplier;
+
+  /// No description provided for @noReorderSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing needs reordering right now.'**
+  String get noReorderSuggestions;
+
+  /// No description provided for @stagnantProductsPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow-Moving Stock'**
+  String get stagnantProductsPanel;
+
+  /// No description provided for @stagnantProductsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'In stock but no sales in the last 30 days'**
+  String get stagnantProductsDesc;
+
+  /// No description provided for @noStagnantProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'No slow-moving stock right now.'**
+  String get noStagnantProducts;
+
+  /// No description provided for @reorderNoticeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} products need reordering soon'**
+  String reorderNoticeMessage(int count);
+
+  /// No description provided for @suggestedPriceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested: {price} (based on similar products)'**
+  String suggestedPriceHint(String price);
+
+  /// No description provided for @useSuggestionAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Use'**
+  String get useSuggestionAction;
 }
 
 class _AppLocalizationsDelegate

@@ -9,7 +9,9 @@ import '../../widgets/quick_add_sale_bar.dart';
 
 class TodaySalesScreen extends StatefulWidget {
   final AppDatabase db;
-  const TodaySalesScreen({super.key, required this.db});
+  final FocusNode?
+  searchFocusNode; // optional external node (e.g. for a global Ctrl+N shortcut)
+  const TodaySalesScreen({super.key, required this.db, this.searchFocusNode});
 
   @override
   State<TodaySalesScreen> createState() => _TodaySalesScreenState();
@@ -17,12 +19,12 @@ class TodaySalesScreen extends StatefulWidget {
 
 class _TodaySalesScreenState extends State<TodaySalesScreen> {
   final _viewKey = GlobalKey<SalesDayViewState>();
-  final _searchFocusNode = FocusNode();
+  late final FocusNode _searchFocusNode = widget.searchFocusNode ?? FocusNode();
   late final DateTime _today = DateTime.now();
 
   @override
   void dispose() {
-    _searchFocusNode.dispose();
+    if (widget.searchFocusNode == null) _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -46,7 +48,10 @@ class _TodaySalesScreenState extends State<TodaySalesScreen> {
           children: [
             PageHeader(
               title: l10n.todaySalesTitle,
-              subtitle: DateFormat('EEEE, MMMM d', Localizations.localeOf(context).toString()).format(_today),
+              subtitle: DateFormat(
+                'EEEE, MMMM d',
+                Localizations.localeOf(context).toString(),
+              ).format(_today),
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,

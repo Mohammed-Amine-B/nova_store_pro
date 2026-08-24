@@ -48,9 +48,14 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-  // Bumped for Settings' password-recovery columns (securityQuestion/securityAnswerHash/recoveryCodeHash).
+  // Bumped for removal of Products.variantGroup (superseded by matching
+  // variants on product name — see ProductRepository.getVariants). One-time
+  // exception to the migration-required rule below: no real onUpgrade step
+  // was written for this column removal since the app has no production data
+  // yet; the local dev SQLite database needs to be deleted once for this
+  // change. All schema changes after this one still require a real migration.
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 14;
 
   // Baseline: schema version 9 as of 2026-08-23. All future schema changes must
   // add a migration step in onUpgrade below — never tell a user to delete their
@@ -68,6 +73,14 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(settings, settings.securityAnswerHash);
             await m.addColumn(settings, settings.recoveryCodeHash);
           }
+          if (from < 11) {
+            await m.addColumn(settings, settings.fontSize);
+          }
+          if (from < 13) {
+            await m.addColumn(products, products.variantSize);
+          }
+          // from < 14: Products.variantGroup was dropped — no migration step
+          // (see the one-time exception noted on schemaVersion above).
         },
         beforeOpen: (details) async {
           // Optional: enable foreign keys or run startup checks here if needed.

@@ -13,6 +13,7 @@ class Products extends Table {
   RealColumn get minStock => real().withDefault(const Constant(0))();
   TextColumn get unitType => text().withDefault(const Constant('piece'))();
   TextColumn get imagePath => text().nullable()(); // filename only, resolved against product_images/ at display time
+  TextColumn get variantSize => text().nullable()(); // e.g. "4mm", "Large", "1kg" — free text, any store type
   BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }

@@ -8,6 +8,7 @@ import '../../widgets/stat_card.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
+import '../../utils/text_scale.dart';
 import 'supplier_form_dialog.dart';
 import 'supplier_detail_screen.dart';
 import 'new_purchase_screen.dart';
@@ -213,8 +214,8 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                             }),
                             columnSpacing: 28,
                             horizontalMargin: 20,
-                            dataRowMinHeight: 56,
-                            dataRowMaxHeight: 64,
+                            dataRowMinHeight: 56 * dataRowScale(context),
+                            dataRowMaxHeight: 64 * dataRowScale(context),
                             columns: [
                               DataColumn(label: Text(l10n.colName)),
                               DataColumn(label: Text(l10n.colLocation)),

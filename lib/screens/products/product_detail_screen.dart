@@ -5,6 +5,7 @@ import '../../data/database/database.dart';
 import '../../data/repositories/product_repository.dart';
 import '../../data/repositories/category_repository.dart';
 import '../../data/repositories/product_status.dart';
+import '../../data/repositories/insights_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/status_badge.dart';
@@ -37,6 +38,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Product? _product;
   List<ProductBatche> _batches = [];
+  List<Product> _variants = [];
   String _categoryName = '—';
   bool _loading = true;
 
@@ -51,6 +53,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final batches = await _repo.getBatches(widget.productId);
     final categoriesWithCounts = await _categoryRepo.getAllWithCounts();
     final categories = categoriesWithCounts.map((c) => c.category).toList();
+    final variants = product != null
+        ? await _repo.getVariants(product.name, excludeId: product.id)
+        : <Product>[];
 
     String categoryName = '—';
     if (product?.categoryId != null) {
@@ -66,10 +71,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     setState(() {
       _product = product;
       _batches = batches;
+      _variants = variants;
       _categoryName = categoryName;
       _categories = categories;
       _loading = false;
     });
+  }
+
+  Future<void> _openVariant(Product variant) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ProductDetailScreen(db: widget.db, productId: variant.id),
+      ),
+    );
+    _load();
   }
 
   Future<void> _editProduct() async {
@@ -166,7 +181,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     };
 
     return Scaffold(
-      appBar: AppBar(title: Text(product.name), leading: const BackButton()),
+      appBar: AppBar(title: Text(productDisplayName(product)), leading: const BackButton()),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -304,6 +319,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                         : l10n.notSet,
                                   ),
                                 ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: _HighlightBox(
+                                    l10n.costPriceLabel,
+                                    _batches.isNotEmpty
+                                        ? formatMoney(_batches.last.buyPrice)
+                                        : l10n.notSet,
+                                  ),
+                                ),
                               ],
                             ),
                           ],
@@ -411,6 +435,32 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               },
                             ),
                     ),
+                    if (_variants.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      Panel(
+                        title: l10n.variantsPanel,
+                        description: l10n.variantsPanelDesc,
+                        child: Column(
+                          children: _variants.map((v) {
+                            final vLowStock = v.stockQuantity <= v.minStock;
+                            return ListTile(
+                              leading: const Icon(Icons.swap_horiz, color: Color(0xFF0E7C7B)),
+                              title: Text(productDisplayName(v)),
+                              subtitle: Text(
+                                vLowStock
+                                    ? l10n.lowStockLeftSuffix(formatQuantity(v.stockQuantity, v.unitType))
+                                    : l10n.inStockCount(formatQuantity(v.stockQuantity, v.unitType)),
+                              ),
+                              trailing: Text(
+                                v.sellingPrice != null ? formatMoney(v.sellingPrice!) : l10n.notSet,
+                                style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF0E7C7B)),
+                              ),
+                              onTap: () => _openVariant(v),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
                   ],
                 );
 
@@ -571,6 +621,7 @@ class _AddStockDialog extends StatefulWidget {
 }
 
 class _AddStockDialogState extends State<_AddStockDialog> {
+  late final InsightsRepository _insightsRepo = InsightsRepository(widget.repo.db);
   final _quantityController = TextEditingController();
   final _buyPriceController = TextEditingController();
   late final _sellingPriceController = TextEditingController(
@@ -669,6 +720,7 @@ class _AddStockDialogState extends State<_AddStockDialog> {
                       border: const OutlineInputBorder(),
                     ),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (_) => setState(() {}),
                   ),
                 ),
               ],
@@ -682,6 +734,37 @@ class _AddStockDialogState extends State<_AddStockDialog> {
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
+            if (widget.product.categoryId != null && (double.tryParse(_buyPriceController.text) ?? 0) > 0)
+              FutureBuilder<double?>(
+                future: _insightsRepo.suggestSellingPrice(
+                  widget.product.categoryId!,
+                  double.tryParse(_buyPriceController.text) ?? 0,
+                ),
+                builder: (context, snapshot) {
+                  final suggestion = snapshot.data;
+                  if (suggestion == null) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.suggestedPriceHint(formatMoney(suggestion)),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () => setState(() => _sellingPriceController.text = plainNumber(suggestion)),
+                          child: Text(l10n.useSuggestionAction),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             const SizedBox(height: 14),
             InkWell(
               onTap: _pickDate,

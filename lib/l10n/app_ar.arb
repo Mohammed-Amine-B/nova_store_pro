@@ -58,6 +58,10 @@
   "categoryOptionalLabel": "التصنيف (اختياري)",
   "noneOption": "بدون",
   "lowStockThresholdLabel": "حد المخزون المنخفض",
+  "variantSizeLabel": "المقاس (اختياري)",
+  "variantSizeHint": "مثال: 4 مم، كبير، 1 كجم",
+  "variantsPanel": "مقاسات أخرى",
+  "variantsPanelDesc": "منتجات أخرى في نفس مجموعة المقاسات",
   "unitTypeLabel": "نوع الوحدة",
   "unitTypePiece": "قطعة",
   "unitTypeKg": "كيلوغرام (kg)",
@@ -67,6 +71,7 @@
   "batchesLabel": "الدفعات",
   "currentStockLabel": "المخزون الحالي",
   "sellingPriceLabel": "سعر البيع",
+  "costPriceLabel": "سعر التكلفة",
   "notSet": "غير محدد",
   "batchesPanelDesc": "FIFO — الدفعة الأقدم تُباع أولًا",
   "noBatchesYet": "لا يوجد مخزون بعد. استخدم \"إضافة مخزون\" لتسجيل أول دفعة.",
@@ -135,6 +140,11 @@
   "themeLight": "فاتح",
   "themeDark": "داكن",
   "themeSystem": "تلقائي",
+  "fontSizePanel": "حجم الخط",
+  "fontSizePanelDesc": "اضبط حجم النص في نوفا ستور",
+  "fontSizeSmall": "صغير",
+  "fontSizeMedium": "متوسط",
+  "fontSizeLarge": "كبير",
   "languagePanel": "اللغة",
   "languagePanelDesc": "اختر لغة التطبيق",
   "savedLabel": "تم الحفظ",
@@ -360,6 +370,16 @@
   "customerSalesLabel": "مبيعات الزبائن",
   "invoiceCountDesc": "{count} فاتورة",
   "noCustomerSalesYet": "لا توجد مبيعات زبائن مسجلة بعد.",
+  "supplierPurchasesLabel": "مشتريات الموردين",
+  "purchaseCountDesc": "{count} عملية شراء",
+  "@purchaseCountDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSupplierPurchasesYet": "لا توجد مشتريات موردين مسجلة بعد.",
   "colCustomer": "الزبون",
   "invoiceAction": "الفاتورة",
   "colNote": "ملاحظة",
@@ -432,5 +452,23 @@
   "securityQuestionFirstPet": "ما اسم أول حيوان أليف لك؟",
   "securityQuestionFavoriteProduct": "ما هو منتجك المفضل للبيع؟",
   "copyCodeAction": "نسخ الرمز",
-  "codeCopiedMessage": "تم نسخ الرمز إلى الحافظة"
+  "codeCopiedMessage": "تم نسخ الرمز إلى الحافظة",
+  "insightsTitle": "اقتراحات ذكية",
+  "insightsSubtitle": "اقتراحات مبنية على بيانات نشاط محلك",
+  "statNextWeekEstimate": "توقع الأسبوع القادم",
+  "statNextMonthEstimate": "توقع الشهر القادم",
+  "todayAnomalyLowMessage": "إيرادات اليوم ({today}) منخفضة بشكل غير معتاد مقارنة بمتوسطك الأخير ({avg}).",
+  "todayAnomalyHighMessage": "إيرادات اليوم ({today}) مرتفعة بشكل غير معتاد مقارنة بمتوسطك الأخير ({avg}).",
+  "reorderSuggestionsPanel": "اقتراحات إعادة الطلب",
+  "reorderSuggestionsDesc": "منتجات قد تنفد قريبًا بناءً على وتيرة المبيعات الأخيرة",
+  "colDaysLeft": "الأيام المتبقية",
+  "colSuggestedQty": "الكمية المقترحة",
+  "colSupplier": "المورد",
+  "noReorderSuggestions": "لا شيء يحتاج إعادة طلب حاليًا.",
+  "stagnantProductsPanel": "مخزون بطيء الحركة",
+  "stagnantProductsDesc": "متوفر في المخزون لكن بدون مبيعات خلال 30 يومًا",
+  "noStagnantProducts": "لا يوجد مخزون بطيء الحركة حاليًا.",
+  "reorderNoticeMessage": "{count} منتج يحتاج إعادة طلب قريبًا",
+  "suggestedPriceHint": "مقترح: {price} (بناءً على منتجات مشابهة)",
+  "useSuggestionAction": "استخدام"
 }

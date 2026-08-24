@@ -115,7 +115,7 @@ class _InvoiceViewScreenState extends State<InvoiceViewScreen> {
                 final product = _products[item.productId];
                 return [
                   '${item.quantity}',
-                  product?.name ?? 'Unknown',
+                  product != null ? productDisplayName(product) : 'Unknown',
                   formatMoney(item.unitPrice),
                   formatMoney(item.quantity * item.unitPrice),
                 ];
@@ -276,7 +276,7 @@ class _InvoiceViewScreenState extends State<InvoiceViewScreen> {
                         final product = _products[item.productId];
                         return TableRow(children: [
                           _Cell('${item.quantity}'),
-                          _Cell(product?.name ?? l10n.unknownProductLabel),
+                          _Cell(product != null ? productDisplayName(product) : l10n.unknownProductLabel),
                           _Cell(formatMoney(item.unitPrice), align: TextAlign.right),
                           _Cell(formatMoney(item.quantity * item.unitPrice), align: TextAlign.right),
                         ]);

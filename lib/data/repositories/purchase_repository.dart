@@ -23,6 +23,14 @@ class PurchaseRepository {
         .get();
   }
 
+  /// All purchases across every supplier, newest first, with the supplier's name resolved.
+  Future<List<({Purchase purchase, String supplierName})>> getAllPurchaseRecords() async {
+    final purchases = await getAllPurchases(); // reuse the existing method
+    final suppliers = await db.select(db.suppliers).get();
+    final nameOf = {for (final s in suppliers) s.id: s.name};
+    return purchases.map((p) => (purchase: p, supplierName: nameOf[p.supplierId] ?? 'Unknown')).toList();
+  }
+
   Future<List<PurchaseItem>> getPurchaseItems(int purchaseId) async {
     return (db.select(db.purchaseItems)..where((i) => i.purchaseId.equals(purchaseId))).get();
   }

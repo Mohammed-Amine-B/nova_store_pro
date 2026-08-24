@@ -114,7 +114,7 @@ class _PurchaseReceiptScreenState extends State<PurchaseReceiptScreen> {
                 final product = _products[item.productId];
                 return [
                   '${item.quantity}',
-                  product?.name ?? 'Unknown',
+                  product != null ? productDisplayName(product) : 'Unknown',
                   formatMoney(item.buyPrice),
                   formatMoney(item.quantity * item.buyPrice),
                 ];
@@ -274,7 +274,7 @@ class _PurchaseReceiptScreenState extends State<PurchaseReceiptScreen> {
                         final product = _products[item.productId];
                         return TableRow(children: [
                           _Cell('${item.quantity}'),
-                          _Cell(product?.name ?? 'Unknown'),
+                          _Cell(product != null ? productDisplayName(product) : 'Unknown'),
                           _Cell(formatMoney(item.buyPrice), align: TextAlign.right),
                           _Cell(formatMoney(item.quantity * item.buyPrice), align: TextAlign.right),
                         ]);

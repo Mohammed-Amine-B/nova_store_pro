@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../data/database/database.dart';
 import '../../data/repositories/sales_repository.dart';
+import '../../data/repositories/purchase_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
@@ -9,9 +10,10 @@ import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
 import 'sales_day_detail_screen.dart';
 import '../reports/invoice_view_screen.dart';
+import '../suppliers/purchase_receipt_screen.dart';
 import '../../widgets/return_dialog.dart';
 
-enum ArchiveView { todaySales, customerSales }
+enum ArchiveView { todaySales, customerSales, supplierPurchases }
 
 class ArchiveScreen extends StatefulWidget {
   final AppDatabase db;
@@ -23,10 +25,12 @@ class ArchiveScreen extends StatefulWidget {
 
 class _ArchiveScreenState extends State<ArchiveScreen> {
   late final SalesRepository _repo = SalesRepository(widget.db);
+  late final PurchaseRepository _purchaseRepo = PurchaseRepository(widget.db);
   ArchiveView _view = ArchiveView.todaySales;
 
   late Future<List<({DateTime date, double revenue, double profit, int count})>> _daysFuture;
   late Future<List<({Sale sale, String customerName})>> _invoicesFuture;
+  late Future<List<({Purchase purchase, String supplierName})>> _purchasesFuture;
 
   @override
   void initState() {
@@ -37,6 +41,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
   void _loadAll() {
     _daysFuture = _repo.getArchiveDays();
     _invoicesFuture = _repo.getCustomerSaleInvoices();
+    _purchasesFuture = _purchaseRepo.getAllPurchaseRecords();
   }
 
   void _reload() {
@@ -61,6 +66,12 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
     );
   }
 
+  Future<void> _openReceipt(int purchaseId) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => PurchaseReceiptScreen(db: widget.db, purchaseId: purchaseId)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -73,6 +84,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
             segments: [
               ButtonSegment(value: ArchiveView.todaySales, label: Text(l10n.navTodaySales), icon: const Icon(Icons.point_of_sale_outlined)),
               ButtonSegment(value: ArchiveView.customerSales, label: Text(l10n.customerSalesLabel), icon: const Icon(Icons.receipt_long_outlined)),
+              ButtonSegment(value: ArchiveView.supplierPurchases, label: Text(l10n.supplierPurchasesLabel), icon: const Icon(Icons.local_shipping_outlined)),
             ],
             selected: {_view},
             onSelectionChanged: (s) => setState(() => _view = s.first),
@@ -130,7 +142,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                 );
               },
             )
-          else
+          else if (_view == ArchiveView.customerSales)
             FutureBuilder<List<({Sale sale, String customerName})>>(
               future: _invoicesFuture,
               builder: (context, snapshot) {
@@ -202,6 +214,68 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                                               },
                                             ),
                                           ],
+                                        )),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                );
+              },
+            )
+          else
+            FutureBuilder<List<({Purchase purchase, String supplierName})>>(
+              future: _purchasesFuture,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final purchases = snapshot.data!;
+                return Panel(
+                  title: l10n.supplierPurchasesLabel,
+                  description: l10n.purchaseCountDesc(purchases.length),
+                  child: purchases.isEmpty
+                      ? EmptyState(icon: Icons.local_shipping_outlined, title: l10n.noSupplierPurchasesYet)
+                      : LayoutBuilder(
+                          builder: (context, constraints) {
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                                child: DataTable(
+                                  showCheckboxColumn: false,
+                                  columns: [
+                                    DataColumn(label: Text(l10n.colDate)),
+                                    DataColumn(label: Text(l10n.colSupplier)),
+                                    DataColumn(label: Text(l10n.totalLabel), numeric: true),
+                                    DataColumn(label: Text(l10n.colPaid), numeric: true),
+                                    DataColumn(label: Text(l10n.colRemaining), numeric: true),
+                                    const DataColumn(label: Text('')),
+                                  ],
+                                  rows: purchases.map((entry) {
+                                    final p = entry.purchase;
+                                    final remaining = p.totalAmount - p.amountPaid;
+                                    return DataRow(
+                                      onSelectChanged: (_) => _openReceipt(p.id),
+                                      cells: [
+                                        DataCell(Text(_formatDate(p.purchaseDate))),
+                                        DataCell(Text(entry.supplierName)),
+                                        DataCell(Text(formatMoney(p.totalAmount))),
+                                        DataCell(Text(formatMoney(p.amountPaid))),
+                                        DataCell(Text(
+                                          formatMoney(remaining),
+                                          style: TextStyle(
+                                            color: remaining > 0 ? const Color(0xFFE4572E) : const Color(0xFF16A34A),
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        )),
+                                        DataCell(IconButton(
+                                          icon: const Icon(Icons.receipt_long_outlined, size: 18),
+                                          tooltip: l10n.viewAction,
+                                          onPressed: () => _openReceipt(p.id),
                                         )),
                                       ],
                                     );

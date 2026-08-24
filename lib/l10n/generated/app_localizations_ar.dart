@@ -193,6 +193,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lowStockThresholdLabel => 'حد المخزون المنخفض';
 
   @override
+  String get variantSizeLabel => 'المقاس (اختياري)';
+
+  @override
+  String get variantSizeHint => 'مثال: 4 مم، كبير، 1 كجم';
+
+  @override
+  String get variantsPanel => 'مقاسات أخرى';
+
+  @override
+  String get variantsPanelDesc => 'منتجات أخرى في نفس مجموعة المقاسات';
+
+  @override
   String get unitTypeLabel => 'نوع الوحدة';
 
   @override
@@ -218,6 +230,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sellingPriceLabel => 'سعر البيع';
+
+  @override
+  String get costPriceLabel => 'سعر التكلفة';
 
   @override
   String get notSet => 'غير محدد';
@@ -438,6 +453,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get themeSystem => 'تلقائي';
+
+  @override
+  String get fontSizePanel => 'حجم الخط';
+
+  @override
+  String get fontSizePanelDesc => 'اضبط حجم النص في نوفا ستور';
+
+  @override
+  String get fontSizeSmall => 'صغير';
+
+  @override
+  String get fontSizeMedium => 'متوسط';
+
+  @override
+  String get fontSizeLarge => 'كبير';
 
   @override
   String get languagePanel => 'اللغة';
@@ -1180,6 +1210,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noCustomerSalesYet => 'لا توجد مبيعات زبائن مسجلة بعد.';
 
   @override
+  String get supplierPurchasesLabel => 'مشتريات الموردين';
+
+  @override
+  String purchaseCountDesc(int count) {
+    return '$count عملية شراء';
+  }
+
+  @override
+  String get noSupplierPurchasesYet => 'لا توجد مشتريات موردين مسجلة بعد.';
+
+  @override
   String get colCustomer => 'الزبون';
 
   @override
@@ -1453,4 +1494,68 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get codeCopiedMessage => 'تم نسخ الرمز إلى الحافظة';
+
+  @override
+  String get insightsTitle => 'اقتراحات ذكية';
+
+  @override
+  String get insightsSubtitle => 'اقتراحات مبنية على بيانات نشاط محلك';
+
+  @override
+  String get statNextWeekEstimate => 'توقع الأسبوع القادم';
+
+  @override
+  String get statNextMonthEstimate => 'توقع الشهر القادم';
+
+  @override
+  String todayAnomalyLowMessage(String today, String avg) {
+    return 'إيرادات اليوم ($today) منخفضة بشكل غير معتاد مقارنة بمتوسطك الأخير ($avg).';
+  }
+
+  @override
+  String todayAnomalyHighMessage(String today, String avg) {
+    return 'إيرادات اليوم ($today) مرتفعة بشكل غير معتاد مقارنة بمتوسطك الأخير ($avg).';
+  }
+
+  @override
+  String get reorderSuggestionsPanel => 'اقتراحات إعادة الطلب';
+
+  @override
+  String get reorderSuggestionsDesc =>
+      'منتجات قد تنفد قريبًا بناءً على وتيرة المبيعات الأخيرة';
+
+  @override
+  String get colDaysLeft => 'الأيام المتبقية';
+
+  @override
+  String get colSuggestedQty => 'الكمية المقترحة';
+
+  @override
+  String get colSupplier => 'المورد';
+
+  @override
+  String get noReorderSuggestions => 'لا شيء يحتاج إعادة طلب حاليًا.';
+
+  @override
+  String get stagnantProductsPanel => 'مخزون بطيء الحركة';
+
+  @override
+  String get stagnantProductsDesc =>
+      'متوفر في المخزون لكن بدون مبيعات خلال 30 يومًا';
+
+  @override
+  String get noStagnantProducts => 'لا يوجد مخزون بطيء الحركة حاليًا.';
+
+  @override
+  String reorderNoticeMessage(int count) {
+    return '$count منتج يحتاج إعادة طلب قريبًا';
+  }
+
+  @override
+  String suggestedPriceHint(String price) {
+    return 'مقترح: $price (بناءً على منتجات مشابهة)';
+  }
+
+  @override
+  String get useSuggestionAction => 'استخدام';
 }

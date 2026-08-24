@@ -11,6 +11,7 @@ class Settings extends Table {
   TextColumn get securityQuestion => text().nullable()();
   TextColumn get securityAnswerHash => text().nullable()(); // hashed the same way as appPasswordHash
   TextColumn get recoveryCodeHash => text().nullable()(); // hashed the same way as appPasswordHash
+  TextColumn get fontSize => text().withDefault(const Constant('medium'))(); // 'small' | 'medium' | 'large'
 
   @override
   Set<Column> get primaryKey => {id};

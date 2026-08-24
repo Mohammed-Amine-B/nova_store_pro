@@ -21,6 +21,8 @@ class SettingsScreen extends StatefulWidget {
   final ValueChanged<String> onThemeModeChanged; // 'light' | 'dark' | 'system'
   final ValueChanged<String> onShopNameChanged;
   final ValueChanged<String> onLanguageChanged; // 'en' | 'ar' | 'fr'
+  final String fontSize; // 'small' | 'medium' | 'large'
+  final ValueChanged<String> onFontSizeChanged;
 
   const SettingsScreen({
     super.key,
@@ -28,6 +30,8 @@ class SettingsScreen extends StatefulWidget {
     required this.onThemeModeChanged,
     required this.onShopNameChanged,
     required this.onLanguageChanged,
+    required this.fontSize,
+    required this.onFontSizeChanged,
   });
 
   @override
@@ -39,6 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _shopNameController = TextEditingController();
   String _themeMode = 'system';
   String _language = 'en';
+  String _fontSize = 'medium';
   bool _loading = true;
   bool _saved = false;
   bool _hasPassword = false;
@@ -57,6 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _shopNameController.text = settings.shopName;
       _themeMode = settings.themeMode;
       _language = settings.language;
+      _fontSize = settings.fontSize;
       _hasPassword =
           settings.appPasswordHash != null &&
           settings.appPasswordHash!.isNotEmpty;
@@ -332,6 +338,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _flashSaved();
   }
 
+  Future<void> _onFontSizeSelected(String size) async {
+    setState(() => _fontSize = size);
+    await _repo.updateFontSize(size);
+    widget.onFontSizeChanged(size);
+    _flashSaved();
+  }
+
   void _flashSaved() {
     setState(() => _saved = true);
     Future.delayed(const Duration(seconds: 2), () {
@@ -472,6 +485,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
                 selected: {_themeMode},
                 onSelectionChanged: (s) => _onThemeChanged(s.first),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Panel(
+            title: l10n.fontSizePanel,
+            description: l10n.fontSizePanelDesc,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: SegmentedButton<String>(
+                segments: [
+                  ButtonSegment(value: 'small', label: Text(l10n.fontSizeSmall)),
+                  ButtonSegment(value: 'medium', label: Text(l10n.fontSizeMedium)),
+                  ButtonSegment(value: 'large', label: Text(l10n.fontSizeLarge)),
+                ],
+                selected: {_fontSize},
+                onSelectionChanged: (s) => _onFontSizeSelected(s.first),
               ),
             ),
           ),

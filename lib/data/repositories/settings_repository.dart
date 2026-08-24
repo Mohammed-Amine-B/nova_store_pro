@@ -40,6 +40,11 @@ class SettingsRepository {
         .write(SettingsCompanion(language: Value(code)));
   }
 
+  Future<void> updateFontSize(String size) async {
+    await (db.update(db.settings)..where((s) => s.id.equals(1)))
+        .write(SettingsCompanion(fontSize: Value(size)));
+  }
+
   String _hash(String value) => sha256.convert(utf8.encode(value)).toString();
 
   /// A 10-character alphanumeric code, excluding visually-ambiguous characters

@@ -20,8 +20,9 @@ List<NavItem> navItemsFor(BuildContext context) {
     NavItem(Icons.archive_outlined, l10n.navArchive, 6),
     NavItem(Icons.history_toggle_off, l10n.returnsTitle, 7),
     NavItem(Icons.bar_chart_outlined, l10n.reportsTitle, 8),
-    NavItem(Icons.history_edu_outlined, l10n.activityLogTitle, 9),
-    NavItem(Icons.settings_outlined, l10n.navSettings, 10),
+    NavItem(Icons.insights_outlined, l10n.insightsTitle, 9),
+    NavItem(Icons.history_edu_outlined, l10n.activityLogTitle, 10),
+    NavItem(Icons.settings_outlined, l10n.navSettings, 11),
   ];
 }
 
@@ -42,7 +43,7 @@ class AppSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      width: 240,
+      width: 260,
       decoration: BoxDecoration(
         color: theme.cardColor,
         border: Border(right: BorderSide(color: theme.dividerColor)),
@@ -96,7 +97,7 @@ class AppSidebar extends StatelessWidget {
       (l10n.navSectionOverview, const [0]),
       (l10n.navSectionInventory, const [1, 2, 4]),
       (l10n.navSectionSales, const [3, 5, 6, 7]),
-      (l10n.navSectionAdmin, const [8, 9, 10]),
+      (l10n.navSectionAdmin, const [8, 9, 10, 11]),
     ];
 
     final theme = Theme.of(context);
@@ -126,16 +127,22 @@ class AppSidebar extends StatelessWidget {
   Widget _navTile(BuildContext context, NavItem item) {
     final theme = Theme.of(context);
     final selected = item.index == selectedIndex;
+    final isDark = theme.brightness == Brightness.dark;
+    // Soft pastel tint of the primary teal for the selected pill — darkened
+    // toward black in dark mode instead of washed out toward white.
+    final selectedTint = isDark
+        ? Color.lerp(theme.colorScheme.primary, Colors.black, 0.7)!
+        : Color.lerp(theme.colorScheme.primary, Colors.white, 0.88)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Material(
-        color: selected ? theme.colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
+        color: selected ? selectedTint : Colors.transparent,
+        borderRadius: BorderRadius.circular(13),
         child: InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(13),
           onTap: () => onSelect(item.index),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
             child: Row(
               children: [
                 Icon(

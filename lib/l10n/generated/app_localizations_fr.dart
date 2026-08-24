@@ -193,6 +193,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get lowStockThresholdLabel => 'Seuil de stock faible';
 
   @override
+  String get variantSizeLabel => 'Taille (facultatif)';
+
+  @override
+  String get variantSizeHint => 'ex. 4mm, Grand, 1kg';
+
+  @override
+  String get variantsPanel => 'Autres tailles';
+
+  @override
+  String get variantsPanelDesc =>
+      'Autres produits dans le même groupe de variantes';
+
+  @override
   String get unitTypeLabel => 'Unité';
 
   @override
@@ -218,6 +231,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get sellingPriceLabel => 'Prix de vente';
+
+  @override
+  String get costPriceLabel => 'Prix de revient';
 
   @override
   String get notSet => 'Non défini';
@@ -441,6 +457,21 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get themeSystem => 'Système';
+
+  @override
+  String get fontSizePanel => 'Taille du texte';
+
+  @override
+  String get fontSizePanelDesc => 'Ajustez la taille du texte dans Nova Store';
+
+  @override
+  String get fontSizeSmall => 'Petit';
+
+  @override
+  String get fontSizeMedium => 'Moyen';
+
+  @override
+  String get fontSizeLarge => 'Grand';
 
   @override
   String get languagePanel => 'Langue';
@@ -1194,6 +1225,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucune vente client enregistrée pour l\'instant.';
 
   @override
+  String get supplierPurchasesLabel => 'Achats fournisseurs';
+
+  @override
+  String purchaseCountDesc(int count) {
+    return '$count achat(s)';
+  }
+
+  @override
+  String get noSupplierPurchasesYet =>
+      'Aucun achat fournisseur enregistré pour l\'instant.';
+
+  @override
   String get colCustomer => 'Client';
 
   @override
@@ -1470,4 +1513,70 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get codeCopiedMessage => 'Code copié dans le presse-papiers';
+
+  @override
+  String get insightsTitle => 'Analyses intelligentes';
+
+  @override
+  String get insightsSubtitle =>
+      'Des suggestions basées sur les données d\'activité de votre magasin';
+
+  @override
+  String get statNextWeekEstimate => 'Estimation semaine prochaine';
+
+  @override
+  String get statNextMonthEstimate => 'Estimation mois prochain';
+
+  @override
+  String todayAnomalyLowMessage(String today, String avg) {
+    return 'Le chiffre d\'affaires d\'aujourd\'hui ($today) est anormalement bas par rapport à votre moyenne récente ($avg).';
+  }
+
+  @override
+  String todayAnomalyHighMessage(String today, String avg) {
+    return 'Le chiffre d\'affaires d\'aujourd\'hui ($today) est anormalement élevé par rapport à votre moyenne récente ($avg).';
+  }
+
+  @override
+  String get reorderSuggestionsPanel => 'Suggestions de réapprovisionnement';
+
+  @override
+  String get reorderSuggestionsDesc =>
+      'Produits susceptibles de s\'épuiser bientôt, selon le rythme de ventes récent';
+
+  @override
+  String get colDaysLeft => 'Jours restants';
+
+  @override
+  String get colSuggestedQty => 'Qté suggérée';
+
+  @override
+  String get colSupplier => 'Fournisseur';
+
+  @override
+  String get noReorderSuggestions => 'Rien à réapprovisionner pour l\'instant.';
+
+  @override
+  String get stagnantProductsPanel => 'Stock à rotation lente';
+
+  @override
+  String get stagnantProductsDesc =>
+      'En stock mais aucune vente depuis 30 jours';
+
+  @override
+  String get noStagnantProducts =>
+      'Aucun stock à rotation lente pour l\'instant.';
+
+  @override
+  String reorderNoticeMessage(int count) {
+    return '$count produits à réapprovisionner bientôt';
+  }
+
+  @override
+  String suggestedPriceHint(String price) {
+    return 'Suggéré : $price (basé sur des produits similaires)';
+  }
+
+  @override
+  String get useSuggestionAction => 'Utiliser';
 }

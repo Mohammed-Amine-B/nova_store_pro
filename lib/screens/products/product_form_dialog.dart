@@ -40,10 +40,14 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
   late final _sellingPriceController = TextEditingController(
     text: widget.editing?.sellingPrice != null ? plainNumber(widget.editing!.sellingPrice!) : '',
   );
+  late final _variantSizeController = TextEditingController(
+    text: widget.editing?.variantSize ?? '',
+  );
   final _nameFocus = FocusNode();
   final _codeFocus = FocusNode();
   final _barcodeFocus = FocusNode();
   final _minStockFocus = FocusNode();
+  final _variantSizeFocus = FocusNode();
 
   int? _categoryId;
   bool _codeManuallyEdited = false;
@@ -77,6 +81,8 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     _codeFocus.dispose();
     _barcodeFocus.dispose();
     _minStockFocus.dispose();
+    _variantSizeFocus.dispose();
+    _variantSizeController.dispose();
     super.dispose();
   }
 
@@ -104,6 +110,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
         minStock: minStock,
         unitType: _unitType,
         imagePath: _imagePath,
+        variantSize: _variantSizeController.text,
       );
     } else {
       await widget.repo.update(
@@ -118,6 +125,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
         unitType: _unitType,
         sellingPrice: double.tryParse(_sellingPriceController.text),
         imagePath: _imagePath,
+        variantSize: _variantSizeController.text,
       );
     }
     if (mounted) Navigator.pop(context, true);
@@ -278,7 +286,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
             TextField(
               controller: _minStockController,
               focusNode: _minStockFocus,
-              textInputAction: TextInputAction.done,
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 labelText: l10n.lowStockThresholdLabel,
                 border: const OutlineInputBorder(),
@@ -286,6 +294,18 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
               keyboardType: _unitType == 'piece'
                   ? TextInputType.number
                   : const TextInputType.numberWithOptions(decimal: true),
+              onSubmitted: (_) => _variantSizeFocus.requestFocus(),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: _variantSizeController,
+              focusNode: _variantSizeFocus,
+              textInputAction: TextInputAction.done,
+              decoration: InputDecoration(
+                labelText: l10n.variantSizeLabel,
+                hintText: l10n.variantSizeHint,
+                border: const OutlineInputBorder(),
+              ),
               onSubmitted: (_) => _save(),
             ),
           ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../data/database/database.dart';
 import '../../data/repositories/dashboard_repository.dart';
+import '../../data/repositories/insights_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../utils/activity_log_formatting.dart';
 import '../../widgets/page_header.dart';
@@ -9,6 +10,12 @@ import '../../widgets/panel.dart';
 import '../../widgets/empty_state.dart';
 import '../../utils/formatting.dart';
 import '../activity_log/activity_log_screen.dart';
+import '../insights/insights_screen.dart';
+
+typedef _DashboardInsights = ({
+  List<ReorderSuggestion> reorder,
+  ({bool isAnomaly, bool isLow, double todayRevenue, double avgRevenue})? anomaly,
+});
 
 class DashboardScreen extends StatefulWidget {
   final AppDatabase db;
@@ -20,12 +27,21 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   late final DashboardRepository _repo = DashboardRepository(widget.db);
+  late final InsightsRepository _insightsRepo = InsightsRepository(widget.db);
   late Future<DashboardSummary> _future;
+  late Future<_DashboardInsights> _insightsFuture;
 
   @override
   void initState() {
     super.initState();
     _future = _repo.getSummary();
+    _insightsFuture = _loadInsights();
+  }
+
+  Future<_DashboardInsights> _loadInsights() async {
+    final reorder = await _insightsRepo.getReorderSuggestions();
+    final anomaly = await _insightsRepo.getTodayAnomaly();
+    return (reorder: reorder, anomaly: anomaly);
   }
 
   @override
@@ -45,6 +61,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
               PageHeader(
                 title: l10n.dashboardTitle,
                 subtitle: l10n.dashboardSubtitle,
+              ),
+              FutureBuilder<_DashboardInsights>(
+                future: _insightsFuture,
+                builder: (context, snapshot) {
+                  final insights = snapshot.data;
+                  if (insights == null) return const SizedBox.shrink();
+                  final banners = <Widget>[];
+                  if (insights.reorder.isNotEmpty) {
+                    banners.add(_InsightBanner(
+                      icon: Icons.inventory_2_outlined,
+                      color: const Color(0xFFF2A93B),
+                      message: l10n.reorderNoticeMessage(insights.reorder.length),
+                      onView: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => InsightsScreen(db: widget.db)),
+                      ),
+                      viewLabel: l10n.viewAllAction,
+                    ));
+                  }
+                  final anomaly = insights.anomaly;
+                  if (anomaly != null) {
+                    banners.add(_InsightBanner(
+                      icon: anomaly.isLow ? Icons.trending_down : Icons.trending_up,
+                      color: anomaly.isLow ? const Color(0xFFE4572E) : const Color(0xFF16A34A),
+                      message: anomaly.isLow
+                          ? l10n.todayAnomalyLowMessage(formatMoney(anomaly.todayRevenue), formatMoney(anomaly.avgRevenue))
+                          : l10n.todayAnomalyHighMessage(formatMoney(anomaly.todayRevenue), formatMoney(anomaly.avgRevenue)),
+                      onView: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => InsightsScreen(db: widget.db)),
+                      ),
+                      viewLabel: l10n.viewAllAction,
+                    ));
+                  }
+                  if (banners.isEmpty) return const SizedBox.shrink();
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ...banners.map((b) => Padding(padding: const EdgeInsets.only(bottom: 12), child: b)),
+                    ],
+                  );
+                },
               ),
               GridView.count(
                 crossAxisCount: 4,
@@ -93,7 +149,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       : data.lowStockProducts
                             .map(
                               (p) => ListTile(
-                                title: Text(p.name),
+                                title: Text(productDisplayName(p)),
                                 trailing: Text(
                                   l10n.unitsLeft(formatQuantity(p.stockQuantity, p.unitType)),
                                 ),
@@ -172,6 +228,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class _InsightBanner extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String message;
+  final VoidCallback onView;
+  final String viewLabel;
+  const _InsightBanner({
+    required this.icon,
+    required this.color,
+    required this.message,
+    required this.onView,
+    required this.viewLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 12),
+          Expanded(child: Text(message)),
+          TextButton(onPressed: onView, child: Text(viewLabel)),
+        ],
+      ),
     );
   }
 }

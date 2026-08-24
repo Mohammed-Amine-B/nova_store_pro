@@ -44,7 +44,12 @@ class ReturnRepository {
           throw Exception('Invalid return quantity for this item');
         }
 
+        final isDamaged = reason == 'damaged';
+
         // Restore stock proportionally to the batches this line originally consumed.
+        // For damaged returns, the item isn't fit to sell again, so the batch/product
+        // sellable quantities are left untouched — only the sale-item-to-batch
+        // bookkeeping below is still updated.
         final batchLinks = await (db.select(db.saleItemBatches)
               ..where((b) => b.saleItemId.equals(line.saleItemId)))
             .get();
@@ -52,24 +57,30 @@ class ReturnRepository {
         for (final link in batchLinks) {
           final restoreQty = r.roundQuantity(line.quantity * (link.quantity / originalTotal));
           if (restoreQty <= 0) continue;
-          final batch = await (db.select(db.productBatches)..where((pb) => pb.id.equals(link.batchId))).getSingle();
-          await (db.update(db.productBatches)..where((pb) => pb.id.equals(link.batchId)))
-              .write(ProductBatchesCompanion(quantity: Value(r.roundQuantity(batch.quantity + restoreQty))));
+          if (!isDamaged) {
+            final batch = await (db.select(db.productBatches)..where((pb) => pb.id.equals(link.batchId))).getSingle();
+            await (db.update(db.productBatches)..where((pb) => pb.id.equals(link.batchId)))
+                .write(ProductBatchesCompanion(quantity: Value(r.roundQuantity(batch.quantity + restoreQty))));
+          }
           await (db.update(db.saleItemBatches)..where((b) => b.id.equals(link.id)))
               .write(SaleItemBatchesCompanion(quantity: Value(r.roundQuantity(link.quantity - restoreQty))));
         }
 
-        final product = await (db.select(db.products)..where((p) => p.id.equals(item.productId))).getSingle();
-        await (db.update(db.products)..where((p) => p.id.equals(item.productId))).write(
-          ProductsCompanion(stockQuantity: Value(r.roundQuantity(product.stockQuantity + line.quantity))),
-        );
+        if (!isDamaged) {
+          final product = await (db.select(db.products)..where((p) => p.id.equals(item.productId))).getSingle();
+          await (db.update(db.products)..where((p) => p.id.equals(item.productId))).write(
+            ProductsCompanion(stockQuantity: Value(r.roundQuantity(product.stockQuantity + line.quantity))),
+          );
+        }
 
         await db.into(db.stockMovements).insert(StockMovementsCompanion.insert(
               productId: item.productId,
-              direction: 'in',
-              type: 'return',
+              direction: isDamaged ? 'out' : 'in',
+              type: isDamaged ? 'damaged_writeoff' : 'return',
               quantity: line.quantity,
-              note: Value('Returned ${line.quantity} units'),
+              note: Value(isDamaged
+                  ? 'Returned as damaged — written off, not returned to sellable stock'
+                  : 'Returned ${line.quantity} units'),
             ));
 
         final refundAmount = r.roundMoney(line.quantity * item.unitPrice);

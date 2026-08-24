@@ -3,6 +3,7 @@ import '../data/database/database.dart';
 import '../data/repositories/sales_repository.dart';
 import '../data/repositories/return_repository.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../utils/formatting.dart';
 
 class ReturnDialog extends StatefulWidget {
   final AppDatabase db;
@@ -99,7 +100,7 @@ class _ReturnDialogState extends State<ReturnDialog> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Text(l10n.returnLineDesc(product?.name ?? l10n.unknownProductLabel, '${item.quantity}', item.unitPrice.toStringAsFixed(2))),
+                            child: Text(l10n.returnLineDesc(product != null ? productDisplayName(product) : l10n.unknownProductLabel, '${item.quantity}', item.unitPrice.toStringAsFixed(2))),
                           ),
                           SizedBox(
                             width: 100,

@@ -7,6 +7,7 @@ import 'stat_card.dart';
 import 'panel.dart';
 import 'metrics_summary_card.dart';
 import '../utils/formatting.dart';
+import '../utils/text_scale.dart';
 import 'return_dialog.dart';
 
 class SalesDayView extends StatefulWidget {
@@ -73,7 +74,10 @@ class SalesDayViewState extends State<SalesDayView> {
     });
   }
 
-  String _productName(int id) => _productCache[id]?.name ?? 'Deleted product';
+  String _productName(int id) {
+    final product = _productCache[id];
+    return product != null ? productDisplayName(product) : 'Deleted product';
+  }
 
   Future<void> _editItem(SaleItem item) async {
     final l10n = AppLocalizations.of(context)!;
@@ -266,9 +270,9 @@ class SalesDayViewState extends State<SalesDayView> {
                                         ),
                                       )
                                     : null,
-                                headingRowHeight: compact ? 40 : null,
-                                dataRowMinHeight: compact ? 44 : null,
-                                dataRowMaxHeight: compact ? 48 : null,
+                                headingRowHeight: compact ? 40 * dataRowScale(context) : null,
+                                dataRowMinHeight: compact ? 44 * dataRowScale(context) : null,
+                                dataRowMaxHeight: compact ? 48 * dataRowScale(context) : null,
                                 dataRowColor: compact
                                     ? WidgetStateProperty.resolveWith((states) {
                                         if (states.contains(
