@@ -7,6 +7,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/return_dialog.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/enter_to_submit.dart';
 import '../../widgets/product_thumbnail.dart';
 import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
@@ -16,7 +17,12 @@ class _CartLine {
   final Product product;
   double quantity;
   double unitPrice;
-  _CartLine({this.saleItemId, required this.product, required this.quantity, required this.unitPrice});
+  _CartLine({
+    this.saleItemId,
+    required this.product,
+    required this.quantity,
+    required this.unitPrice,
+  });
 
   double get lineTotal => quantity * unitPrice;
 }
@@ -25,7 +31,12 @@ class CustomerSaleScreen extends StatefulWidget {
   final AppDatabase db;
   final int? customerId;
   final int? saleId;
-  const CustomerSaleScreen({super.key, required this.db, this.customerId, this.saleId});
+  const CustomerSaleScreen({
+    super.key,
+    required this.db,
+    this.customerId,
+    this.saleId,
+  });
 
   bool get isEditMode => saleId != null;
 
@@ -60,7 +71,11 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
   Future<void> _loadFrequentlySold() async {
     final now = DateTime.now();
     final start = now.subtract(const Duration(days: 90));
-    final best = await _reportRepo.getBestSellingProducts(start, now.add(const Duration(days: 1)), limit: 6);
+    final best = await _reportRepo.getBestSellingProducts(
+      start,
+      now.add(const Duration(days: 1)),
+      limit: 6,
+    );
     final products = <Product>[];
     for (final b in best) {
       products.add(await _salesRepo.getProduct(b.productId));
@@ -74,11 +89,20 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
     if (widget.isEditMode) {
       final sale = await _salesRepo.getSaleById(widget.saleId!);
       final items = await _salesRepo.getItemsForSale(widget.saleId!);
-      final customer = sale.customerId != null ? await _customerRepo.getById(sale.customerId!) : null;
+      final customer = sale.customerId != null
+          ? await _customerRepo.getById(sale.customerId!)
+          : null;
       final lines = <_CartLine>[];
       for (final item in items) {
         final product = await _salesRepo.getProduct(item.productId);
-        lines.add(_CartLine(saleItemId: item.id, product: product, quantity: item.quantity, unitPrice: item.unitPrice));
+        lines.add(
+          _CartLine(
+            saleItemId: item.id,
+            product: product,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          ),
+        );
       }
       if (!mounted) return;
       setState(() {
@@ -90,7 +114,9 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
       });
     } else {
       final customer = await _customerRepo.getById(widget.customerId!);
-      final balance = await _customerRepo.getRemainingBalance(widget.customerId!);
+      final balance = await _customerRepo.getRemainingBalance(
+        widget.customerId!,
+      );
       if (!mounted) return;
       setState(() {
         _customer = customer;
@@ -110,44 +136,58 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
     final l10n = AppLocalizations.of(context)!;
     final isPiece = product.unitType == 'piece';
     final quantityController = TextEditingController(text: '1');
-    final priceController = TextEditingController(text: plainNumber(product.sellingPrice ?? 0));
+    final priceController = TextEditingController(
+      text: plainNumber(product.sellingPrice ?? 0),
+    );
+    void confirm(BuildContext context) {
+      var quantity = double.tryParse(quantityController.text) ?? 0;
+      if (isPiece) quantity = quantity.roundToDouble();
+      final price = double.tryParse(priceController.text) ?? 0;
+      if (quantity <= 0 || price <= 0) return;
+      Navigator.pop(context, (quantity, price));
+    }
+
     return showDialog<(double, double)>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(productDisplayName(product)),
-        content: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              child: TextField(
-                controller: quantityController,
-                decoration: InputDecoration(labelText: l10n.quantityLabel),
-                keyboardType: isPiece ? TextInputType.number : const TextInputType.numberWithOptions(decimal: true),
+      builder: (context) => EnterToSubmit(
+        onSubmit: () => confirm(context),
+        child: AlertDialog(
+          title: Text(productDisplayName(product)),
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: quantityController,
+                  decoration: InputDecoration(labelText: l10n.quantityLabel),
+                  keyboardType: isPiece
+                      ? TextInputType.number
+                      : const TextInputType.numberWithOptions(decimal: true),
+                ),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: priceController,
+                  decoration: InputDecoration(labelText: l10n.colUnitPrice),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancel),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: TextField(
-                controller: priceController,
-                decoration: InputDecoration(labelText: l10n.colUnitPrice),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              ),
+            FilledButton(
+              onPressed: () => confirm(context),
+              child: Text(l10n.addAction),
             ),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-          FilledButton(
-            onPressed: () {
-              var quantity = double.tryParse(quantityController.text) ?? 0;
-              if (isPiece) quantity = quantity.roundToDouble();
-              final price = double.tryParse(priceController.text) ?? 0;
-              if (quantity <= 0 || price <= 0) return;
-              Navigator.pop(context, (quantity, price));
-            },
-            child: Text(l10n.addAction),
-          ),
-        ],
       ),
     );
   }
@@ -159,11 +199,24 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
     if (result == null) return;
 
     if (!widget.isEditMode) {
-      setState(() => _lines.add(_CartLine(product: product, quantity: result.$1, unitPrice: result.$2)));
+      setState(
+        () => _lines.add(
+          _CartLine(
+            product: product,
+            quantity: result.$1,
+            unitPrice: result.$2,
+          ),
+        ),
+      );
       return;
     }
     try {
-      await _salesRepo.addSaleLine(saleId: widget.saleId!, productId: product.id, quantity: result.$1, unitPrice: result.$2);
+      await _salesRepo.addSaleLine(
+        saleId: widget.saleId!,
+        productId: product.id,
+        quantity: result.$1,
+        unitPrice: result.$2,
+      );
       await _reloadEditMode();
     } catch (e) {
       setState(() => _error = e.toString());
@@ -181,7 +234,11 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
       return;
     }
     try {
-      await _salesRepo.updateSaleItem(saleItemId: line.saleItemId!, newQuantity: result.$1, newUnitPrice: result.$2);
+      await _salesRepo.updateSaleItem(
+        saleItemId: line.saleItemId!,
+        newQuantity: result.$1,
+        newUnitPrice: result.$2,
+      );
       await _reloadEditMode();
     } catch (e) {
       setState(() => _error = e.toString());
@@ -203,7 +260,14 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
     final lines = <_CartLine>[];
     for (final item in items) {
       final product = await _salesRepo.getProduct(item.productId);
-      lines.add(_CartLine(saleItemId: item.id, product: product, quantity: item.quantity, unitPrice: item.unitPrice));
+      lines.add(
+        _CartLine(
+          saleItemId: item.id,
+          product: product,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        ),
+      );
     }
     if (!mounted) return;
     setState(() {
@@ -227,9 +291,15 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
       return;
     }
     try {
-      await _salesRepo.updateAmountPaid(saleId: widget.saleId!, newAmountPaid: amount);
+      await _salesRepo.updateAmountPaid(
+        saleId: widget.saleId!,
+        newAmountPaid: amount,
+      );
       await _reloadEditMode();
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.paymentUpdated)));
+      if (mounted)
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.paymentUpdated)));
     } catch (e) {
       setState(() => _error = e.toString());
     }
@@ -241,7 +311,9 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
       setState(() => _error = l10n.addAtLeastOneProduct);
       return;
     }
-    final amount = _amountPaidController.text.isEmpty ? 0.0 : double.tryParse(_amountPaidController.text);
+    final amount = _amountPaidController.text.isEmpty
+        ? 0.0
+        : double.tryParse(_amountPaidController.text);
     if (amount == null || amount < 0) {
       setState(() => _error = l10n.amountPaidRangeError);
       return;
@@ -256,9 +328,19 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
       final overpay = amount > total ? amount - total : 0.0;
       final saleId = await _salesRepo.createSale(
         date: DateTime.now(),
-        lines: _lines.map((l) => SaleLineInput(productId: l.product.id, quantity: l.quantity, unitPrice: l.unitPrice)).toList(),
+        lines: _lines
+            .map(
+              (l) => SaleLineInput(
+                productId: l.product.id,
+                quantity: l.quantity,
+                unitPrice: l.unitPrice,
+              ),
+            )
+            .toList(),
         customerId: widget.customerId,
-        paymentMethod: transactionPaid >= total ? 'cash' : (transactionPaid <= 0 ? 'credit' : 'split'),
+        paymentMethod: transactionPaid >= total
+            ? 'cash'
+            : (transactionPaid <= 0 ? 'credit' : 'split'),
         amountPaid: transactionPaid,
         source: 'customer_sale',
       );
@@ -273,7 +355,11 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
       if (!mounted) return;
       if (overpay > 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sale recorded. ${formatMoney(overpay)} extra applied to reduce balance.')),
+          SnackBar(
+            content: Text(
+              'Sale recorded. ${formatMoney(overpay)} extra applied to reduce balance.',
+            ),
+          ),
         );
         await Future.delayed(const Duration(milliseconds: 900));
         if (!mounted) return;
@@ -317,24 +403,37 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                 ),
                 if (_productMatches.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  ..._productMatches.map((p) => ListTile(
-                        dense: true,
-                        leading: ProductThumbnail(imagePath: p.imagePath, size: 36),
-                        title: Text(productDisplayName(p)),
-                        subtitle: Text(p.barcode ?? p.code),
-                        trailing: MoneyText(
-                          p.sellingPrice != null ? formatMoney(p.sellingPrice!) : '—',
-                          style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF0E7C7B)),
+                  ..._productMatches.map(
+                    (p) => ListTile(
+                      dense: true,
+                      leading: ProductThumbnail(
+                        imagePath: p.imagePath,
+                        size: 36,
+                      ),
+                      title: Text(productDisplayName(p)),
+                      subtitle: Text(p.barcode ?? p.code),
+                      trailing: MoneyText(
+                        p.sellingPrice != null
+                            ? formatMoney(p.sellingPrice!)
+                            : '—',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF0E7C7B),
                         ),
-                        onTap: () => _addLine(p),
-                      )),
+                      ),
+                      onTap: () => _addLine(p),
+                    ),
+                  ),
                 ],
                 if (_frequentlySold.isNotEmpty) ...[
                   const SizedBox(height: 16),
-                  Text(l10n.frequentlySoldLabel, style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                    letterSpacing: 0.6,
-                  )),
+                  Text(
+                    l10n.frequentlySoldLabel,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      letterSpacing: 0.6,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   GridView.count(
                     crossAxisCount: 2,
@@ -357,7 +456,10 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              ProductThumbnail(imagePath: p.imagePath, size: 32),
+                              ProductThumbnail(
+                                imagePath: p.imagePath,
+                                size: 32,
+                              ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Column(
@@ -367,21 +469,47 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                                     Row(
                                       children: [
                                         Expanded(
-                                          child: Text(productDisplayName(p), maxLines: 1, overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(fontWeight: FontWeight.w600)),
+                                          child: Text(
+                                            productDisplayName(p),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
                                         ),
                                         MoneyText(
-                                          p.sellingPrice != null ? formatMoney(p.sellingPrice!) : '—',
-                                          style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF0E7C7B)),
+                                          p.sellingPrice != null
+                                              ? formatMoney(p.sellingPrice!)
+                                              : '—',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFF0E7C7B),
+                                          ),
                                         ),
                                       ],
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      lowStock ? l10n.lowStockLeftSuffix(formatQuantity(p.stockQuantity, p.unitType)) : l10n.inStockCount(formatQuantity(p.stockQuantity, p.unitType)),
+                                      lowStock
+                                          ? l10n.lowStockLeftSuffix(
+                                              formatQuantity(
+                                                p.stockQuantity,
+                                                p.unitType,
+                                              ),
+                                            )
+                                          : l10n.inStockCount(
+                                              formatQuantity(
+                                                p.stockQuantity,
+                                                p.unitType,
+                                              ),
+                                            ),
                                       style: TextStyle(
                                         fontSize: 11,
-                                        color: lowStock ? const Color(0xFFE4572E) : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                        color: lowStock
+                                            ? const Color(0xFFE4572E)
+                                            : theme.colorScheme.onSurface
+                                                  .withValues(alpha: 0.5),
                                       ),
                                     ),
                                   ],
@@ -413,49 +541,95 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                     return SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: ConstrainedBox(
-                        constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                        constraints: BoxConstraints(
+                          minWidth: constraints.maxWidth,
+                        ),
                         child: DataTable(
                           columns: [
                             DataColumn(label: Text(l10n.colProduct)),
-                            DataColumn(label: Text(l10n.colQuantity), numeric: true),
-                            DataColumn(label: Text(l10n.colUnitPrice), numeric: true),
-                            DataColumn(label: Text(l10n.colTotal), numeric: true),
+                            DataColumn(
+                              label: Text(l10n.colQuantity),
+                              numeric: true,
+                            ),
+                            DataColumn(
+                              label: Text(l10n.colUnitPrice),
+                              numeric: true,
+                            ),
+                            DataColumn(
+                              label: Text(l10n.colTotal),
+                              numeric: true,
+                            ),
                             const DataColumn(label: Text('')),
                           ],
                           rows: _lines.map((line) {
-                            return DataRow(cells: [
-                              DataCell(Tooltip(
-                                message: productDisplayName(line.product),
-                                child: SizedBox(
-                                  width: 200,
-                                  child: Text(
-                                    productDisplayName(line.product),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
+                            return DataRow(
+                              cells: [
+                                DataCell(
+                                  Tooltip(
+                                    message: productDisplayName(line.product),
+                                    child: SizedBox(
+                                      width: 200,
+                                      child: Text(
+                                        productDisplayName(line.product),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              )),
-                              DataCell(Text(formatQuantity(line.quantity, line.product.unitType))),
-                              DataCell(MoneyText(formatMoney(line.unitPrice))),
-                              DataCell(MoneyText(formatMoney(line.lineTotal), style: const TextStyle(fontWeight: FontWeight.w700))),
-                              DataCell(Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(icon: const Icon(Icons.edit_outlined, size: 18), onPressed: () => _editLine(line)),
-                                  if (widget.isEditMode)
-                                    IconButton(
-                                      icon: const Icon(Icons.assignment_return_outlined, size: 18),
-                                      tooltip: l10n.returnTooltip,
-                                      onPressed: () => _returnLine(line),
-                                    )
-                                  else
-                                    IconButton(
-                                      icon: Icon(Icons.close, size: 18, color: theme.colorScheme.error),
-                                      onPressed: () => _removeLine(line),
+                                DataCell(
+                                  Text(
+                                    formatQuantity(
+                                      line.quantity,
+                                      line.product.unitType,
                                     ),
-                                ],
-                              )),
-                            ]);
+                                  ),
+                                ),
+                                DataCell(
+                                  MoneyText(formatMoney(line.unitPrice)),
+                                ),
+                                DataCell(
+                                  MoneyText(
+                                    formatMoney(line.lineTotal),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                DataCell(
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.edit_outlined,
+                                          size: 18,
+                                        ),
+                                        onPressed: () => _editLine(line),
+                                      ),
+                                      if (widget.isEditMode)
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.assignment_return_outlined,
+                                            size: 18,
+                                          ),
+                                          tooltip: l10n.returnTooltip,
+                                          onPressed: () => _returnLine(line),
+                                        )
+                                      else
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.close,
+                                            size: 18,
+                                            color: theme.colorScheme.error,
+                                          ),
+                                          onPressed: () => _removeLine(line),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
                           }).toList(),
                         ),
                       ),
@@ -475,12 +649,22 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                _SummaryRow(l10n.colItems, l10n.itemsUnitsCount(formatQuantity(_totalItems, 'unit'))),
+                _SummaryRow(
+                  l10n.colItems,
+                  l10n.itemsUnitsCount(formatQuantity(_totalItems, 'unit')),
+                ),
                 const SizedBox(height: 10),
-                _SummaryRow(l10n.subtotalRow, formatMoney(_total), isMoney: true),
+                _SummaryRow(
+                  l10n.subtotalRow,
+                  formatMoney(_total),
+                  isMoney: true,
+                ),
                 if (!widget.isEditMode) ...[
                   const SizedBox(height: 10),
-                  _SummaryRow(l10n.previousBalanceRow, formatBalance(_previousBalance).$1),
+                  _SummaryRow(
+                    l10n.previousBalanceRow,
+                    formatBalance(_previousBalance).$1,
+                  ),
                 ],
                 const SizedBox(height: 14),
                 Divider(color: theme.dividerColor),
@@ -488,10 +672,18 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(widget.isEditMode ? l10n.totalLabel : l10n.totalDueRow, style: theme.textTheme.bodyMedium),
+                    Text(
+                      widget.isEditMode ? l10n.totalLabel : l10n.totalDueRow,
+                      style: theme.textTheme.bodyMedium,
+                    ),
                     MoneyText(
-                      formatMoney(widget.isEditMode ? _total : _total + _previousBalance),
-                      style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0E7C7B)),
+                      formatMoney(
+                        widget.isEditMode ? _total : _total + _previousBalance,
+                      ),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF0E7C7B),
+                      ),
                     ),
                   ],
                 ),
@@ -500,7 +692,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
           ),
         ),
         const SizedBox(height: 20),
-                Panel(
+        Panel(
           title: l10n.paymentPanel,
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -508,43 +700,75 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SummaryRow(l10n.colPaid, formatMoney(_existingSale?.amountPaid ?? 0), isMoney: true),
+                      _SummaryRow(
+                        l10n.colPaid,
+                        formatMoney(_existingSale?.amountPaid ?? 0),
+                        isMoney: true,
+                      ),
                       const SizedBox(height: 10),
                       _SummaryRow(
                         l10n.colRemaining,
-                        formatMoney((_existingSale?.totalAmount ?? 0) - (_existingSale?.amountPaid ?? 0)),
+                        formatMoney(
+                          (_existingSale?.totalAmount ?? 0) -
+                              (_existingSale?.amountPaid ?? 0),
+                        ),
                         isMoney: true,
                       ),
                       const SizedBox(height: 12),
                       Text(
                         l10n.toRecordPaymentHintCustomer,
-                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.5,
+                          ),
+                        ),
                       ),
                     ],
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(l10n.amountPaidRow, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                      Text(
+                        l10n.amountPaidRow,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.6,
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 6),
                       TextField(
                         controller: _amountPaidController,
-                        decoration: InputDecoration(hintText: l10n.zeroFullyOnCreditHint, border: const OutlineInputBorder(), prefixText: '\$ '),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        decoration: InputDecoration(
+                          hintText: l10n.zeroFullyOnCreditHint,
+                          border: const OutlineInputBorder(),
+                          prefixText: '\$ ',
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Row(
                         children: [
                           Expanded(
                             child: OutlinedButton(
-                              onPressed: () => setState(() => _amountPaidController.text = plainNumber(_total)),
+                              onPressed: () => setState(
+                                () => _amountPaidController.text = plainNumber(
+                                  _total,
+                                ),
+                              ),
                               child: Text(l10n.payFullAction),
                             ),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: OutlinedButton(
-                              onPressed: () => setState(() => _amountPaidController.text = plainNumber(_total / 2)),
+                              onPressed: () => setState(
+                                () => _amountPaidController.text = plainNumber(
+                                  _total / 2,
+                                ),
+                              ),
                               child: Text(l10n.halfNowAction),
                             ),
                           ),
@@ -565,8 +789,13 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
             height: 52,
             child: FilledButton(
               onPressed: _saving ? null : _confirmNewSale,
-              style: FilledButton.styleFrom(backgroundColor: const Color(0xFF0E7C7B)),
-              child: Text(l10n.confirmSaleAction, style: const TextStyle(fontWeight: FontWeight.w700)),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF0E7C7B),
+              ),
+              child: Text(
+                l10n.confirmSaleAction,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
             ),
           ),
         ],
@@ -584,19 +813,34 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.isEditMode ? l10n.editSaleTitle : l10n.newCustomerSaleTitle,
-                        style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
+                    Text(
+                      widget.isEditMode
+                          ? l10n.editSaleTitle
+                          : l10n.newCustomerSaleTitle,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     const SizedBox(height: 2),
                     Text(
-                      widget.isEditMode ? l10n.editingSaleNum('${widget.saleId}') : l10n.draftNotSaved,
-                      style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                      widget.isEditMode
+                          ? l10n.editingSaleNum('${widget.saleId}')
+                          : l10n.draftNotSaved,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.5,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
               if (customer != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     border: Border.all(color: theme.dividerColor),
                     borderRadius: BorderRadius.circular(999),
@@ -606,13 +850,28 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                     children: [
                       CircleAvatar(
                         radius: 14,
-                        backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.12),
-                        child: Text(customer.name.isNotEmpty ? customer.name[0].toUpperCase() : '?', style: const TextStyle(fontSize: 12)),
+                        backgroundColor: theme.colorScheme.primary.withValues(
+                          alpha: 0.12,
+                        ),
+                        child: Text(
+                          customer.name.isNotEmpty
+                              ? customer.name[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(fontSize: 12),
+                        ),
                       ),
                       const SizedBox(width: 8),
-                      Text(customer.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(
+                        customer.name,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
                       if (!widget.isEditMode) ...[
-                        Text(l10n.balanceSuffix(formatBalance(_previousBalance).$1), style: theme.textTheme.bodySmall),
+                        Text(
+                          l10n.balanceSuffix(
+                            formatBalance(_previousBalance).$1,
+                          ),
+                          style: theme.textTheme.bodySmall,
+                        ),
                       ],
                     ],
                   ),
@@ -623,7 +882,9 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
           LayoutBuilder(
             builder: (context, constraints) {
               if (constraints.maxWidth < 900) {
-                return Column(children: [left, const SizedBox(height: 20), right]);
+                return Column(
+                  children: [left, const SizedBox(height: 20), right],
+                );
               }
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -650,12 +911,21 @@ class _SummaryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final valueStyle = theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600);
+    final valueStyle = theme.textTheme.bodyMedium?.copyWith(
+      fontWeight: FontWeight.w600,
+    );
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
-        isMoney ? MoneyText(value, style: valueStyle) : Text(value, style: valueStyle),
+        Text(
+          label,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        ),
+        isMoney
+            ? MoneyText(value, style: valueStyle)
+            : Text(value, style: valueStyle),
       ],
     );
   }

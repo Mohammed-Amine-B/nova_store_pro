@@ -3,6 +3,7 @@ import '../../data/database/database.dart';
 import '../../data/repositories/category_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/confirm_dialog.dart';
+import '../../widgets/enter_to_submit.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/empty_state.dart';
@@ -30,82 +31,86 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       _future = _repo.getAllWithCounts();
     });
   }
-Future<void> _showAddDialog({Category? editing}) async {
-  final l10n = AppLocalizations.of(context)!;
-  final controller = TextEditingController(text: editing?.name ?? '');
-  final result = await showDialog<String>(
-    context: context,
-    builder: (context) => AlertDialog(
-      contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
+
+  Future<void> _showAddDialog({Category? editing}) async {
+    final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController(text: editing?.name ?? '');
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => EnterToSubmit(
+        onSubmit: () => Navigator.pop(context, controller.text),
+        child: AlertDialog(
+          contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.category_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                editing == null ? l10n.addCategory : l10n.editCategory,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: 320,
+            child: TextField(
+              controller: controller,
+              autofocus: true,
+              textInputAction: TextInputAction.done,
+              decoration: InputDecoration(
+                labelText: l10n.categoryNameLabel,
+                border: const OutlineInputBorder(),
+              ),
+              onSubmitted: (value) => Navigator.pop(context, value),
             ),
-            child: Icon(
-              Icons.category_outlined,
-              color: Theme.of(context).colorScheme.primary,
-              size: 22,
+          ),
+          actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancel),
             ),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            editing == null ? l10n.addCategory : l10n.editCategory,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-          ),
-        ],
-      ),
-      content: SizedBox(
-        width: 320,
-        child: TextField(
-          controller: controller,
-          autofocus: true,
-          textInputAction: TextInputAction.done,
-          decoration: InputDecoration(
-            labelText: l10n.categoryNameLabel,
-            border: const OutlineInputBorder(),
-          ),
-          onSubmitted: (value) => Navigator.pop(context, value),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, controller.text),
+              child: Text(l10n.save),
+            ),
+          ],
         ),
       ),
-      actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, controller.text),
-          child: Text(l10n.save),
-        ),
-      ],
-    ),
-  );
-  if (result == null || result.trim().isEmpty) return;
-  try {
-    if (editing == null) {
-      await _repo.add(result);
-    } else {
-      await _repo.update(editing.id, result);
-    }
-    _reload();
-  } catch (e) {
-    if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    );
+    if (result == null || result.trim().isEmpty) return;
+    try {
+      if (editing == null) {
+        await _repo.add(result);
+      } else {
+        await _repo.update(editing.id, result);
+      }
+      _reload();
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
     }
   }
-}
 
   Future<void> _confirmDelete(Category category) async {
     final l10n = AppLocalizations.of(context)!;
@@ -158,7 +163,10 @@ Future<void> _showAddDialog({Category? editing}) async {
               child: Panel(
                 title: l10n.allCategoriesPanel,
                 child: items.isEmpty
-                    ? EmptyState(icon: Icons.category_outlined, title: l10n.noCategoriesYet)
+                    ? EmptyState(
+                        icon: Icons.category_outlined,
+                        title: l10n.noCategoriesYet,
+                      )
                     : ListView.separated(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),

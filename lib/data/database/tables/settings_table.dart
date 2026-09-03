@@ -12,6 +12,8 @@ class Settings extends Table {
   TextColumn get securityAnswerHash => text().nullable()(); // hashed the same way as appPasswordHash
   TextColumn get recoveryCodeHash => text().nullable()(); // hashed the same way as appPasswordHash
   TextColumn get fontSize => text().withDefault(const Constant('medium'))(); // 'small' | 'medium' | 'large'
+  TextColumn get backupDestination => text().nullable()(); // a folder path, e.g. "D:\NovaProBackups"
+  DateTimeColumn get lastAutoBackupAt => dateTime().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

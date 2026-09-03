@@ -4,6 +4,7 @@ import '../data/repositories/sales_repository.dart';
 import '../data/repositories/return_repository.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../utils/formatting.dart';
+import 'enter_to_submit.dart';
 
 class ReturnDialog extends StatefulWidget {
   final AppDatabase db;
@@ -85,112 +86,115 @@ class _ReturnDialogState extends State<ReturnDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return AlertDialog(
-      title: Text(l10n.returnItemsPanel),
-      content: SizedBox(
-        width: 400,
-        child: _loading
-            ? const SizedBox(
-                height: 100,
-                child: Center(child: CircularProgressIndicator()),
-              )
-            : SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ..._items.map((item) {
-                      final product = _products[item.productId];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                l10n.returnLineDesc(
-                                  product != null
-                                      ? productDisplayName(product)
-                                      : l10n.unknownProductLabel,
-                                  '${item.quantity}',
-                                  item.unitPrice.toStringAsFixed(2),
+    return EnterToSubmit(
+      onSubmit: _submitting ? null : _submit,
+      child: AlertDialog(
+        title: Text(l10n.returnItemsPanel),
+        content: SizedBox(
+          width: 400,
+          child: _loading
+              ? const SizedBox(
+                  height: 100,
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              : SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ..._items.map((item) {
+                        final product = _products[item.productId];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  l10n.returnLineDesc(
+                                    product != null
+                                        ? productDisplayName(product)
+                                        : l10n.unknownProductLabel,
+                                    '${item.quantity}',
+                                    item.unitPrice.toStringAsFixed(2),
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              width: 100,
-                              child: TextField(
-                                controller: _qtyControllers[item.id],
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                      decimal: true,
-                                    ),
-                                decoration: InputDecoration(
-                                  labelText: l10n.returnQtyLabel,
-                                  isDense: true,
+                              SizedBox(
+                                width: 100,
+                                child: TextField(
+                                  controller: _qtyControllers[item.id],
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                  decoration: InputDecoration(
+                                    labelText: l10n.returnQtyLabel,
+                                    isDense: true,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        initialValue: _reason,
+                        decoration: InputDecoration(
+                          labelText: l10n.reasonLabel,
+                          border: const OutlineInputBorder(),
                         ),
-                      );
-                    }),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      initialValue: _reason,
-                      decoration: InputDecoration(
-                        labelText: l10n.reasonLabel,
-                        border: const OutlineInputBorder(),
+                        items: [
+                          DropdownMenuItem(
+                            value: 'damaged',
+                            child: Text(l10n.reasonDamaged),
+                          ),
+                          DropdownMenuItem(
+                            value: 'wrong_item',
+                            child: Text(l10n.reasonWrongItem),
+                          ),
+                          DropdownMenuItem(
+                            value: 'changed_mind',
+                            child: Text(l10n.reasonChangedMind),
+                          ),
+                          DropdownMenuItem(
+                            value: 'other',
+                            child: Text(l10n.reasonOther),
+                          ),
+                        ],
+                        onChanged: (v) => setState(() => _reason = v!),
                       ),
-                      items: [
-                        DropdownMenuItem(
-                          value: 'damaged',
-                          child: Text(l10n.reasonDamaged),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _noteController,
+                        decoration: InputDecoration(
+                          labelText: l10n.noteOptionalLabel,
+                          border: const OutlineInputBorder(),
                         ),
-                        DropdownMenuItem(
-                          value: 'wrong_item',
-                          child: Text(l10n.reasonWrongItem),
-                        ),
-                        DropdownMenuItem(
-                          value: 'changed_mind',
-                          child: Text(l10n.reasonChangedMind),
-                        ),
-                        DropdownMenuItem(
-                          value: 'other',
-                          child: Text(l10n.reasonOther),
+                      ),
+                      if (_error != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          _error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
                         ),
                       ],
-                      onChanged: (v) => setState(() => _reason = v!),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _noteController,
-                      decoration: InputDecoration(
-                        labelText: l10n.noteOptionalLabel,
-                        border: const OutlineInputBorder(),
-                      ),
-                    ),
-                    if (_error != null) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        _error!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
                     ],
-                  ],
+                  ),
                 ),
-              ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: _submitting ? null : _submit,
+            child: Text(l10n.confirmReturnAction),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
-        ),
-        FilledButton(
-          onPressed: _submitting ? null : _submit,
-          child: Text(l10n.confirmReturnAction),
-        ),
-      ],
     );
   }
 }

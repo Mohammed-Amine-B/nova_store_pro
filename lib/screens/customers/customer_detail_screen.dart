@@ -5,8 +5,8 @@ import '../../data/repositories/sales_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/confirm_dialog.dart';
-import '../../widgets/status_badge.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/enter_to_submit.dart';
 import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
 import 'customer_form_dialog.dart';
@@ -31,9 +31,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
   late final SalesRepository _salesRepo = SalesRepository(widget.db);
 
   Customer? _customer;
-  List<Sale> _sales = [];
   Map<int, List<SaleItem>> _itemsBySale = {};
-  List<DebtPayment> _payments = [];
+  List<_HistoryEntry> _history = [];
   double _balance = 0;
   bool _loading = true;
 
@@ -51,14 +50,20 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
       itemsBySale[s.id] = await _salesRepo.getItemsForSale(s.id);
     }
     final payments = await _repo.getPaymentsForCustomer(widget.customerId);
+    final debtAdjustments = await _repo.getDebtAdjustments(widget.customerId);
     final balance = await _repo.getRemainingBalance(widget.customerId);
+
+    final history = <_HistoryEntry>[
+      ...sales.map((s) => _HistoryEntry.sale(s)),
+      ...payments.map((p) => _HistoryEntry.payment(p)),
+      ...debtAdjustments.map((a) => _HistoryEntry.debt(a)),
+    ]..sort((a, b) => b.date.compareTo(a.date));
 
     if (!mounted) return;
     setState(() {
       _customer = customer;
-      _sales = sales;
       _itemsBySale = itemsBySale;
-      _payments = payments;
+      _history = history;
       _balance = balance;
       _loading = false;
     });
@@ -123,96 +128,208 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           final l10n = AppLocalizations.of(context)!;
-          return AlertDialog(
-            title: Text(l10n.recordPaymentTitle),
-            content: SizedBox(
-              width: 320,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (error != null) ...[
-                      Text(
-                        error!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
+          Future<void> confirm() async {
+            final amount = double.tryParse(amountController.text) ?? 0;
+            if (amount <= 0) {
+              setDialogState(() => error = l10n.enterValidAmount);
+              return;
+            }
+            if (amount > _balance) {
+              setDialogState(() => error = l10n.amountPaidExceedsTotal);
+              return;
+            }
+            await _repo.recordPayment(
+              customerId: _customer!.id,
+              amount: amount,
+              paymentDate: paymentDate,
+              note: noteController.text.isEmpty ? null : noteController.text,
+            );
+            if (context.mounted) Navigator.pop(context, true);
+          }
+
+          return EnterToSubmit(
+            onSubmit: confirm,
+            child: AlertDialog(
+              title: Text(l10n.recordPaymentTitle),
+              content: SizedBox(
+                width: 320,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (error != null) ...[
+                        Text(
+                          error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    TextField(
-                      controller: amountController,
-                      decoration: InputDecoration(
-                        labelText: l10n.amountLabel,
-                        border: const OutlineInputBorder(),
-                      ),
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    InkWell(
-                      onTap: () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: paymentDate,
-                          firstDate: DateTime(2020),
-                          lastDate: DateTime.now(),
-                        );
-                        if (picked != null)
-                          setDialogState(() => paymentDate = picked);
-                      },
-                      child: InputDecorator(
+                        const SizedBox(height: 8),
+                      ],
+                      TextField(
+                        controller: amountController,
                         decoration: InputDecoration(
-                          labelText: l10n.paymentDateLabel,
+                          labelText: l10n.amountLabel,
                           border: const OutlineInputBorder(),
                         ),
-                        child: Text(
-                          '${paymentDate.year}-${paymentDate.month.toString().padLeft(2, '0')}-${paymentDate.day.toString().padLeft(2, '0')}',
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 14),
-                    TextField(
-                      controller: noteController,
-                      decoration: InputDecoration(
-                        labelText: l10n.noteOptionalLabel,
-                        border: const OutlineInputBorder(),
+                      const SizedBox(height: 14),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: paymentDate,
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null)
+                            setDialogState(() => paymentDate = picked);
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: l10n.paymentDateLabel,
+                            border: const OutlineInputBorder(),
+                          ),
+                          child: Text(
+                            '${paymentDate.year}-${paymentDate.month.toString().padLeft(2, '0')}-${paymentDate.day.toString().padLeft(2, '0')}',
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: noteController,
+                        decoration: InputDecoration(
+                          labelText: l10n.noteOptionalLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(onPressed: confirm, child: Text(l10n.save)),
+              ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(l10n.cancel),
+          );
+        },
+      ),
+    );
+    if (saved == true) _load();
+  }
+
+  Future<void> _addDebt() async {
+    final amountController = TextEditingController();
+    final noteController = TextEditingController();
+    var debtDate = DateTime.now();
+    String? error;
+
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final l10n = AppLocalizations.of(context)!;
+          Future<void> confirm() async {
+            final amount = double.tryParse(amountController.text) ?? 0;
+            if (amount <= 0) {
+              setDialogState(() => error = l10n.enterValidAmount);
+              return;
+            }
+            await _repo.addDebtAdjustment(
+              customerId: _customer!.id,
+              amount: amount,
+              date: debtDate,
+              note: noteController.text.isEmpty ? null : noteController.text,
+            );
+            if (context.mounted) Navigator.pop(context, true);
+          }
+
+          return EnterToSubmit(
+            onSubmit: confirm,
+            child: AlertDialog(
+              title: Text(l10n.addDebtAction),
+              content: SizedBox(
+                width: 320,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (error != null) ...[
+                        Text(
+                          error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      TextField(
+                        controller: amountController,
+                        decoration: InputDecoration(
+                          labelText: l10n.amountLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: debtDate,
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null) {
+                            setDialogState(() => debtDate = picked);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: l10n.paymentDateLabel,
+                            border: const OutlineInputBorder(),
+                          ),
+                          child: Text(
+                            '${debtDate.year}-${debtDate.month.toString().padLeft(2, '0')}-${debtDate.day.toString().padLeft(2, '0')}',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: noteController,
+                        decoration: InputDecoration(
+                          labelText: l10n.noteOptionalLabel,
+                          hintText: l10n.debtNoteHint,
+                          border: const OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              FilledButton(
-                onPressed: () async {
-                  final amount = double.tryParse(amountController.text) ?? 0;
-                  if (amount <= 0) {
-                    setDialogState(() => error = l10n.enterValidAmount);
-                    return;
-                  }
-                  if (amount > _balance) {
-                    setDialogState(() => error = l10n.amountPaidExceedsTotal);
-                    return;
-                  }
-                  await _repo.recordPayment(
-                    customerId: _customer!.id,
-                    amount: amount,
-                    paymentDate: paymentDate,
-                    note: noteController.text.isEmpty
-                        ? null
-                        : noteController.text,
-                  );
-                  if (context.mounted) Navigator.pop(context, true);
-                },
-                child: Text(l10n.save),
-              ),
-            ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF0E7C7B),
+                  ),
+                  onPressed: confirm,
+                  child: Text(l10n.save),
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -246,6 +363,176 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
   String _formatDate(DateTime d) =>
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  Widget _buildHistoryRow(BuildContext context, _HistoryEntry entry) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    return switch (entry.type) {
+      _HistoryType.sale => _buildSaleHistoryRow(l10n, theme, entry.sale!),
+      _HistoryType.payment => _buildPaymentHistoryRow(l10n, entry.payment!),
+      _HistoryType.debt => _buildDebtHistoryRow(l10n, entry.adjustment!),
+    };
+  }
+
+  Widget _buildSaleHistoryRow(AppLocalizations l10n, ThemeData theme, Sale s) {
+    final items = _itemsBySale[s.id] ?? <SaleItem>[];
+    final remaining = s.totalAmount - s.amountPaid;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(width: 92, child: Text(_formatDate(s.date))),
+          _TypeBadge(label: l10n.catSale, color: const Color(0xFF0E7C7B)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              '${l10n.saleItemsCount(items.length)} · ${l10n.colPaid}: ${formatMoney(s.amountPaid)}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              MoneyText(
+                formatMoney(s.totalAmount),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+              MoneyText(
+                remaining > 0
+                    ? '${l10n.colRemaining}: ${formatMoney(remaining)}'
+                    : l10n.colPaid,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: remaining > 0
+                      ? const Color(0xFFE4572E)
+                      : const Color(0xFF16A34A),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                tooltip: l10n.editSaleTitle,
+                onPressed: () async {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Scaffold(
+                        appBar: AppBar(
+                          title: Text(l10n.editSaleTitle),
+                          leading: const BackButton(),
+                        ),
+                        body: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: CustomerSaleScreen(
+                            db: widget.db,
+                            saleId: s.id,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                  _load();
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.receipt_long_outlined, size: 18),
+                tooltip: l10n.viewInvoiceTooltip,
+                onPressed: () => _viewInvoice(s),
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.delete_outline,
+                  size: 18,
+                  color: theme.colorScheme.error,
+                ),
+                onPressed: () => _deleteSale(s),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentHistoryRow(AppLocalizations l10n, DebtPayment p) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(width: 92, child: Text(_formatDate(p.paymentDate))),
+          _TypeBadge(label: l10n.catPayment, color: const Color(0xFF16A34A)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              p.note ?? '—',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+          MoneyText(
+            '+${formatMoney(p.amount)}',
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF16A34A),
+            ),
+          ),
+          const SizedBox(width: 48),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDebtHistoryRow(AppLocalizations l10n, CustomerDebtAdjustment a) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(width: 92, child: Text(_formatDate(a.date))),
+          _TypeBadge(
+            label: l10n.debtAddedLabel,
+            color: const Color(0xFFE4572E),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              a.note ?? '—',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+          MoneyText(
+            '+${formatMoney(a.amount)}',
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Color(0xFFE4572E),
+            ),
+          ),
+          const SizedBox(width: 48),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -311,238 +598,24 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                     ),
                     const SizedBox(height: 20),
                     Panel(
-                      title: l10n.salesHistoryPanel,
-                      description: l10n.salesHistoryCountDesc(_sales.length),
-                      child: _sales.isEmpty
+                      title: l10n.historyPanel,
+                      description: l10n.historyCountDesc(_history.length),
+                      child: _history.isEmpty
                           ? EmptyState(
                               icon: Icons.receipt_long_outlined,
-                              title: l10n.noSalesYetForCustomer,
+                              title: l10n.noHistoryYet,
                             )
-                          : LayoutBuilder(
-                              builder: (context, constraints) {
-                                return SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      minWidth: constraints.maxWidth,
+                          : Column(
+                              children: [
+                                for (var i = 0; i < _history.length; i++) ...[
+                                  _buildHistoryRow(context, _history[i]),
+                                  if (i < _history.length - 1)
+                                    Divider(
+                                      height: 1,
+                                      color: theme.dividerColor,
                                     ),
-                                    child: DataTable(
-                                      showCheckboxColumn: false,
-                                      columns: [
-                                        DataColumn(label: Text(l10n.colDate)),
-                                        DataColumn(label: Text(l10n.colItems)),
-                                        DataColumn(
-                                          label: Text(l10n.totalLabel),
-                                          numeric: true,
-                                        ),
-                                        DataColumn(
-                                          label: Text(l10n.colPaid),
-                                          numeric: true,
-                                        ),
-                                        DataColumn(
-                                          label: Text(l10n.colRemaining),
-                                          numeric: true,
-                                        ),
-                                        DataColumn(label: Text(l10n.colMethod)),
-                                        DataColumn(
-                                          label: Text(l10n.colActions),
-                                        ),
-                                      ],
-                                      rows: _sales.map((s) {
-                                        final items =
-                                            _itemsBySale[s.id] ?? <SaleItem>[];
-                                        final remaining =
-                                            s.totalAmount - s.amountPaid;
-                                        final tone = switch (s.paymentMethod) {
-                                          'cash' => BadgeTone.success,
-                                          'card' => BadgeTone.neutral,
-                                          'credit' => BadgeTone.destructive,
-                                          'split' => BadgeTone.warning,
-                                          _ => BadgeTone.neutral,
-                                        };
-                                        return DataRow(
-                                          onSelectChanged: (_) async {
-                                            await Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (context) => Scaffold(
-                                                  appBar: AppBar(
-                                                    title: Text(
-                                                      l10n.editSaleTitle,
-                                                    ),
-                                                    leading: const BackButton(),
-                                                  ),
-                                                  body: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                          24,
-                                                        ),
-                                                    child: CustomerSaleScreen(
-                                                      db: widget.db,
-                                                      saleId: s.id,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                            _load();
-                                          },
-                                          cells: [
-                                            DataCell(Text(_formatDate(s.date))),
-                                            DataCell(
-                                              Text(
-                                                l10n.saleItemsCount(
-                                                  items.length,
-                                                ),
-                                              ),
-                                            ),
-                                            DataCell(
-                                              MoneyText(formatMoney(s.totalAmount)),
-                                            ),
-                                            DataCell(
-                                              MoneyText(formatMoney(s.amountPaid)),
-                                            ),
-                                            DataCell(
-                                              MoneyText(
-                                                formatMoney(remaining),
-                                                style: TextStyle(
-                                                  color: remaining > 0
-                                                      ? const Color(0xFFE4572E)
-                                                      : const Color(0xFF16A34A),
-                                                  fontWeight: FontWeight.w700,
-                                                ),
-                                              ),
-                                            ),
-                                            DataCell(
-                                              StatusBadge(
-                                                label: s.paymentMethod,
-                                                tone: tone,
-                                              ),
-                                            ),
-                                            DataCell(
-                                              Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  IconButton(
-                                                    icon: const Icon(
-                                                      Icons.edit_outlined,
-                                                      size: 18,
-                                                    ),
-                                                    tooltip: l10n.editSaleTitle,
-                                                    onPressed: () async {
-                                                      await Navigator.of(
-                                                        context,
-                                                      ).push(
-                                                        MaterialPageRoute(
-                                                          builder: (context) => Scaffold(
-                                                            appBar: AppBar(
-                                                              title: Text(
-                                                                l10n.editSaleTitle,
-                                                              ),
-                                                              leading:
-                                                                  const BackButton(),
-                                                            ),
-                                                            body: Padding(
-                                                              padding:
-                                                                  const EdgeInsets.all(
-                                                                    24,
-                                                                  ),
-                                                              child:
-                                                                  CustomerSaleScreen(
-                                                                    db: widget
-                                                                        .db,
-                                                                    saleId:
-                                                                        s.id,
-                                                                  ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      );
-                                                      _load();
-                                                    },
-                                                  ),
-                                                  IconButton(
-                                                    icon: const Icon(
-                                                      Icons
-                                                          .receipt_long_outlined,
-                                                      size: 18,
-                                                    ),
-                                                    tooltip:
-                                                        l10n.viewInvoiceTooltip,
-                                                    onPressed: () =>
-                                                        _viewInvoice(s),
-                                                  ),
-                                                  IconButton(
-                                                    icon: Icon(
-                                                      Icons.delete_outline,
-                                                      size: 18,
-                                                      color: theme
-                                                          .colorScheme
-                                                          .error,
-                                                    ),
-                                                    onPressed: () =>
-                                                        _deleteSale(s),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                    ),
-                    const SizedBox(height: 20),
-                    Panel(
-                      title: l10n.paymentsHistoryPanel,
-                      description: l10n.paymentCountDesc(_payments.length),
-                      child: _payments.isEmpty
-                          ? EmptyState(
-                              icon: Icons.payments_outlined,
-                              title: l10n.noPaymentsYet,
-                            )
-                          : LayoutBuilder(
-                              builder: (context, constraints) {
-                                return SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      minWidth: constraints.maxWidth,
-                                    ),
-                                    child: DataTable(
-                                      columns: [
-                                        DataColumn(label: Text(l10n.colDate)),
-                                        DataColumn(
-                                          label: Text(l10n.colAmount),
-                                          numeric: true,
-                                        ),
-                                        DataColumn(label: Text(l10n.colNote)),
-                                      ],
-                                      rows: _payments.map((p) {
-                                        return DataRow(
-                                          cells: [
-                                            DataCell(
-                                              Text(_formatDate(p.paymentDate)),
-                                            ),
-                                            DataCell(
-                                              MoneyText(
-                                                formatMoney(p.amount),
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xFF16A34A),
-                                                ),
-                                              ),
-                                            ),
-                                            DataCell(Text(p.note ?? '—')),
-                                          ],
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                );
-                              },
+                                ],
+                              ],
                             ),
                     ),
                   ],
@@ -560,6 +633,24 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                             onPressed: _recordPayment,
                             icon: const Icon(Icons.payments_outlined),
                             label: Text(l10n.recordPaymentTitle),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: _addDebt,
+                            icon: const Icon(
+                              Icons.add_card_outlined,
+                              color: Color(0xFF0E7C7B),
+                            ),
+                            label: Text(
+                              l10n.addDebtAction,
+                              style: const TextStyle(color: Color(0xFF0E7C7B)),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFF0E7C7B)),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -651,6 +742,67 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+enum _HistoryType { sale, payment, debt }
+
+/// One row in the merged Sales/Payments/Debt-Adjustments history timeline.
+class _HistoryEntry {
+  final DateTime date;
+  final _HistoryType type;
+  final Sale? sale;
+  final DebtPayment? payment;
+  final CustomerDebtAdjustment? adjustment;
+
+  _HistoryEntry.sale(Sale sale)
+    : date = sale.date,
+      type = _HistoryType.sale,
+      sale = sale,
+      payment = null,
+      adjustment = null;
+
+  _HistoryEntry.payment(DebtPayment payment)
+    : date = payment.paymentDate,
+      type = _HistoryType.payment,
+      sale = null,
+      payment = payment,
+      adjustment = null;
+
+  _HistoryEntry.debt(CustomerDebtAdjustment adjustment)
+    : date = adjustment.date,
+      type = _HistoryType.debt,
+      sale = null,
+      payment = null,
+      adjustment = adjustment;
+}
+
+/// Small colored pill marking a history row's type (Sale/Payment/Debt
+/// Added). Uses this app's exact brand hex values directly rather than the
+/// shared status-badge tones, since those don't line up 1:1 with the
+/// specific colors this feature calls for.
+class _TypeBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+  const _TypeBadge({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

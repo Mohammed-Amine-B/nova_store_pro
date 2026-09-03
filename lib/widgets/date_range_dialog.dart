@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'enter_to_submit.dart';
 
 /// Shows a compact dialog (not the built-in full-page calendar) for picking
 /// a start/end date range, using tap-to-open single-date fields.
@@ -69,54 +70,62 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
   @override
   Widget build(BuildContext context) {
     final canApply = _start != null && _end != null;
-    return AlertDialog(
-      title: const Text('Select Date Range'),
-      content: SizedBox(
-        width: 320,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              InkWell(
-                onTap: _pickStart,
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Start Date',
-                    border: OutlineInputBorder(),
+    return EnterToSubmit(
+      onSubmit: canApply
+          ? () => Navigator.pop(
+              context,
+              DateTimeRange(start: _start!, end: _end!),
+            )
+          : null,
+      child: AlertDialog(
+        title: const Text('Select Date Range'),
+        content: SizedBox(
+          width: 320,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                InkWell(
+                  onTap: _pickStart,
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Start Date',
+                      border: OutlineInputBorder(),
+                    ),
+                    child: Text(_start != null ? _format(_start!) : '—'),
                   ),
-                  child: Text(_start != null ? _format(_start!) : '—'),
                 ),
-              ),
-              const SizedBox(height: 14),
-              InkWell(
-                onTap: _pickEnd,
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'End Date',
-                    border: OutlineInputBorder(),
+                const SizedBox(height: 14),
+                InkWell(
+                  onTap: _pickEnd,
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'End Date',
+                      border: OutlineInputBorder(),
+                    ),
+                    child: Text(_end != null ? _format(_end!) : '—'),
                   ),
-                  child: Text(_end != null ? _format(_end!) : '—'),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: canApply
+                ? () => Navigator.pop(
+                    context,
+                    DateTimeRange(start: _start!, end: _end!),
+                  )
+                : null,
+            child: const Text('Apply'),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: canApply
-              ? () => Navigator.pop(
-                  context,
-                  DateTimeRange(start: _start!, end: _end!),
-                )
-              : null,
-          child: const Text('Apply'),
-        ),
-      ],
     );
   }
 }

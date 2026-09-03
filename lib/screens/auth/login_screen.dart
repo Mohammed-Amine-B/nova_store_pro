@@ -4,6 +4,7 @@ import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import '../../data/database/database.dart';
 import '../../data/repositories/settings_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../widgets/enter_to_submit.dart';
 
 class LoginScreen extends StatefulWidget {
   final AppDatabase db;
@@ -305,238 +306,255 @@ class _RecoveryDialogState extends State<_RecoveryDialog> {
         );
 
       case _RecoveryStep.question:
-        return AlertDialog(
-          title: Text(l10n.recoveryMethodQuestion),
-          content: SizedBox(
-            width: 320,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _securityQuestion ?? '',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _answerController,
-                    decoration: InputDecoration(
-                      labelText: l10n.securityAnswerLabel,
-                    ),
-                    onSubmitted: (_) => _verifyAnswer(),
-                  ),
-                  if (_error != null) ...[
-                    const SizedBox(height: 8),
+        return EnterToSubmit(
+          onSubmit: _busy ? null : _verifyAnswer,
+          child: AlertDialog(
+            title: Text(l10n.recoveryMethodQuestion),
+            content: SizedBox(
+              width: 320,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      _error!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
+                      _securityQuestion ?? '',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _answerController,
+                      decoration: InputDecoration(
+                        labelText: l10n.securityAnswerLabel,
+                      ),
+                      onSubmitted: (_) => _verifyAnswer(),
+                    ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        _error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: _busy ? null : _verifyAnswer,
+                child: Text(l10n.verifyAction),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.cancel),
-            ),
-            FilledButton(
-              onPressed: _busy ? null : _verifyAnswer,
-              child: Text(l10n.verifyAction),
-            ),
-          ],
         );
 
       case _RecoveryStep.code:
-        return AlertDialog(
-          title: Text(l10n.recoveryMethodCode),
-          content: SizedBox(
-            width: 320,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: _codeController,
-                    textCapitalization: TextCapitalization.characters,
-                    decoration: InputDecoration(
-                      labelText: l10n.recoveryCodeFieldLabel,
-                    ),
-                    onSubmitted: (_) => _verifyCode(),
-                  ),
-                  if (_error != null) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      _error!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
+        return EnterToSubmit(
+          onSubmit: _busy ? null : _verifyCode,
+          child: AlertDialog(
+            title: Text(l10n.recoveryMethodCode),
+            content: SizedBox(
+              width: 320,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: _codeController,
+                      textCapitalization: TextCapitalization.characters,
+                      decoration: InputDecoration(
+                        labelText: l10n.recoveryCodeFieldLabel,
                       ),
+                      onSubmitted: (_) => _verifyCode(),
                     ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        _error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: _busy ? null : _verifyCode,
+                child: Text(l10n.verifyAction),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.cancel),
-            ),
-            FilledButton(
-              onPressed: _busy ? null : _verifyCode,
-              child: Text(l10n.verifyAction),
-            ),
-          ],
         );
 
       case _RecoveryStep.newPassword:
-        return AlertDialog(
-          title: Text(l10n.recoveryNewPasswordTitle),
-          content: SizedBox(
-            width: 320,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: _newPasswordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: l10n.newPasswordLabel,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _confirmPasswordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: l10n.confirmNewPasswordLabel,
-                    ),
-                  ),
-                  if (_error != null) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      _error!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
+        return EnterToSubmit(
+          onSubmit: _busy ? null : _resetPassword,
+          child: AlertDialog(
+            title: Text(l10n.recoveryNewPasswordTitle),
+            content: SizedBox(
+              width: 320,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: _newPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: l10n.newPasswordLabel,
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: l10n.confirmNewPasswordLabel,
+                      ),
+                    ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        _error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: _busy ? null : _resetPassword,
+                child: Text(l10n.save),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.cancel),
-            ),
-            FilledButton(
-              onPressed: _busy ? null : _resetPassword,
-              child: Text(l10n.save),
-            ),
-          ],
         );
 
       case _RecoveryStep.showNewCode:
-        return AlertDialog(
-          title: Text(l10n.recoveryCodeDialogTitle),
-          content: SizedBox(
-            width: 320,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.recoveryCodeSaveWarning),
-                  const SizedBox(height: 12),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
+        return EnterToSubmit(
+          onSubmit: _codeAcknowledged
+              ? () => Navigator.pop(context, true)
+              : null,
+          child: AlertDialog(
+            title: Text(l10n.recoveryCodeDialogTitle),
+            content: SizedBox(
+              width: 320,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.recoveryCodeSaveWarning),
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 8,
+                      ),
+                      decoration: BoxDecoration(
                         color: Theme.of(
                           context,
-                        ).colorScheme.primary.withValues(alpha: 0.3),
+                        ).colorScheme.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.3),
+                        ),
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            _newCode ?? '',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 2,
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _newCode ?? '',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 2,
+                              ),
                             ),
                           ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Clipboard.setData(
-                              ClipboardData(text: _newCode ?? ''),
-                            );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(l10n.codeCopiedMessage)),
-                            );
-                          },
-                          icon: const Icon(Icons.copy_outlined, size: 20),
-                          tooltip: l10n.copyCodeAction,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ],
+                          IconButton(
+                            onPressed: () {
+                              Clipboard.setData(
+                                ClipboardData(text: _newCode ?? ''),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(l10n.codeCopiedMessage)),
+                              );
+                            },
+                            icon: const Icon(Icons.copy_outlined, size: 20),
+                            tooltip: l10n.copyCodeAction,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  CheckboxListTile(
-                    value: _codeAcknowledged,
-                    onChanged: (v) =>
-                        setState(() => _codeAcknowledged = v ?? false),
-                    title: Text(l10n.recoveryCodeAckCheckbox),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    CheckboxListTile(
+                      value: _codeAcknowledged,
+                      onChanged: (v) =>
+                          setState(() => _codeAcknowledged = v ?? false),
+                      title: Text(l10n.recoveryCodeAckCheckbox),
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ],
+                ),
               ),
             ),
+            actions: [
+              FilledButton(
+                onPressed: _codeAcknowledged
+                    ? () => Navigator.pop(context, true)
+                    : null,
+                child: Text(l10n.continueAction),
+              ),
+            ],
           ),
-          actions: [
-            FilledButton(
-              onPressed: _codeAcknowledged
-                  ? () => Navigator.pop(context, true)
-                  : null,
-              child: Text(l10n.continueAction),
-            ),
-          ],
         );
 
       case _RecoveryStep.unavailable:
-        return AlertDialog(
-          title: Text(l10n.recoveryNotAvailableTitle),
-          content: SizedBox(
-            width: 320,
-            child: Text(l10n.recoveryNotAvailableMessage),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.close),
+        return EnterToSubmit(
+          onSubmit: () => Navigator.pop(context),
+          child: AlertDialog(
+            title: Text(l10n.recoveryNotAvailableTitle),
+            content: SizedBox(
+              width: 320,
+              child: Text(l10n.recoveryNotAvailableMessage),
             ),
-          ],
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.close),
+              ),
+            ],
+          ),
         );
     }
   }

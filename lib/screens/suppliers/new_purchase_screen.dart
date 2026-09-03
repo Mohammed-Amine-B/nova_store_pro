@@ -7,6 +7,7 @@ import '../../data/repositories/insights_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/enter_to_submit.dart';
 import '../../widgets/product_thumbnail.dart';
 import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
@@ -148,170 +149,174 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
               ? previewPerUnit
               : previewEnteredPrice;
 
-          return AlertDialog(
-            title: Text(productDisplayName(product)),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: quantityController,
-                          decoration: InputDecoration(
-                            labelText: l10n.quantityLabel,
+          void confirm() {
+            var quantity = double.tryParse(quantityController.text) ?? 0;
+            if (isPiece) quantity = quantity.roundToDouble();
+            final enteredPrice = double.tryParse(priceController.text) ?? 0;
+            if (quantity <= 0 || enteredPrice <= 0) return;
+            final price = totalPriceMode
+                ? enteredPrice / quantity
+                : enteredPrice;
+            double? sellingPrice;
+            if (isFirstBatch) {
+              sellingPrice = double.tryParse(sellingPriceController.text);
+              if (sellingPrice == null || sellingPrice <= 0) return;
+            }
+            Navigator.pop(context, (quantity, price, sellingPrice));
+          }
+
+          return EnterToSubmit(
+            onSubmit: confirm,
+            child: AlertDialog(
+              title: Text(productDisplayName(product)),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: quantityController,
+                            decoration: InputDecoration(
+                              labelText: l10n.quantityLabel,
+                            ),
+                            keyboardType: isPiece
+                                ? TextInputType.number
+                                : const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                            onChanged: (_) => setDialogState(() {}),
                           ),
-                          keyboardType: isPiece
-                              ? TextInputType.number
-                              : const TextInputType.numberWithOptions(
-                                  decimal: true,
-                                ),
-                          onChanged: (_) => setDialogState(() {}),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: priceController,
-                          decoration: InputDecoration(
-                            labelText: totalPriceMode
-                                ? l10n.totalPricePaidLabel
-                                : l10n.buyPriceLabel,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: priceController,
+                            decoration: InputDecoration(
+                              labelText: totalPriceMode
+                                  ? l10n.totalPricePaidLabel
+                                  : l10n.buyPriceLabel,
+                            ),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            onChanged: (_) => setDialogState(() {}),
                           ),
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
+                        ),
+                      ],
+                    ),
+                    if (!isPiece) ...[
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: SegmentedButton<bool>(
+                          segments: [
+                            ButtonSegment(
+                              value: false,
+                              label: Text(l10n.priceModePerUnit),
+                            ),
+                            ButtonSegment(
+                              value: true,
+                              label: Text(l10n.priceModeTotal),
+                            ),
+                          ],
+                          selected: {totalPriceMode},
+                          onSelectionChanged: (s) =>
+                              setDialogState(() => totalPriceMode = s.first),
+                          style: SegmentedButton.styleFrom(
+                            selectedBackgroundColor: const Color(
+                              0xFF0E7C7B,
+                            ).withValues(alpha: 0.12),
+                            selectedForegroundColor: const Color(0xFF0E7C7B),
                           ),
-                          onChanged: (_) => setDialogState(() {}),
                         ),
                       ),
                     ],
-                  ),
-                  if (!isPiece) ...[
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: SegmentedButton<bool>(
-                        segments: [
-                          ButtonSegment(
-                            value: false,
-                            label: Text(l10n.priceModePerUnit),
+                    if (showPreview) ...[
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          l10n.perUnitPreview(
+                            formatMoney(previewPerUnit),
+                            unitLabel,
                           ),
-                          ButtonSegment(
-                            value: true,
-                            label: Text(l10n.priceModeTotal),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
-                        ],
-                        selected: {totalPriceMode},
-                        onSelectionChanged: (s) =>
-                            setDialogState(() => totalPriceMode = s.first),
-                        style: SegmentedButton.styleFrom(
-                          selectedBackgroundColor: const Color(
-                            0xFF0E7C7B,
-                          ).withValues(alpha: 0.12),
-                          selectedForegroundColor: const Color(0xFF0E7C7B),
                         ),
                       ),
-                    ),
-                  ],
-                  if (showPreview) ...[
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        l10n.perUnitPreview(
-                          formatMoney(previewPerUnit),
-                          unitLabel,
+                    ],
+                    if (isFirstBatch) ...[
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: sellingPriceController,
+                        decoration: InputDecoration(
+                          labelText: l10n.sellingPriceRequiredFirstBatch,
                         ),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.6),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
                         ),
                       ),
-                    ),
-                  ],
-                  if (isFirstBatch) ...[
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: sellingPriceController,
-                      decoration: InputDecoration(
-                        labelText: l10n.sellingPriceRequiredFirstBatch,
-                      ),
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                    ),
-                    if (product.categoryId != null && effectiveBuyPrice > 0)
-                      FutureBuilder<double?>(
-                        future: _insightsRepo.suggestSellingPrice(
-                          product.categoryId!,
-                          effectiveBuyPrice,
-                        ),
-                        builder: (context, snapshot) {
-                          final suggestion = snapshot.data;
-                          if (suggestion == null)
-                            return const SizedBox.shrink();
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    l10n.suggestedPriceHint(
-                                      formatMoney(suggestion),
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withValues(alpha: 0.6),
+                      if (product.categoryId != null && effectiveBuyPrice > 0)
+                        FutureBuilder<double?>(
+                          future: _insightsRepo.suggestSellingPrice(
+                            product.categoryId!,
+                            effectiveBuyPrice,
+                          ),
+                          builder: (context, snapshot) {
+                            final suggestion = snapshot.data;
+                            if (suggestion == null)
+                              return const SizedBox.shrink();
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      l10n.suggestedPriceHint(
+                                        formatMoney(suggestion),
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.6),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                TextButton(
-                                  onPressed: () => setDialogState(
-                                    () => sellingPriceController.text =
-                                        plainNumber(suggestion),
+                                  TextButton(
+                                    onPressed: () => setDialogState(
+                                      () => sellingPriceController.text =
+                                          plainNumber(suggestion),
+                                    ),
+                                    child: Text(l10n.useSuggestionAction),
                                   ),
-                                  child: Text(l10n.useSuggestionAction),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                    ],
                   ],
-                ],
+                ),
               ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(
+                  onPressed: confirm,
+                  child: Text(l10n.addLineAction),
+                ),
+              ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(l10n.cancel),
-              ),
-              FilledButton(
-                onPressed: () {
-                  var quantity = double.tryParse(quantityController.text) ?? 0;
-                  if (isPiece) quantity = quantity.roundToDouble();
-                  final enteredPrice =
-                      double.tryParse(priceController.text) ?? 0;
-                  if (quantity <= 0 || enteredPrice <= 0) return;
-                  final price = totalPriceMode
-                      ? enteredPrice / quantity
-                      : enteredPrice;
-                  double? sellingPrice;
-                  if (isFirstBatch) {
-                    sellingPrice = double.tryParse(sellingPriceController.text);
-                    if (sellingPrice == null || sellingPrice <= 0) return;
-                  }
-                  Navigator.pop(context, (quantity, price, sellingPrice));
-                },
-                child: Text(l10n.addLineAction),
-              ),
-            ],
           );
         },
       ),
@@ -609,7 +614,11 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
                   l10n.itemsUnitsCount(formatQuantity(_totalItems, 'unit')),
                 ),
                 const SizedBox(height: 10),
-                _SummaryRow(l10n.subtotalRow, formatMoney(_total), isMoney: true),
+                _SummaryRow(
+                  l10n.subtotalRow,
+                  formatMoney(_total),
+                  isMoney: true,
+                ),
                 if (!widget.isEditMode) ...[
                   const SizedBox(height: 10),
                   _SummaryRow(

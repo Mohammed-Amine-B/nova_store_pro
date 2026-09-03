@@ -211,6 +211,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get variantSizeHint => 'مثال: 4 مم، كبير، 1 كجم';
 
   @override
+  String get normalProductOption => 'منتج عادي';
+
+  @override
+  String get productWithSizesOption => 'منتج بأحجام متعددة';
+
+  @override
+  String get sizeLabelFieldLabel => 'الحجم';
+
+  @override
+  String get addAnotherSizeAction => 'إضافة حجم آخر';
+
+  @override
+  String get removeSizeTooltip => 'إزالة هذا الحجم';
+
+  @override
+  String get sizesSectionLabel => 'الأحجام';
+
+  @override
   String get variantsPanel => 'مقاسات أخرى';
 
   @override
@@ -285,6 +303,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get buyPriceLabel => 'سعر الشراء';
+
+  @override
+  String get estimatedCostOptionalLabel => 'التكلفة التقديرية (اختياري)';
+
+  @override
+  String get openingStockToggleLabel =>
+      'هذا مخزون كان لدي بالفعل (وليس شراءً جديدًا)';
+
+  @override
+  String get addOpeningStockAction => 'إضافة مخزون افتتاحي';
 
   @override
   String get sellingPriceFieldLabel => 'سعر البيع';
@@ -691,6 +719,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noPaymentsYet => 'لا توجد دفعات مسجلة بعد.';
+
+  @override
+  String get historyPanel => 'السجل';
+
+  @override
+  String historyCountDesc(int count) {
+    return '$count عنصر';
+  }
+
+  @override
+  String get noHistoryYet => 'لا يوجد سجل بعد لهذا العميل.';
+
+  @override
+  String get debtAddedLabel => 'دين مضاف';
+
+  @override
+  String get addDebtAction => 'إضافة دين';
+
+  @override
+  String get debtNoteHint => 'مثال: رصيد افتتاحي قبل استخدام هذا التطبيق';
 
   @override
   String get supplierDetailFallbackTitle => 'تفاصيل المورد';
@@ -1224,6 +1272,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get changePhotoAction => 'تغيير الصورة';
+
+  @override
+  String get searchImagesOnlineAction => 'البحث عن صور عبر الإنترنت';
+
+  @override
+  String get searchImagesOnlineHint =>
+      'يفتح متصفحك — انقر بزر الفأرة الأيمن واحفظ أي صورة تعجبك، ثم استخدم \"تغيير الصورة\" لإضافتها هنا.';
+
+  @override
+  String get searchImagesOnlineDisabledHint => 'أدخل اسم المنتج أولاً';
 
   @override
   String get removePhotoAction => 'إزالة الصورة';

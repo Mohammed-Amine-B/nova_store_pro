@@ -4,6 +4,7 @@ import '../data/database/database.dart';
 import '../data/repositories/sales_repository.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../utils/formatting.dart';
+import 'enter_to_submit.dart';
 import 'product_thumbnail.dart';
 import 'money_text.dart';
 
@@ -195,142 +196,148 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           final l10n = AppLocalizations.of(context)!;
-          return AlertDialog(
-            contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
+          Future<void> confirm() async {
+            var quantity = double.tryParse(quantityController.text) ?? 0;
+            if (isPiece) quantity = quantity.roundToDouble();
+            final price = double.tryParse(priceController.text) ?? 0;
+            if (quantity <= 0 || price <= 0) {
+              setDialogState(() => error = l10n.enterValidQuantityPrice);
+              return;
+            }
+            try {
+              await _repo.createSale(
+                date: widget.date,
+                lines: [
+                  SaleLineInput(
+                    productId: p.id,
+                    quantity: quantity,
+                    unitPrice: price,
                   ),
-                  child: Icon(
-                    Icons.point_of_sale_outlined,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 22,
+                ],
+              );
+              if (context.mounted) Navigator.pop(context, true);
+            } catch (e) {
+              setDialogState(() => error = e.toString());
+            }
+          }
+
+          return EnterToSubmit(
+            onSubmit: confirm,
+            child: AlertDialog(
+              contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.point_of_sale_outlined,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    productDisplayName(p),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: 320,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.inventory_2_outlined,
+                            size: 14,
+                            color: p.stockQuantity <= 0
+                                ? Theme.of(context).colorScheme.error
+                                : const Color(0xFF16A34A),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            l10n.inStockCount(
+                              formatQuantity(p.stockQuantity, p.unitType),
+                            ),
+                            style: TextStyle(
+                              color: p.stockQuantity <= 0
+                                  ? Theme.of(context).colorScheme.error
+                                  : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      if (error != null) ...[
+                        Text(
+                          error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: quantityController,
+                              decoration: InputDecoration(
+                                labelText: l10n.quantityLabel,
+                                border: const OutlineInputBorder(),
+                              ),
+                              keyboardType: isPiece
+                                  ? TextInputType.number
+                                  : const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: TextField(
+                              controller: priceController,
+                              decoration: InputDecoration(
+                                labelText: l10n.sellingPriceFieldLabel,
+                                border: const OutlineInputBorder(),
+                              ),
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 14),
-                Text(
-                  productDisplayName(p),
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(
+                  onPressed: confirm,
+                  child: Text(l10n.addSaleAction),
                 ),
               ],
             ),
-            content: SizedBox(
-              width: 320,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.inventory_2_outlined,
-                          size: 14,
-                          color: p.stockQuantity <= 0
-                              ? Theme.of(context).colorScheme.error
-                              : const Color(0xFF16A34A),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          l10n.inStockCount(
-                            formatQuantity(p.stockQuantity, p.unitType),
-                          ),
-                          style: TextStyle(
-                            color: p.stockQuantity <= 0
-                                ? Theme.of(context).colorScheme.error
-                                : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    if (error != null) ...[
-                      Text(
-                        error!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: quantityController,
-                            decoration: InputDecoration(
-                              labelText: l10n.quantityLabel,
-                              border: const OutlineInputBorder(),
-                            ),
-                            keyboardType: isPiece
-                                ? TextInputType.number
-                                : const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextField(
-                            controller: priceController,
-                            decoration: InputDecoration(
-                              labelText: l10n.sellingPriceFieldLabel,
-                              border: const OutlineInputBorder(),
-                            ),
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(l10n.cancel),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  var quantity = double.tryParse(quantityController.text) ?? 0;
-                  if (isPiece) quantity = quantity.roundToDouble();
-                  final price = double.tryParse(priceController.text) ?? 0;
-                  if (quantity <= 0 || price <= 0) {
-                    setDialogState(() => error = l10n.enterValidQuantityPrice);
-                    return;
-                  }
-                  try {
-                    await _repo.createSale(
-                      date: widget.date,
-                      lines: [
-                        SaleLineInput(
-                          productId: p.id,
-                          quantity: quantity,
-                          unitPrice: price,
-                        ),
-                      ],
-                    );
-                    if (context.mounted) Navigator.pop(context, true);
-                  } catch (e) {
-                    setDialogState(() => error = e.toString());
-                  }
-                },
-                child: Text(l10n.addSaleAction),
-              ),
-            ],
           );
         },
       ),
@@ -381,18 +388,14 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withValues(
-                      alpha: 0.06,
-                    ),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: theme.dividerColor),
                   ),
                   child: Text(
                     l10n.ctrlFHint,
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(
-                        alpha: 0.5,
-                      ),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       fontSize: 10.5,
                     ),
                   ),

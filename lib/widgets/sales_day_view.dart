@@ -9,6 +9,7 @@ import '../data/repositories/product_repository.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../screens/products/product_detail_screen.dart';
 import 'confirm_dialog.dart';
+import 'enter_to_submit.dart';
 import 'stat_card.dart';
 import 'panel.dart';
 import 'metrics_summary_card.dart';
@@ -118,98 +119,124 @@ class SalesDayViewState extends State<SalesDayView> {
     final labelStyle = theme.textTheme.bodyMedium?.copyWith(
       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
     );
-    final valueStyle = theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600);
+    final valueStyle = theme.textTheme.bodyMedium?.copyWith(
+      fontWeight: FontWeight.w600,
+    );
 
     Widget row(String label, Widget value) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(label, style: labelStyle),
-              value,
-            ],
-          ),
-        );
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: labelStyle),
+          value,
+        ],
+      ),
+    );
 
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: theme.dividerColor),
-              ),
-              child: ProductThumbnail(imagePath: product.imagePath, size: 44),
+      builder: (dialogContext) => EnterToSubmit(
+        onSubmit: () async {
+          Navigator.pop(dialogContext);
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) =>
+                  ProductDetailScreen(db: widget.db, productId: product.id),
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                productDisplayName(product),
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-              ),
-            ),
-          ],
-        ),
-        content: SizedBox(
-          width: 320,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          );
+          reload();
+        },
+        child: AlertDialog(
+          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+          title: Row(
             children: [
-              Divider(height: 24, color: theme.dividerColor),
-              row(
-                l10n.colCategory,
-                CategoryChip(name: _categoryNames[product.categoryId] ?? '—'),
-              ),
-              row(l10n.colBarcode, Text(product.barcode ?? product.code, style: valueStyle)),
-              row(
-                l10n.colCurrentStock,
-                Text(
-                  formatQuantity(product.stockQuantity, product.unitType),
-                  style: valueStyle,
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: theme.dividerColor),
                 ),
+                child: ProductThumbnail(imagePath: product.imagePath, size: 44),
               ),
-              row(
-                l10n.costPriceLabel,
-                MoneyText(
-                  costPrice != null ? formatMoney(costPrice) : l10n.notSet,
-                  style: valueStyle,
-                ),
-              ),
-              row(
-                l10n.colSellingPrice,
-                MoneyText(
-                  product.sellingPrice != null ? formatMoney(product.sellingPrice!) : l10n.notSet,
-                  style: valueStyle?.copyWith(color: const Color(0xFF0E7C7B), fontWeight: FontWeight.w700),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  productDisplayName(product),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-        actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(l10n.close),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-              await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ProductDetailScreen(db: widget.db, productId: product.id),
+          content: SizedBox(
+            width: 320,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Divider(height: 24, color: theme.dividerColor),
+                row(
+                  l10n.colCategory,
+                  CategoryChip(name: _categoryNames[product.categoryId] ?? '—'),
                 ),
-              );
-              reload();
-            },
-            child: Text(l10n.productDetailsAction),
+                row(
+                  l10n.colBarcode,
+                  Text(product.barcode ?? product.code, style: valueStyle),
+                ),
+                row(
+                  l10n.colCurrentStock,
+                  Text(
+                    formatQuantity(product.stockQuantity, product.unitType),
+                    style: valueStyle,
+                  ),
+                ),
+                row(
+                  l10n.costPriceLabel,
+                  MoneyText(
+                    costPrice != null ? formatMoney(costPrice) : l10n.notSet,
+                    style: valueStyle,
+                  ),
+                ),
+                row(
+                  l10n.colSellingPrice,
+                  MoneyText(
+                    product.sellingPrice != null
+                        ? formatMoney(product.sellingPrice!)
+                        : l10n.notSet,
+                    style: valueStyle?.copyWith(
+                      color: const Color(0xFF0E7C7B),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
+          actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(l10n.close),
+            ),
+            FilledButton(
+              onPressed: () async {
+                Navigator.pop(dialogContext);
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ProductDetailScreen(
+                      db: widget.db,
+                      productId: product.id,
+                    ),
+                  ),
+                );
+                reload();
+              },
+              child: Text(l10n.productDetailsAction),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -274,9 +301,15 @@ class SalesDayViewState extends State<SalesDayView> {
                   formatMoney(item.quantity * item.unitPrice),
                 ];
               }).toList(),
-              headerStyle: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+              headerStyle: pw.TextStyle(
+                fontSize: 10,
+                fontWeight: pw.FontWeight.bold,
+              ),
               cellStyle: const pw.TextStyle(fontSize: 10),
-              cellPadding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              cellPadding: const pw.EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 6,
+              ),
             ),
           ],
         ),
@@ -302,44 +335,47 @@ class SalesDayViewState extends State<SalesDayView> {
     );
     final saved = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.editSaleTitle),
-        content: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              child: TextField(
-                controller: quantityController,
-                decoration: InputDecoration(labelText: l10n.quantityLabel),
-                keyboardType: isPiece
-                    ? TextInputType.number
-                    : const TextInputType.numberWithOptions(decimal: true),
+      builder: (context) => EnterToSubmit(
+        onSubmit: () => Navigator.pop(context, true),
+        child: AlertDialog(
+          title: Text(l10n.editSaleTitle),
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: quantityController,
+                  decoration: InputDecoration(labelText: l10n.quantityLabel),
+                  keyboardType: isPiece
+                      ? TextInputType.number
+                      : const TextInputType.numberWithOptions(decimal: true),
+                ),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: priceController,
+                  decoration: InputDecoration(
+                    labelText: l10n.sellingPriceFieldLabel,
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: TextField(
-                controller: priceController,
-                decoration: InputDecoration(
-                  labelText: l10n.sellingPriceFieldLabel,
-                ),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-              ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.saveChanges),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.saveChanges),
-          ),
-        ],
       ),
     );
     if (saved != true) return;
@@ -602,9 +638,13 @@ class SalesDayViewState extends State<SalesDayView> {
                                       DataCell(
                                         GestureDetector(
                                           onDoubleTap: () =>
-                                              _showProductQuickView(item.productId),
+                                              _showProductQuickView(
+                                                item.productId,
+                                              ),
                                           child: Tooltip(
-                                            message: _productName(item.productId),
+                                            message: _productName(
+                                              item.productId,
+                                            ),
                                             child: SizedBox(
                                               width: 220,
                                               child: Text(

@@ -211,6 +211,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get variantSizeHint => 'e.g. 4mm, Large, 1kg';
 
   @override
+  String get normalProductOption => 'Normal Product';
+
+  @override
+  String get productWithSizesOption => 'Product with Sizes';
+
+  @override
+  String get sizeLabelFieldLabel => 'Size';
+
+  @override
+  String get addAnotherSizeAction => 'Add Another Size';
+
+  @override
+  String get removeSizeTooltip => 'Remove this size';
+
+  @override
+  String get sizesSectionLabel => 'Sizes';
+
+  @override
   String get variantsPanel => 'Other Sizes';
 
   @override
@@ -285,6 +303,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get buyPriceLabel => 'Buy Price';
+
+  @override
+  String get estimatedCostOptionalLabel => 'Estimated Cost (optional)';
+
+  @override
+  String get openingStockToggleLabel =>
+      'This is stock I already had (not a new purchase)';
+
+  @override
+  String get addOpeningStockAction => 'Add Opening Stock';
 
   @override
   String get sellingPriceFieldLabel => 'Selling Price';
@@ -691,6 +719,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noPaymentsYet => 'No payments recorded yet.';
+
+  @override
+  String get historyPanel => 'History';
+
+  @override
+  String historyCountDesc(int count) {
+    return '$count entries';
+  }
+
+  @override
+  String get noHistoryYet => 'No history yet for this customer.';
+
+  @override
+  String get debtAddedLabel => 'Debt Added';
+
+  @override
+  String get addDebtAction => 'Add Debt';
+
+  @override
+  String get debtNoteHint => 'e.g. Opening balance before using this app';
 
   @override
   String get supplierDetailFallbackTitle => 'Supplier Detail';
@@ -1224,6 +1272,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get changePhotoAction => 'Change Photo';
+
+  @override
+  String get searchImagesOnlineAction => 'Search Images Online';
+
+  @override
+  String get searchImagesOnlineHint =>
+      'Opens your browser — right-click and save any image you like, then use Choose Photo to add it here.';
+
+  @override
+  String get searchImagesOnlineDisabledHint => 'Enter a product name first';
 
   @override
   String get removePhotoAction => 'Remove Photo';

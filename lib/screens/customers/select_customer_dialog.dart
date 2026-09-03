@@ -3,6 +3,7 @@ import '../../data/database/database.dart';
 import '../../data/repositories/customer_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/enter_to_submit.dart';
 import 'customer_form_dialog.dart';
 
 class SelectCustomerDialog extends StatefulWidget {
@@ -39,7 +40,9 @@ class _SelectCustomerDialogState extends State<SelectCustomerDialog> {
   void _onSearchChanged(String query) {
     final q = query.trim().toLowerCase();
     setState(() {
-      _filtered = q.isEmpty ? _customers : _customers.where((c) => c.name.toLowerCase().contains(q)).toList();
+      _filtered = q.isEmpty
+          ? _customers
+          : _customers.where((c) => c.name.toLowerCase().contains(q)).toList();
     });
   }
 
@@ -54,54 +57,80 @@ class _SelectCustomerDialogState extends State<SelectCustomerDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return AlertDialog(
-      title: Text(l10n.selectCustomerTitle),
-      content: SizedBox(
-        width: 380,
-        height: 420,
-        child: _loading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: _searchController,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      hintText: l10n.searchCustomersEllipsis,
-                      prefixIcon: const Icon(Icons.search, size: 18),
-                      border: const OutlineInputBorder(),
-                      isDense: true,
+    return EnterToSubmit(
+      onSubmit: _filtered.isNotEmpty
+          ? () => Navigator.pop(context, _filtered.first.id)
+          : null,
+      child: AlertDialog(
+        title: Text(l10n.selectCustomerTitle),
+        content: SizedBox(
+          width: 380,
+          height: 420,
+          child: _loading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _searchController,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: l10n.searchCustomersEllipsis,
+                        prefixIcon: const Icon(Icons.search, size: 18),
+                        border: const OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      onChanged: _onSearchChanged,
                     ),
-                    onChanged: _onSearchChanged,
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: _filtered.isEmpty
-                        ? Center(child: EmptyState(icon: Icons.people_outline, title: l10n.noCustomersFound))
-                        : ListView(
-                            children: _filtered.map((c) => ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
-                                    child: Text(c.name.isNotEmpty ? c.name[0].toUpperCase() : '?'),
-                                  ),
-                                  title: Text(c.name),
-                                  subtitle: c.phone != null ? Text(c.phone!) : null,
-                                  onTap: () => Navigator.pop(context, c.id),
-                                )).toList(),
-                          ),
-                  ),
-                ],
-              ),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-        FilledButton.icon(
-          onPressed: _addNewCustomer,
-          icon: const Icon(Icons.add, size: 18),
-          label: Text(l10n.newCustomerAction),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: _filtered.isEmpty
+                          ? Center(
+                              child: EmptyState(
+                                icon: Icons.people_outline,
+                                title: l10n.noCustomersFound,
+                              ),
+                            )
+                          : ListView(
+                              children: _filtered
+                                  .map(
+                                    (c) => ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withValues(alpha: 0.12),
+                                        child: Text(
+                                          c.name.isNotEmpty
+                                              ? c.name[0].toUpperCase()
+                                              : '?',
+                                        ),
+                                      ),
+                                      title: Text(c.name),
+                                      subtitle: c.phone != null
+                                          ? Text(c.phone!)
+                                          : null,
+                                      onTap: () => Navigator.pop(context, c.id),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                    ),
+                  ],
+                ),
         ),
-      ],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton.icon(
+            onPressed: _addNewCustomer,
+            icon: const Icon(Icons.add, size: 18),
+            label: Text(l10n.newCustomerAction),
+          ),
+        ],
+      ),
     );
   }
 }

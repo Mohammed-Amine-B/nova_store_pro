@@ -212,6 +212,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get variantSizeHint => 'ex. 4mm, Grand, 1kg';
 
   @override
+  String get normalProductOption => 'Produit normal';
+
+  @override
+  String get productWithSizesOption => 'Produit avec tailles';
+
+  @override
+  String get sizeLabelFieldLabel => 'Taille';
+
+  @override
+  String get addAnotherSizeAction => 'Ajouter une autre taille';
+
+  @override
+  String get removeSizeTooltip => 'Retirer cette taille';
+
+  @override
+  String get sizesSectionLabel => 'Tailles';
+
+  @override
   String get variantsPanel => 'Autres tailles';
 
   @override
@@ -288,6 +306,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get buyPriceLabel => 'Prix d\'achat';
+
+  @override
+  String get estimatedCostOptionalLabel => 'Coût estimé (facultatif)';
+
+  @override
+  String get openingStockToggleLabel =>
+      'C\'est un stock que j\'avais déjà (pas un nouvel achat)';
+
+  @override
+  String get addOpeningStockAction => 'Ajouter le stock initial';
 
   @override
   String get sellingPriceFieldLabel => 'Prix de vente';
@@ -699,6 +727,27 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noPaymentsYet => 'Aucun paiement enregistré pour l\'instant.';
+
+  @override
+  String get historyPanel => 'Historique';
+
+  @override
+  String historyCountDesc(int count) {
+    return '$count entrées';
+  }
+
+  @override
+  String get noHistoryYet => 'Aucun historique pour ce client pour l\'instant.';
+
+  @override
+  String get debtAddedLabel => 'Dette ajoutée';
+
+  @override
+  String get addDebtAction => 'Ajouter une dette';
+
+  @override
+  String get debtNoteHint =>
+      'ex. Solde d\'ouverture avant l\'utilisation de cette application';
 
   @override
   String get supplierDetailFallbackTitle => 'Détail du fournisseur';
@@ -1239,6 +1288,17 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get changePhotoAction => 'Changer la photo';
+
+  @override
+  String get searchImagesOnlineAction => 'Rechercher des images en ligne';
+
+  @override
+  String get searchImagesOnlineHint =>
+      'Ouvre votre navigateur — faites un clic droit et enregistrez l\'image de votre choix, puis utilisez \"Changer la photo\" pour l\'ajouter ici.';
+
+  @override
+  String get searchImagesOnlineDisabledHint =>
+      'Entrez d\'abord un nom de produit';
 
   @override
   String get removePhotoAction => 'Retirer la photo';

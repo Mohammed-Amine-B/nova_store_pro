@@ -3,6 +3,7 @@ import '../../data/database/database.dart';
 import '../../data/repositories/supplier_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/enter_to_submit.dart';
 import 'supplier_form_dialog.dart';
 
 class SelectSupplierDialog extends StatefulWidget {
@@ -39,7 +40,9 @@ class _SelectSupplierDialogState extends State<SelectSupplierDialog> {
   void _onSearchChanged(String query) {
     final q = query.trim().toLowerCase();
     setState(() {
-      _filtered = q.isEmpty ? _suppliers : _suppliers.where((s) => s.name.toLowerCase().contains(q)).toList();
+      _filtered = q.isEmpty
+          ? _suppliers
+          : _suppliers.where((s) => s.name.toLowerCase().contains(q)).toList();
     });
   }
 
@@ -54,54 +57,80 @@ class _SelectSupplierDialogState extends State<SelectSupplierDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return AlertDialog(
-      title: Text(l10n.selectSupplierTitle),
-      content: SizedBox(
-        width: 380,
-        height: 420,
-        child: _loading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: _searchController,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      hintText: l10n.searchSuppliersEllipsis,
-                      prefixIcon: const Icon(Icons.search, size: 18),
-                      border: const OutlineInputBorder(),
-                      isDense: true,
+    return EnterToSubmit(
+      onSubmit: _filtered.isNotEmpty
+          ? () => Navigator.pop(context, _filtered.first.id)
+          : null,
+      child: AlertDialog(
+        title: Text(l10n.selectSupplierTitle),
+        content: SizedBox(
+          width: 380,
+          height: 420,
+          child: _loading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _searchController,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: l10n.searchSuppliersEllipsis,
+                        prefixIcon: const Icon(Icons.search, size: 18),
+                        border: const OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      onChanged: _onSearchChanged,
                     ),
-                    onChanged: _onSearchChanged,
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: _filtered.isEmpty
-                        ? Center(child: EmptyState(icon: Icons.local_shipping_outlined, title: l10n.noSuppliersFound))
-                        : ListView(
-                            children: _filtered.map((s) => ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
-                                    child: Text(s.name.isNotEmpty ? s.name[0].toUpperCase() : '?'),
-                                  ),
-                                  title: Text(s.name),
-                                  subtitle: s.phone != null ? Text(s.phone!) : null,
-                                  onTap: () => Navigator.pop(context, s.id),
-                                )).toList(),
-                          ),
-                  ),
-                ],
-              ),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-        FilledButton.icon(
-          onPressed: _addNewSupplier,
-          icon: const Icon(Icons.add, size: 18),
-          label: Text(l10n.newSupplierAction),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: _filtered.isEmpty
+                          ? Center(
+                              child: EmptyState(
+                                icon: Icons.local_shipping_outlined,
+                                title: l10n.noSuppliersFound,
+                              ),
+                            )
+                          : ListView(
+                              children: _filtered
+                                  .map(
+                                    (s) => ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withValues(alpha: 0.12),
+                                        child: Text(
+                                          s.name.isNotEmpty
+                                              ? s.name[0].toUpperCase()
+                                              : '?',
+                                        ),
+                                      ),
+                                      title: Text(s.name),
+                                      subtitle: s.phone != null
+                                          ? Text(s.phone!)
+                                          : null,
+                                      onTap: () => Navigator.pop(context, s.id),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                    ),
+                  ],
+                ),
         ),
-      ],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton.icon(
+            onPressed: _addNewSupplier,
+            icon: const Icon(Icons.add, size: 18),
+            label: Text(l10n.newSupplierAction),
+          ),
+        ],
+      ),
     );
   }
 }

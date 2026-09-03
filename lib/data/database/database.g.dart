@@ -3757,6 +3757,30 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     requiredDuringInsert: false,
     defaultValue: const Constant('medium'),
   );
+  static const VerificationMeta _backupDestinationMeta = const VerificationMeta(
+    'backupDestination',
+  );
+  @override
+  late final GeneratedColumn<String> backupDestination =
+      GeneratedColumn<String>(
+        'backup_destination',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _lastAutoBackupAtMeta = const VerificationMeta(
+    'lastAutoBackupAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastAutoBackupAt =
+      GeneratedColumn<DateTime>(
+        'last_auto_backup_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3768,6 +3792,8 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     securityAnswerHash,
     recoveryCodeHash,
     fontSize,
+    backupDestination,
+    lastAutoBackupAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3844,6 +3870,24 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         fontSize.isAcceptableOrUnknown(data['font_size']!, _fontSizeMeta),
       );
     }
+    if (data.containsKey('backup_destination')) {
+      context.handle(
+        _backupDestinationMeta,
+        backupDestination.isAcceptableOrUnknown(
+          data['backup_destination']!,
+          _backupDestinationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_auto_backup_at')) {
+      context.handle(
+        _lastAutoBackupAtMeta,
+        lastAutoBackupAt.isAcceptableOrUnknown(
+          data['last_auto_backup_at']!,
+          _lastAutoBackupAtMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3889,6 +3933,14 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         DriftSqlType.string,
         data['${effectivePrefix}font_size'],
       )!,
+      backupDestination: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}backup_destination'],
+      ),
+      lastAutoBackupAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_auto_backup_at'],
+      ),
     );
   }
 
@@ -3908,6 +3960,8 @@ class Setting extends DataClass implements Insertable<Setting> {
   final String? securityAnswerHash;
   final String? recoveryCodeHash;
   final String fontSize;
+  final String? backupDestination;
+  final DateTime? lastAutoBackupAt;
   const Setting({
     required this.id,
     required this.shopName,
@@ -3918,6 +3972,8 @@ class Setting extends DataClass implements Insertable<Setting> {
     this.securityAnswerHash,
     this.recoveryCodeHash,
     required this.fontSize,
+    this.backupDestination,
+    this.lastAutoBackupAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3939,6 +3995,12 @@ class Setting extends DataClass implements Insertable<Setting> {
       map['recovery_code_hash'] = Variable<String>(recoveryCodeHash);
     }
     map['font_size'] = Variable<String>(fontSize);
+    if (!nullToAbsent || backupDestination != null) {
+      map['backup_destination'] = Variable<String>(backupDestination);
+    }
+    if (!nullToAbsent || lastAutoBackupAt != null) {
+      map['last_auto_backup_at'] = Variable<DateTime>(lastAutoBackupAt);
+    }
     return map;
   }
 
@@ -3961,6 +4023,12 @@ class Setting extends DataClass implements Insertable<Setting> {
           ? const Value.absent()
           : Value(recoveryCodeHash),
       fontSize: Value(fontSize),
+      backupDestination: backupDestination == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backupDestination),
+      lastAutoBackupAt: lastAutoBackupAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastAutoBackupAt),
     );
   }
 
@@ -3981,6 +4049,12 @@ class Setting extends DataClass implements Insertable<Setting> {
       ),
       recoveryCodeHash: serializer.fromJson<String?>(json['recoveryCodeHash']),
       fontSize: serializer.fromJson<String>(json['fontSize']),
+      backupDestination: serializer.fromJson<String?>(
+        json['backupDestination'],
+      ),
+      lastAutoBackupAt: serializer.fromJson<DateTime?>(
+        json['lastAutoBackupAt'],
+      ),
     );
   }
   @override
@@ -3996,6 +4070,8 @@ class Setting extends DataClass implements Insertable<Setting> {
       'securityAnswerHash': serializer.toJson<String?>(securityAnswerHash),
       'recoveryCodeHash': serializer.toJson<String?>(recoveryCodeHash),
       'fontSize': serializer.toJson<String>(fontSize),
+      'backupDestination': serializer.toJson<String?>(backupDestination),
+      'lastAutoBackupAt': serializer.toJson<DateTime?>(lastAutoBackupAt),
     };
   }
 
@@ -4009,6 +4085,8 @@ class Setting extends DataClass implements Insertable<Setting> {
     Value<String?> securityAnswerHash = const Value.absent(),
     Value<String?> recoveryCodeHash = const Value.absent(),
     String? fontSize,
+    Value<String?> backupDestination = const Value.absent(),
+    Value<DateTime?> lastAutoBackupAt = const Value.absent(),
   }) => Setting(
     id: id ?? this.id,
     shopName: shopName ?? this.shopName,
@@ -4027,6 +4105,12 @@ class Setting extends DataClass implements Insertable<Setting> {
         ? recoveryCodeHash.value
         : this.recoveryCodeHash,
     fontSize: fontSize ?? this.fontSize,
+    backupDestination: backupDestination.present
+        ? backupDestination.value
+        : this.backupDestination,
+    lastAutoBackupAt: lastAutoBackupAt.present
+        ? lastAutoBackupAt.value
+        : this.lastAutoBackupAt,
   );
   Setting copyWithCompanion(SettingsCompanion data) {
     return Setting(
@@ -4047,6 +4131,12 @@ class Setting extends DataClass implements Insertable<Setting> {
           ? data.recoveryCodeHash.value
           : this.recoveryCodeHash,
       fontSize: data.fontSize.present ? data.fontSize.value : this.fontSize,
+      backupDestination: data.backupDestination.present
+          ? data.backupDestination.value
+          : this.backupDestination,
+      lastAutoBackupAt: data.lastAutoBackupAt.present
+          ? data.lastAutoBackupAt.value
+          : this.lastAutoBackupAt,
     );
   }
 
@@ -4061,7 +4151,9 @@ class Setting extends DataClass implements Insertable<Setting> {
           ..write('securityQuestion: $securityQuestion, ')
           ..write('securityAnswerHash: $securityAnswerHash, ')
           ..write('recoveryCodeHash: $recoveryCodeHash, ')
-          ..write('fontSize: $fontSize')
+          ..write('fontSize: $fontSize, ')
+          ..write('backupDestination: $backupDestination, ')
+          ..write('lastAutoBackupAt: $lastAutoBackupAt')
           ..write(')'))
         .toString();
   }
@@ -4077,6 +4169,8 @@ class Setting extends DataClass implements Insertable<Setting> {
     securityAnswerHash,
     recoveryCodeHash,
     fontSize,
+    backupDestination,
+    lastAutoBackupAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -4090,7 +4184,9 @@ class Setting extends DataClass implements Insertable<Setting> {
           other.securityQuestion == this.securityQuestion &&
           other.securityAnswerHash == this.securityAnswerHash &&
           other.recoveryCodeHash == this.recoveryCodeHash &&
-          other.fontSize == this.fontSize);
+          other.fontSize == this.fontSize &&
+          other.backupDestination == this.backupDestination &&
+          other.lastAutoBackupAt == this.lastAutoBackupAt);
 }
 
 class SettingsCompanion extends UpdateCompanion<Setting> {
@@ -4103,6 +4199,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   final Value<String?> securityAnswerHash;
   final Value<String?> recoveryCodeHash;
   final Value<String> fontSize;
+  final Value<String?> backupDestination;
+  final Value<DateTime?> lastAutoBackupAt;
   const SettingsCompanion({
     this.id = const Value.absent(),
     this.shopName = const Value.absent(),
@@ -4113,6 +4211,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     this.securityAnswerHash = const Value.absent(),
     this.recoveryCodeHash = const Value.absent(),
     this.fontSize = const Value.absent(),
+    this.backupDestination = const Value.absent(),
+    this.lastAutoBackupAt = const Value.absent(),
   });
   SettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -4124,6 +4224,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     this.securityAnswerHash = const Value.absent(),
     this.recoveryCodeHash = const Value.absent(),
     this.fontSize = const Value.absent(),
+    this.backupDestination = const Value.absent(),
+    this.lastAutoBackupAt = const Value.absent(),
   });
   static Insertable<Setting> custom({
     Expression<int>? id,
@@ -4135,6 +4237,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Expression<String>? securityAnswerHash,
     Expression<String>? recoveryCodeHash,
     Expression<String>? fontSize,
+    Expression<String>? backupDestination,
+    Expression<DateTime>? lastAutoBackupAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -4147,6 +4251,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
         'security_answer_hash': securityAnswerHash,
       if (recoveryCodeHash != null) 'recovery_code_hash': recoveryCodeHash,
       if (fontSize != null) 'font_size': fontSize,
+      if (backupDestination != null) 'backup_destination': backupDestination,
+      if (lastAutoBackupAt != null) 'last_auto_backup_at': lastAutoBackupAt,
     });
   }
 
@@ -4160,6 +4266,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Value<String?>? securityAnswerHash,
     Value<String?>? recoveryCodeHash,
     Value<String>? fontSize,
+    Value<String?>? backupDestination,
+    Value<DateTime?>? lastAutoBackupAt,
   }) {
     return SettingsCompanion(
       id: id ?? this.id,
@@ -4171,6 +4279,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
       securityAnswerHash: securityAnswerHash ?? this.securityAnswerHash,
       recoveryCodeHash: recoveryCodeHash ?? this.recoveryCodeHash,
       fontSize: fontSize ?? this.fontSize,
+      backupDestination: backupDestination ?? this.backupDestination,
+      lastAutoBackupAt: lastAutoBackupAt ?? this.lastAutoBackupAt,
     );
   }
 
@@ -4204,6 +4314,12 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     if (fontSize.present) {
       map['font_size'] = Variable<String>(fontSize.value);
     }
+    if (backupDestination.present) {
+      map['backup_destination'] = Variable<String>(backupDestination.value);
+    }
+    if (lastAutoBackupAt.present) {
+      map['last_auto_backup_at'] = Variable<DateTime>(lastAutoBackupAt.value);
+    }
     return map;
   }
 
@@ -4218,7 +4334,9 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
           ..write('securityQuestion: $securityQuestion, ')
           ..write('securityAnswerHash: $securityAnswerHash, ')
           ..write('recoveryCodeHash: $recoveryCodeHash, ')
-          ..write('fontSize: $fontSize')
+          ..write('fontSize: $fontSize, ')
+          ..write('backupDestination: $backupDestination, ')
+          ..write('lastAutoBackupAt: $lastAutoBackupAt')
           ..write(')'))
         .toString();
   }
@@ -5899,6 +6017,406 @@ class DebtPaymentsCompanion extends UpdateCompanion<DebtPayment> {
   }
 }
 
+class $CustomerDebtAdjustmentsTable extends CustomerDebtAdjustments
+    with TableInfo<$CustomerDebtAdjustmentsTable, CustomerDebtAdjustment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CustomerDebtAdjustmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _customerIdMeta = const VerificationMeta(
+    'customerId',
+  );
+  @override
+  late final GeneratedColumn<int> customerId = GeneratedColumn<int>(
+    'customer_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES customers (id)',
+    ),
+  );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<double> amount = GeneratedColumn<double>(
+    'amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    customerId,
+    amount,
+    date,
+    note,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'customer_debt_adjustments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CustomerDebtAdjustment> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('customer_id')) {
+      context.handle(
+        _customerIdMeta,
+        customerId.isAcceptableOrUnknown(data['customer_id']!, _customerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_customerIdMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CustomerDebtAdjustment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CustomerDebtAdjustment(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      customerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}customer_id'],
+      )!,
+      amount: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}amount'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}date'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CustomerDebtAdjustmentsTable createAlias(String alias) {
+    return $CustomerDebtAdjustmentsTable(attachedDatabase, alias);
+  }
+}
+
+class CustomerDebtAdjustment extends DataClass
+    implements Insertable<CustomerDebtAdjustment> {
+  final int id;
+  final int customerId;
+  final double amount;
+  final DateTime date;
+  final String? note;
+  final DateTime createdAt;
+  const CustomerDebtAdjustment({
+    required this.id,
+    required this.customerId,
+    required this.amount,
+    required this.date,
+    this.note,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['customer_id'] = Variable<int>(customerId);
+    map['amount'] = Variable<double>(amount);
+    map['date'] = Variable<DateTime>(date);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  CustomerDebtAdjustmentsCompanion toCompanion(bool nullToAbsent) {
+    return CustomerDebtAdjustmentsCompanion(
+      id: Value(id),
+      customerId: Value(customerId),
+      amount: Value(amount),
+      date: Value(date),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory CustomerDebtAdjustment.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CustomerDebtAdjustment(
+      id: serializer.fromJson<int>(json['id']),
+      customerId: serializer.fromJson<int>(json['customerId']),
+      amount: serializer.fromJson<double>(json['amount']),
+      date: serializer.fromJson<DateTime>(json['date']),
+      note: serializer.fromJson<String?>(json['note']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'customerId': serializer.toJson<int>(customerId),
+      'amount': serializer.toJson<double>(amount),
+      'date': serializer.toJson<DateTime>(date),
+      'note': serializer.toJson<String?>(note),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  CustomerDebtAdjustment copyWith({
+    int? id,
+    int? customerId,
+    double? amount,
+    DateTime? date,
+    Value<String?> note = const Value.absent(),
+    DateTime? createdAt,
+  }) => CustomerDebtAdjustment(
+    id: id ?? this.id,
+    customerId: customerId ?? this.customerId,
+    amount: amount ?? this.amount,
+    date: date ?? this.date,
+    note: note.present ? note.value : this.note,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  CustomerDebtAdjustment copyWithCompanion(
+    CustomerDebtAdjustmentsCompanion data,
+  ) {
+    return CustomerDebtAdjustment(
+      id: data.id.present ? data.id.value : this.id,
+      customerId: data.customerId.present
+          ? data.customerId.value
+          : this.customerId,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      date: data.date.present ? data.date.value : this.date,
+      note: data.note.present ? data.note.value : this.note,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomerDebtAdjustment(')
+          ..write('id: $id, ')
+          ..write('customerId: $customerId, ')
+          ..write('amount: $amount, ')
+          ..write('date: $date, ')
+          ..write('note: $note, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, customerId, amount, date, note, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CustomerDebtAdjustment &&
+          other.id == this.id &&
+          other.customerId == this.customerId &&
+          other.amount == this.amount &&
+          other.date == this.date &&
+          other.note == this.note &&
+          other.createdAt == this.createdAt);
+}
+
+class CustomerDebtAdjustmentsCompanion
+    extends UpdateCompanion<CustomerDebtAdjustment> {
+  final Value<int> id;
+  final Value<int> customerId;
+  final Value<double> amount;
+  final Value<DateTime> date;
+  final Value<String?> note;
+  final Value<DateTime> createdAt;
+  const CustomerDebtAdjustmentsCompanion({
+    this.id = const Value.absent(),
+    this.customerId = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.date = const Value.absent(),
+    this.note = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  CustomerDebtAdjustmentsCompanion.insert({
+    this.id = const Value.absent(),
+    required int customerId,
+    required double amount,
+    required DateTime date,
+    this.note = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : customerId = Value(customerId),
+       amount = Value(amount),
+       date = Value(date);
+  static Insertable<CustomerDebtAdjustment> custom({
+    Expression<int>? id,
+    Expression<int>? customerId,
+    Expression<double>? amount,
+    Expression<DateTime>? date,
+    Expression<String>? note,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (customerId != null) 'customer_id': customerId,
+      if (amount != null) 'amount': amount,
+      if (date != null) 'date': date,
+      if (note != null) 'note': note,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  CustomerDebtAdjustmentsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? customerId,
+    Value<double>? amount,
+    Value<DateTime>? date,
+    Value<String?>? note,
+    Value<DateTime>? createdAt,
+  }) {
+    return CustomerDebtAdjustmentsCompanion(
+      id: id ?? this.id,
+      customerId: customerId ?? this.customerId,
+      amount: amount ?? this.amount,
+      date: date ?? this.date,
+      note: note ?? this.note,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (customerId.present) {
+      map['customer_id'] = Variable<int>(customerId.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<double>(amount.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CustomerDebtAdjustmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('customerId: $customerId, ')
+          ..write('amount: $amount, ')
+          ..write('date: $date, ')
+          ..write('note: $note, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $ReturnsTable extends Returns with TableInfo<$ReturnsTable, Return> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -7534,6 +8052,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PurchasesTable purchases = $PurchasesTable(this);
   late final $PurchaseItemsTable purchaseItems = $PurchaseItemsTable(this);
   late final $DebtPaymentsTable debtPayments = $DebtPaymentsTable(this);
+  late final $CustomerDebtAdjustmentsTable customerDebtAdjustments =
+      $CustomerDebtAdjustmentsTable(this);
   late final $ReturnsTable returns = $ReturnsTable(this);
   late final $ReturnItemsTable returnItems = $ReturnItemsTable(this);
   late final $SupplierPaymentsTable supplierPayments = $SupplierPaymentsTable(
@@ -7558,6 +8078,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     purchases,
     purchaseItems,
     debtPayments,
+    customerDebtAdjustments,
     returns,
     returnItems,
     supplierPayments,
@@ -9824,6 +10345,31 @@ final class $$CustomersTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $CustomerDebtAdjustmentsTable,
+    List<CustomerDebtAdjustment>
+  >
+  _customerDebtAdjustmentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.customerDebtAdjustments,
+        aliasName: 'customers__id__customer_debt_adjustments__customer_id',
+      );
+
+  $$CustomerDebtAdjustmentsTableProcessedTableManager
+  get customerDebtAdjustmentsRefs {
+    final manager = $$CustomerDebtAdjustmentsTableTableManager(
+      $_db,
+      $_db.customerDebtAdjustments,
+    ).filter((f) => f.customerId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _customerDebtAdjustmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$CustomersTableFilterComposer
@@ -9912,6 +10458,32 @@ class $$CustomersTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> customerDebtAdjustmentsRefs(
+    Expression<bool> Function($$CustomerDebtAdjustmentsTableFilterComposer f) f,
+  ) {
+    final $$CustomerDebtAdjustmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.customerDebtAdjustments,
+          getReferencedColumn: (t) => t.customerId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CustomerDebtAdjustmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.customerDebtAdjustments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -10034,6 +10606,33 @@ class $$CustomersTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> customerDebtAdjustmentsRefs<T extends Object>(
+    Expression<T> Function($$CustomerDebtAdjustmentsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$CustomerDebtAdjustmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.customerDebtAdjustments,
+          getReferencedColumn: (t) => t.customerId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CustomerDebtAdjustmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.customerDebtAdjustments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$CustomersTableTableManager
@@ -10049,7 +10648,11 @@ class $$CustomersTableTableManager
           $$CustomersTableUpdateCompanionBuilder,
           (Customer, $$CustomersTableReferences),
           Customer,
-          PrefetchHooks Function({bool salesRefs, bool debtPaymentsRefs})
+          PrefetchHooks Function({
+            bool salesRefs,
+            bool debtPaymentsRefs,
+            bool customerDebtAdjustmentsRefs,
+          })
         > {
   $$CustomersTableTableManager(_$AppDatabase db, $CustomersTable table)
     : super(
@@ -10103,12 +10706,17 @@ class $$CustomersTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({salesRefs = false, debtPaymentsRefs = false}) {
+              ({
+                salesRefs = false,
+                debtPaymentsRefs = false,
+                customerDebtAdjustmentsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (salesRefs) db.sales,
                     if (debtPaymentsRefs) db.debtPayments,
+                    if (customerDebtAdjustmentsRefs) db.customerDebtAdjustments,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -10155,6 +10763,27 @@ class $$CustomersTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (customerDebtAdjustmentsRefs)
+                        await $_getPrefetchedData<
+                          Customer,
+                          $CustomersTable,
+                          CustomerDebtAdjustment
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CustomersTableReferences
+                              ._customerDebtAdjustmentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CustomersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).customerDebtAdjustmentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.customerId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -10175,7 +10804,11 @@ typedef $$CustomersTableProcessedTableManager =
       $$CustomersTableUpdateCompanionBuilder,
       (Customer, $$CustomersTableReferences),
       Customer,
-      PrefetchHooks Function({bool salesRefs, bool debtPaymentsRefs})
+      PrefetchHooks Function({
+        bool salesRefs,
+        bool debtPaymentsRefs,
+        bool customerDebtAdjustmentsRefs,
+      })
     >;
 typedef $$SalesTableCreateCompanionBuilder =
     SalesCompanion Function({
@@ -11789,6 +12422,8 @@ typedef $$SettingsTableCreateCompanionBuilder =
       Value<String?> securityAnswerHash,
       Value<String?> recoveryCodeHash,
       Value<String> fontSize,
+      Value<String?> backupDestination,
+      Value<DateTime?> lastAutoBackupAt,
     });
 typedef $$SettingsTableUpdateCompanionBuilder =
     SettingsCompanion Function({
@@ -11801,6 +12436,8 @@ typedef $$SettingsTableUpdateCompanionBuilder =
       Value<String?> securityAnswerHash,
       Value<String?> recoveryCodeHash,
       Value<String> fontSize,
+      Value<String?> backupDestination,
+      Value<DateTime?> lastAutoBackupAt,
     });
 
 class $$SettingsTableFilterComposer
@@ -11854,6 +12491,16 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<String> get fontSize => $composableBuilder(
     column: $table.fontSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get backupDestination => $composableBuilder(
+    column: $table.backupDestination,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastAutoBackupAt => $composableBuilder(
+    column: $table.lastAutoBackupAt,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -11911,6 +12558,16 @@ class $$SettingsTableOrderingComposer
     column: $table.fontSize,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get backupDestination => $composableBuilder(
+    column: $table.backupDestination,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastAutoBackupAt => $composableBuilder(
+    column: $table.lastAutoBackupAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableAnnotationComposer
@@ -11956,6 +12613,16 @@ class $$SettingsTableAnnotationComposer
 
   GeneratedColumn<String> get fontSize =>
       $composableBuilder(column: $table.fontSize, builder: (column) => column);
+
+  GeneratedColumn<String> get backupDestination => $composableBuilder(
+    column: $table.backupDestination,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastAutoBackupAt => $composableBuilder(
+    column: $table.lastAutoBackupAt,
+    builder: (column) => column,
+  );
 }
 
 class $$SettingsTableTableManager
@@ -11995,6 +12662,8 @@ class $$SettingsTableTableManager
                 Value<String?> securityAnswerHash = const Value.absent(),
                 Value<String?> recoveryCodeHash = const Value.absent(),
                 Value<String> fontSize = const Value.absent(),
+                Value<String?> backupDestination = const Value.absent(),
+                Value<DateTime?> lastAutoBackupAt = const Value.absent(),
               }) => SettingsCompanion(
                 id: id,
                 shopName: shopName,
@@ -12005,6 +12674,8 @@ class $$SettingsTableTableManager
                 securityAnswerHash: securityAnswerHash,
                 recoveryCodeHash: recoveryCodeHash,
                 fontSize: fontSize,
+                backupDestination: backupDestination,
+                lastAutoBackupAt: lastAutoBackupAt,
               ),
           createCompanionCallback:
               ({
@@ -12017,6 +12688,8 @@ class $$SettingsTableTableManager
                 Value<String?> securityAnswerHash = const Value.absent(),
                 Value<String?> recoveryCodeHash = const Value.absent(),
                 Value<String> fontSize = const Value.absent(),
+                Value<String?> backupDestination = const Value.absent(),
+                Value<DateTime?> lastAutoBackupAt = const Value.absent(),
               }) => SettingsCompanion.insert(
                 id: id,
                 shopName: shopName,
@@ -12027,6 +12700,8 @@ class $$SettingsTableTableManager
                 securityAnswerHash: securityAnswerHash,
                 recoveryCodeHash: recoveryCodeHash,
                 fontSize: fontSize,
+                backupDestination: backupDestination,
+                lastAutoBackupAt: lastAutoBackupAt,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -13764,6 +14439,358 @@ typedef $$DebtPaymentsTableProcessedTableManager =
       DebtPayment,
       PrefetchHooks Function({bool customerId})
     >;
+typedef $$CustomerDebtAdjustmentsTableCreateCompanionBuilder =
+    CustomerDebtAdjustmentsCompanion Function({
+      Value<int> id,
+      required int customerId,
+      required double amount,
+      required DateTime date,
+      Value<String?> note,
+      Value<DateTime> createdAt,
+    });
+typedef $$CustomerDebtAdjustmentsTableUpdateCompanionBuilder =
+    CustomerDebtAdjustmentsCompanion Function({
+      Value<int> id,
+      Value<int> customerId,
+      Value<double> amount,
+      Value<DateTime> date,
+      Value<String?> note,
+      Value<DateTime> createdAt,
+    });
+
+final class $$CustomerDebtAdjustmentsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $CustomerDebtAdjustmentsTable,
+          CustomerDebtAdjustment
+        > {
+  $$CustomerDebtAdjustmentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CustomersTable _customerIdTable(_$AppDatabase db) => db.customers
+      .createAlias('customer_debt_adjustments__customer_id__customers__id');
+
+  $$CustomersTableProcessedTableManager get customerId {
+    final $_column = $_itemColumn<int>('customer_id')!;
+
+    final manager = $$CustomersTableTableManager(
+      $_db,
+      $_db.customers,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_customerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CustomerDebtAdjustmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $CustomerDebtAdjustmentsTable> {
+  $$CustomerDebtAdjustmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CustomersTableFilterComposer get customerId {
+    final $$CustomersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.customerId,
+      referencedTable: $db.customers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CustomersTableFilterComposer(
+            $db: $db,
+            $table: $db.customers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CustomerDebtAdjustmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CustomerDebtAdjustmentsTable> {
+  $$CustomerDebtAdjustmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CustomersTableOrderingComposer get customerId {
+    final $$CustomersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.customerId,
+      referencedTable: $db.customers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CustomersTableOrderingComposer(
+            $db: $db,
+            $table: $db.customers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CustomerDebtAdjustmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CustomerDebtAdjustmentsTable> {
+  $$CustomerDebtAdjustmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<double> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$CustomersTableAnnotationComposer get customerId {
+    final $$CustomersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.customerId,
+      referencedTable: $db.customers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CustomersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.customers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CustomerDebtAdjustmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CustomerDebtAdjustmentsTable,
+          CustomerDebtAdjustment,
+          $$CustomerDebtAdjustmentsTableFilterComposer,
+          $$CustomerDebtAdjustmentsTableOrderingComposer,
+          $$CustomerDebtAdjustmentsTableAnnotationComposer,
+          $$CustomerDebtAdjustmentsTableCreateCompanionBuilder,
+          $$CustomerDebtAdjustmentsTableUpdateCompanionBuilder,
+          (CustomerDebtAdjustment, $$CustomerDebtAdjustmentsTableReferences),
+          CustomerDebtAdjustment,
+          PrefetchHooks Function({bool customerId})
+        > {
+  $$CustomerDebtAdjustmentsTableTableManager(
+    _$AppDatabase db,
+    $CustomerDebtAdjustmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CustomerDebtAdjustmentsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$CustomerDebtAdjustmentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$CustomerDebtAdjustmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> customerId = const Value.absent(),
+                Value<double> amount = const Value.absent(),
+                Value<DateTime> date = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => CustomerDebtAdjustmentsCompanion(
+                id: id,
+                customerId: customerId,
+                amount: amount,
+                date: date,
+                note: note,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int customerId,
+                required double amount,
+                required DateTime date,
+                Value<String?> note = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => CustomerDebtAdjustmentsCompanion.insert(
+                id: id,
+                customerId: customerId,
+                amount: amount,
+                date: date,
+                note: note,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$CustomerDebtAdjustmentsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({customerId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (customerId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.customerId,
+                                referencedTable:
+                                    $$CustomerDebtAdjustmentsTableReferences
+                                        ._customerIdTable(db),
+                                referencedColumn:
+                                    $$CustomerDebtAdjustmentsTableReferences
+                                        ._customerIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CustomerDebtAdjustmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CustomerDebtAdjustmentsTable,
+      CustomerDebtAdjustment,
+      $$CustomerDebtAdjustmentsTableFilterComposer,
+      $$CustomerDebtAdjustmentsTableOrderingComposer,
+      $$CustomerDebtAdjustmentsTableAnnotationComposer,
+      $$CustomerDebtAdjustmentsTableCreateCompanionBuilder,
+      $$CustomerDebtAdjustmentsTableUpdateCompanionBuilder,
+      (CustomerDebtAdjustment, $$CustomerDebtAdjustmentsTableReferences),
+      CustomerDebtAdjustment,
+      PrefetchHooks Function({bool customerId})
+    >;
 typedef $$ReturnsTableCreateCompanionBuilder =
     ReturnsCompanion Function({
       Value<int> id,
@@ -15187,6 +16214,11 @@ class $AppDatabaseManager {
       $$PurchaseItemsTableTableManager(_db, _db.purchaseItems);
   $$DebtPaymentsTableTableManager get debtPayments =>
       $$DebtPaymentsTableTableManager(_db, _db.debtPayments);
+  $$CustomerDebtAdjustmentsTableTableManager get customerDebtAdjustments =>
+      $$CustomerDebtAdjustmentsTableTableManager(
+        _db,
+        _db.customerDebtAdjustments,
+      );
   $$ReturnsTableTableManager get returns =>
       $$ReturnsTableTableManager(_db, _db.returns);
   $$ReturnItemsTableTableManager get returnItems =>

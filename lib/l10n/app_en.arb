@@ -102,6 +102,12 @@
   "lowStockThresholdLabel": "Low stock threshold",
   "variantSizeLabel": "Size (optional)",
   "variantSizeHint": "e.g. 4mm, Large, 1kg",
+  "normalProductOption": "Normal Product",
+  "productWithSizesOption": "Product with Sizes",
+  "sizeLabelFieldLabel": "Size",
+  "addAnotherSizeAction": "Add Another Size",
+  "removeSizeTooltip": "Remove this size",
+  "sizesSectionLabel": "Sizes",
   "variantsPanel": "Other Sizes",
   "variantsPanelDesc": "Other products in the same variant group",
   "unitTypeLabel": "Unit Type",
@@ -127,6 +133,9 @@
   "viewStockMovements": "View Stock Movements",
   "quantityLabel": "Quantity",
   "buyPriceLabel": "Buy Price",
+  "estimatedCostOptionalLabel": "Estimated Cost (optional)",
+  "openingStockToggleLabel": "This is stock I already had (not a new purchase)",
+  "addOpeningStockAction": "Add Opening Stock",
   "sellingPriceFieldLabel": "Selling Price",
   "purchaseDateLabel": "Purchase Date",
   "stockMovementsTitle": "Stock Movements",
@@ -350,6 +359,19 @@
     }
   },
   "noPaymentsYet": "No payments recorded yet.",
+  "historyPanel": "History",
+  "historyCountDesc": "{count} entries",
+  "@historyCountDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noHistoryYet": "No history yet for this customer.",
+  "debtAddedLabel": "Debt Added",
+  "addDebtAction": "Add Debt",
+  "debtNoteHint": "e.g. Opening balance before using this app",
   "supplierDetailFallbackTitle": "Supplier Detail",
   "supplierNoLongerExists": "This supplier no longer exists.",
   "selectSupplierTitle": "Select Supplier",
@@ -698,6 +720,9 @@
   "removePhotoMessage": "The product photo will be permanently deleted.",
   "noPhotoLabel": "No photo",
   "changePhotoAction": "Change Photo",
+  "searchImagesOnlineAction": "Search Images Online",
+  "searchImagesOnlineHint": "Opens your browser — right-click and save any image you like, then use Choose Photo to add it here.",
+  "searchImagesOnlineDisabledHint": "Enter a product name first",
   "removePhotoAction": "Remove Photo",
   "batchHashLabel": "Batch #{n}",
   "@batchHashLabel": {

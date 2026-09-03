@@ -45,6 +45,18 @@ class SettingsRepository {
         .write(SettingsCompanion(fontSize: Value(size)));
   }
 
+  /// Sets (or clears, if [path] is null) the folder daily automatic backups
+  /// are written to. Does not touch the app's primary data location.
+  Future<void> updateBackupDestination(String? path) async {
+    await (db.update(db.settings)..where((s) => s.id.equals(1)))
+        .write(SettingsCompanion(backupDestination: Value(path)));
+  }
+
+  Future<void> updateLastAutoBackupAt(DateTime time) async {
+    await (db.update(db.settings)..where((s) => s.id.equals(1)))
+        .write(SettingsCompanion(lastAutoBackupAt: Value(time)));
+  }
+
   String _hash(String value) => sha256.convert(utf8.encode(value)).toString();
 
   /// A 10-character alphanumeric code, excluding visually-ambiguous characters

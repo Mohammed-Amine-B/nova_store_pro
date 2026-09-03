@@ -8,6 +8,7 @@ import 'widgets/app_scaffold.dart';
 import 'widgets/confirm_dialog.dart';
 import 'data/database/database.dart';
 import 'data/repositories/settings_repository.dart';
+import 'utils/backup.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'screens/categories/categories_screen.dart';
 import 'screens/products/products_screen.dart';
@@ -115,6 +116,9 @@ class _NovaStoreAppState extends State<NovaStoreApp> with WindowListener {
           settings.appPasswordHash == null || settings.appPasswordHash!.isEmpty;
       _loading = false;
     });
+    // Fire-and-forget: never block or slow down startup, and stay silent on
+    // success — it's a no-op unless a backup destination is set and due.
+    runAutoBackupIfDue(widget.db, _settingsRepo);
   }
 
   ThemeMode _parseThemeMode(String mode) => switch (mode) {

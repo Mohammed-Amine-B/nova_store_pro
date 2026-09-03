@@ -10,6 +10,7 @@ import '../../widgets/panel.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/enter_to_submit.dart';
 import '../../widgets/money_text.dart';
 import 'product_form_dialog.dart';
 import 'product_detail_screen.dart';
@@ -526,71 +527,74 @@ class _ForceDeleteDialogState extends State<_ForceDeleteDialog> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     const color = Color(0xFFE4572E);
-    return AlertDialog(
-      contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.dangerous_outlined,
-              color: color,
-              size: 22,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            l10n.forceDeleteTitle,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-      content: SizedBox(
-        width: 360,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    return EnterToSubmit(
+      onSubmit: _matches ? () => Navigator.pop(context, true) : null,
+      child: AlertDialog(
+        contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.forceDeleteWarning(widget.product.name),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.dangerous_outlined,
+                color: color,
+                size: 22,
               ),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _controller,
-              autofocus: true,
-              decoration: InputDecoration(
-                labelText: l10n.forceDeleteTypeToConfirm(widget.product.name),
-                border: const OutlineInputBorder(),
+            const SizedBox(height: 14),
+            Text(
+              l10n.forceDeleteTitle,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
               ),
-              onChanged: (value) =>
-                  setState(() => _matches = value == widget.product.name),
             ),
           ],
         ),
+        content: SizedBox(
+          width: 360,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.forceDeleteWarning(widget.product.name),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _controller,
+                autofocus: true,
+                decoration: InputDecoration(
+                  labelText: l10n.forceDeleteTypeToConfirm(widget.product.name),
+                  border: const OutlineInputBorder(),
+                ),
+                onChanged: (value) =>
+                    setState(() => _matches = value == widget.product.name),
+              ),
+            ],
+          ),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: color),
+            onPressed: _matches ? () => Navigator.pop(context, true) : null,
+            child: Text(l10n.forceDeleteAction),
+          ),
+        ],
       ),
-      actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text(l10n.cancel),
-        ),
-        FilledButton(
-          style: FilledButton.styleFrom(backgroundColor: color),
-          onPressed: _matches ? () => Navigator.pop(context, true) : null,
-          child: Text(l10n.forceDeleteAction),
-        ),
-      ],
     );
   }
 }

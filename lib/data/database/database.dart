@@ -17,6 +17,7 @@ import 'tables/purchases_table.dart';
 import 'tables/purchase_items_table.dart';
 import 'tables/customers_table.dart';
 import 'tables/debt_payments_table.dart';
+import 'tables/customer_debt_adjustments_table.dart';
 import 'tables/returns_table.dart';
 import 'tables/return_items_table.dart';
 import 'tables/supplier_payments_table.dart';
@@ -39,6 +40,7 @@ part 'database.g.dart';
     PurchaseItems,
     Customers,
     DebtPayments,
+    CustomerDebtAdjustments,
     Returns,
     ReturnItems,
     SupplierPayments,
@@ -55,7 +57,7 @@ class AppDatabase extends _$AppDatabase {
   // yet; the local dev SQLite database needs to be deleted once for this
   // change. All schema changes after this one still require a real migration.
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 16;
 
   // Baseline: schema version 9 as of 2026-08-23. All future schema changes must
   // add a migration step in onUpgrade below — never tell a user to delete their
@@ -81,6 +83,13 @@ class AppDatabase extends _$AppDatabase {
           }
           // from < 14: Products.variantGroup was dropped — no migration step
           // (see the one-time exception noted on schemaVersion above).
+          if (from < 15) {
+            await m.createTable(customerDebtAdjustments);
+          }
+          if (from < 16) {
+            await m.addColumn(settings, settings.backupDestination);
+            await m.addColumn(settings, settings.lastAutoBackupAt);
+          }
         },
         beforeOpen: (details) async {
           // Optional: enable foreign keys or run startup checks here if needed.

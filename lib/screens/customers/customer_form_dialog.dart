@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/database/database.dart';
 import '../../data/repositories/customer_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../widgets/enter_to_submit.dart';
 
 class CustomerFormDialog extends StatefulWidget {
   final CustomerRepository repo;
@@ -48,77 +49,80 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return AlertDialog(
-      contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Theme.of(
+    return EnterToSubmit(
+      onSubmit: _save,
+      child: AlertDialog(
+        contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.people_outline,
+                color: Theme.of(context).colorScheme.primary,
+                size: 22,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              widget.editing == null ? l10n.addCustomer : l10n.editCustomer,
+              style: Theme.of(
                 context,
-              ).colorScheme.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
             ),
-            child: Icon(
-              Icons.people_outline,
-              color: Theme.of(context).colorScheme.primary,
-              size: 22,
+          ],
+        ),
+        content: SizedBox(
+          width: 380,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: l10n.colName,
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: _phoneController,
+                  decoration: InputDecoration(
+                    labelText: l10n.phoneOptionalLabel,
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: _noteController,
+                  decoration: InputDecoration(
+                    labelText: l10n.noteOptionalLabel,
+                    border: const OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 14),
-          Text(
-            widget.editing == null ? l10n.addCustomer : l10n.editCustomer,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
           ),
+          FilledButton(onPressed: _save, child: Text(l10n.save)),
         ],
       ),
-      content: SizedBox(
-        width: 380,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: l10n.colName,
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _phoneController,
-                decoration: InputDecoration(
-                  labelText: l10n.phoneOptionalLabel,
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _noteController,
-                decoration: InputDecoration(
-                  labelText: l10n.noteOptionalLabel,
-                  border: const OutlineInputBorder(),
-                ),
-                maxLines: 3,
-              ),
-            ],
-          ),
-        ),
-      ),
-      actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(l10n.cancel),
-        ),
-        FilledButton(onPressed: _save, child: Text(l10n.save)),
-      ],
     );
   }
 }

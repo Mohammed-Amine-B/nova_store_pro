@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import '../../data/database/database.dart';
 import '../../data/repositories/settings_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../utils/backup.dart';
+import '../../widgets/enter_to_submit.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
 
@@ -48,6 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _saved = false;
   bool _hasPassword = false;
   bool _backingUp = false;
+  String? _backupDestination;
 
   @override
   void initState() {
@@ -66,6 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _hasPassword =
           settings.appPasswordHash != null &&
           settings.appPasswordHash!.isNotEmpty;
+      _backupDestination = settings.backupDestination;
       _loading = false;
     });
   }
@@ -83,130 +87,130 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           final l10n = AppLocalizations.of(context)!;
-          return AlertDialog(
-            title: Text(
-              _hasPassword
-                  ? l10n.changePasswordDialogTitle
-                  : l10n.setPasswordDialogTitle,
-            ),
-            content: SizedBox(
-              width: 320,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (_hasPassword)
+          Future<void> confirm() async {
+            if (newController.text.isEmpty) {
+              setDialogState(() => error = l10n.enterNewPassword);
+              return;
+            }
+            if (newController.text != confirmController.text) {
+              setDialogState(() => error = l10n.passwordsDoNotMatch);
+              return;
+            }
+            if (!_hasPassword) {
+              if (selectedSecurityQuestion == null) {
+                setDialogState(() => error = l10n.securityQuestionRequired);
+                return;
+              }
+              if (securityAnswerController.text.trim().isEmpty) {
+                setDialogState(() => error = l10n.securityAnswerRequired);
+                return;
+              }
+            }
+            final setResult = await _repo.setPassword(
+              newController.text,
+              currentPassword: _hasPassword ? currentController.text : null,
+              securityQuestion: _hasPassword ? null : selectedSecurityQuestion,
+              securityAnswer: _hasPassword
+                  ? null
+                  : securityAnswerController.text,
+            );
+            if (setResult.success) {
+              if (context.mounted) Navigator.pop(context, setResult);
+            } else {
+              setDialogState(() => error = l10n.currentPasswordIncorrect);
+            }
+          }
+
+          return EnterToSubmit(
+            onSubmit: confirm,
+            child: AlertDialog(
+              title: Text(
+                _hasPassword
+                    ? l10n.changePasswordDialogTitle
+                    : l10n.setPasswordDialogTitle,
+              ),
+              content: SizedBox(
+                width: 320,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_hasPassword)
+                        TextField(
+                          controller: currentController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: l10n.currentPasswordLabel,
+                          ),
+                        ),
+                      if (_hasPassword) const SizedBox(height: 12),
                       TextField(
-                        controller: currentController,
+                        controller: newController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          labelText: l10n.currentPasswordLabel,
+                          labelText: l10n.newPasswordLabel,
                         ),
-                      ),
-                    if (_hasPassword) const SizedBox(height: 12),
-                    TextField(
-                      controller: newController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: l10n.newPasswordLabel,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: confirmController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: l10n.confirmNewPasswordLabel,
-                      ),
-                    ),
-                    if (!_hasPassword) ...[
-                      const SizedBox(height: 12),
-                      DropdownButtonFormField<String>(
-                        initialValue: selectedSecurityQuestion,
-                        isExpanded: true,
-                        decoration: InputDecoration(
-                          labelText: l10n.securityQuestionLabel,
-                        ),
-                        items: securityQuestionOptions(l10n)
-                            .map(
-                              (q) => DropdownMenuItem(
-                                value: q,
-                                child: Text(q, overflow: TextOverflow.ellipsis),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (v) =>
-                            setDialogState(() => selectedSecurityQuestion = v),
                       ),
                       const SizedBox(height: 12),
                       TextField(
-                        controller: securityAnswerController,
+                        controller: confirmController,
+                        obscureText: true,
                         decoration: InputDecoration(
-                          labelText: l10n.securityAnswerLabel,
+                          labelText: l10n.confirmNewPasswordLabel,
                         ),
                       ),
-                    ],
-                    if (error != null) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        error!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
+                      if (!_hasPassword) ...[
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<String>(
+                          initialValue: selectedSecurityQuestion,
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            labelText: l10n.securityQuestionLabel,
+                          ),
+                          items: securityQuestionOptions(l10n)
+                              .map(
+                                (q) => DropdownMenuItem(
+                                  value: q,
+                                  child: Text(
+                                    q,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (v) => setDialogState(
+                            () => selectedSecurityQuestion = v,
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: securityAnswerController,
+                          decoration: InputDecoration(
+                            labelText: l10n.securityAnswerLabel,
+                          ),
+                        ),
+                      ],
+                      if (error != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(onPressed: confirm, child: Text(l10n.save)),
+              ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(l10n.cancel),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  if (newController.text.isEmpty) {
-                    setDialogState(() => error = l10n.enterNewPassword);
-                    return;
-                  }
-                  if (newController.text != confirmController.text) {
-                    setDialogState(() => error = l10n.passwordsDoNotMatch);
-                    return;
-                  }
-                  if (!_hasPassword) {
-                    if (selectedSecurityQuestion == null) {
-                      setDialogState(
-                        () => error = l10n.securityQuestionRequired,
-                      );
-                      return;
-                    }
-                    if (securityAnswerController.text.trim().isEmpty) {
-                      setDialogState(() => error = l10n.securityAnswerRequired);
-                      return;
-                    }
-                  }
-                  final setResult = await _repo.setPassword(
-                    newController.text,
-                    currentPassword: _hasPassword
-                        ? currentController.text
-                        : null,
-                    securityQuestion: _hasPassword
-                        ? null
-                        : selectedSecurityQuestion,
-                    securityAnswer: _hasPassword
-                        ? null
-                        : securityAnswerController.text,
-                  );
-                  if (setResult.success) {
-                    if (context.mounted) Navigator.pop(context, setResult);
-                  } else {
-                    setDialogState(() => error = l10n.currentPasswordIncorrect);
-                  }
-                },
-                child: Text(l10n.save),
-              ),
-            ],
           );
         },
       ),
@@ -228,81 +232,86 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           final l10n = AppLocalizations.of(context)!;
-          return AlertDialog(
-            title: Text(l10n.recoveryCodeDialogTitle),
-            content: SizedBox(
-              width: 320,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l10n.recoveryCodeSaveWarning),
-                    const SizedBox(height: 12),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
+          return EnterToSubmit(
+            onSubmit: acknowledged ? () => Navigator.pop(context) : null,
+            child: AlertDialog(
+              title: Text(l10n.recoveryCodeDialogTitle),
+              content: SizedBox(
+                width: 320,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l10n.recoveryCodeSaveWarning),
+                      const SizedBox(height: 12),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 8,
+                        ),
+                        decoration: BoxDecoration(
                           color: Theme.of(
                             context,
-                          ).colorScheme.primary.withValues(alpha: 0.3),
+                          ).colorScheme.primary.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.3),
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              code,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 2,
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                code,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 2,
+                                ),
                               ),
                             ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              Clipboard.setData(ClipboardData(text: code));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(l10n.codeCopiedMessage)),
-                              );
-                            },
-                            icon: const Icon(Icons.copy_outlined, size: 20),
-                            tooltip: l10n.copyCodeAction,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ],
+                            IconButton(
+                              onPressed: () {
+                                Clipboard.setData(ClipboardData(text: code));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(l10n.codeCopiedMessage),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.copy_outlined, size: 20),
+                              tooltip: l10n.copyCodeAction,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    CheckboxListTile(
-                      value: acknowledged,
-                      onChanged: (v) =>
-                          setDialogState(() => acknowledged = v ?? false),
-                      title: Text(l10n.recoveryCodeAckCheckbox),
-                      controlAffinity: ListTileControlAffinity.leading,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+                      CheckboxListTile(
+                        value: acknowledged,
+                        onChanged: (v) =>
+                            setDialogState(() => acknowledged = v ?? false),
+                        title: Text(l10n.recoveryCodeAckCheckbox),
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              actions: [
+                FilledButton(
+                  onPressed: acknowledged ? () => Navigator.pop(context) : null,
+                  child: Text(l10n.continueAction),
+                ),
+              ],
             ),
-            actions: [
-              FilledButton(
-                onPressed: acknowledged ? () => Navigator.pop(context) : null,
-                child: Text(l10n.continueAction),
-              ),
-            ],
           );
         },
       ),
@@ -318,55 +327,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           final l10n = AppLocalizations.of(context)!;
-          return AlertDialog(
-            title: Text(l10n.removePasswordDialogTitle),
-            content: SizedBox(
-              width: 320,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: currentController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: l10n.currentPasswordLabel,
-                      ),
-                    ),
-                    if (error != null) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        error!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
+          Future<void> confirm() async {
+            final ok = await _repo.removePassword(currentController.text);
+            if (ok) {
+              if (context.mounted) Navigator.pop(context);
+              setState(() => _hasPassword = false);
+            } else {
+              setDialogState(() => error = l10n.incorrectPassword);
+            }
+          }
+
+          return EnterToSubmit(
+            onSubmit: confirm,
+            child: AlertDialog(
+              title: Text(l10n.removePasswordDialogTitle),
+              content: SizedBox(
+                width: 320,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: currentController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: l10n.currentPasswordLabel,
                         ),
                       ),
+                      if (error != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                  onPressed: confirm,
+                  child: Text(l10n.removeAction),
+                ),
+              ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(l10n.cancel),
-              ),
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-                onPressed: () async {
-                  final ok = await _repo.removePassword(currentController.text);
-                  if (ok) {
-                    if (context.mounted) Navigator.pop(context);
-                    setState(() => _hasPassword = false);
-                  } else {
-                    setDialogState(() => error = l10n.incorrectPassword);
-                  }
-                },
-                child: Text(l10n.removeAction),
-              ),
-            ],
           );
         },
       ),
@@ -423,6 +437,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _chooseBackupDestination() async {
+    final path = await FilePicker.getDirectoryPath(
+      dialogTitle: 'Choose a backup folder',
+    );
+    if (path == null) return;
+    await _repo.updateBackupDestination(path);
+    if (!mounted) return;
+    setState(() => _backupDestination = path);
+  }
+
   Future<void> _openContainingFolder(String zipPath) async {
     try {
       final folder = File(zipPath).parent.path;
@@ -439,42 +463,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _showBackupResultDialog(String zipPath) async {
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Backup Created'),
-        content: SizedBox(
-          width: 380,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Your backup was saved to:'),
-                const SizedBox(height: 8),
-                SelectableText(
-                  zipPath,
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-                ),
-              ],
+      builder: (context) => EnterToSubmit(
+        onSubmit: () => Navigator.pop(context),
+        child: AlertDialog(
+          title: const Text('Backup Created'),
+          content: SizedBox(
+            width: 380,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Your backup was saved to:'),
+                  const SizedBox(height: 8),
+                  SelectableText(
+                    zipPath,
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        actions: [
-          TextButton.icon(
-            onPressed: () => Clipboard.setData(ClipboardData(text: zipPath)),
-            icon: const Icon(Icons.copy, size: 16),
-            label: const Text('Copy Path'),
-          ),
-          if (Platform.isLinux || Platform.isWindows)
+          actions: [
             TextButton.icon(
-              onPressed: () => _openContainingFolder(zipPath),
-              icon: const Icon(Icons.folder_open, size: 16),
-              label: const Text('Show in Folder'),
+              onPressed: () => Clipboard.setData(ClipboardData(text: zipPath)),
+              icon: const Icon(Icons.copy, size: 16),
+              label: const Text('Copy Path'),
             ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Done'),
-          ),
-        ],
+            if (Platform.isLinux || Platform.isWindows)
+              TextButton.icon(
+                onPressed: () => _openContainingFolder(zipPath),
+                icon: const Icon(Icons.folder_open, size: 16),
+                label: const Text('Show in Folder'),
+              ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Done'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -664,6 +694,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           )
                         : const Icon(Icons.backup_outlined, size: 18),
                     label: const Text('Backup Now'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Panel(
+            title: 'Automatic Daily Backups',
+            description:
+                'Protect your data if this computer\'s drive ever fails.',
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.folder_special_outlined,
+                        color: Color(0xFF0E7C7B),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _backupDestination == null ||
+                                  _backupDestination!.isEmpty
+                              ? 'Not set'
+                              : _backupDestination!,
+                          style:
+                              _backupDestination == null ||
+                                  _backupDestination!.isEmpty
+                              ? TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.5),
+                                )
+                              : const TextStyle(
+                                  fontFamily: 'monospace',
+                                  fontSize: 12,
+                                ),
+                        ),
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: _chooseBackupDestination,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF0E7C7B),
+                          side: const BorderSide(color: Color(0xFF0E7C7B)),
+                        ),
+                        icon: const Icon(Icons.folder_open, size: 18),
+                        label: const Text('Choose Folder'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Automatic backups run daily to this folder when the app starts, if it\'s set.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
                 ],
               ),

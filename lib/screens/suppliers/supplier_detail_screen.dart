@@ -6,6 +6,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/enter_to_submit.dart';
 import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
 import 'supplier_form_dialog.dart';
@@ -147,96 +148,96 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           final l10n = AppLocalizations.of(context)!;
-          return AlertDialog(
-            title: Text(l10n.recordPaymentTitle),
-            content: SizedBox(
-              width: 320,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (error != null) ...[
-                      Text(
-                        error!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
+          Future<void> confirm() async {
+            final amount = double.tryParse(amountController.text) ?? 0;
+            if (amount <= 0) {
+              setDialogState(() => error = l10n.enterValidAmount);
+              return;
+            }
+            if (amount > _owed) {
+              setDialogState(() => error = l10n.amountPaidExceedsTotal);
+              return;
+            }
+            await _repo.recordPayment(
+              supplierId: _supplier!.id,
+              amount: amount,
+              paymentDate: paymentDate,
+              note: noteController.text.isEmpty ? null : noteController.text,
+            );
+            if (context.mounted) Navigator.pop(context, true);
+          }
+
+          return EnterToSubmit(
+            onSubmit: confirm,
+            child: AlertDialog(
+              title: Text(l10n.recordPaymentTitle),
+              content: SizedBox(
+                width: 320,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (error != null) ...[
+                        Text(
+                          error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    TextField(
-                      controller: amountController,
-                      decoration: InputDecoration(
-                        labelText: l10n.amountLabel,
-                        border: const OutlineInputBorder(),
-                      ),
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    InkWell(
-                      onTap: () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: paymentDate,
-                          firstDate: DateTime(2020),
-                          lastDate: DateTime.now(),
-                        );
-                        if (picked != null)
-                          setDialogState(() => paymentDate = picked);
-                      },
-                      child: InputDecorator(
+                        const SizedBox(height: 8),
+                      ],
+                      TextField(
+                        controller: amountController,
                         decoration: InputDecoration(
-                          labelText: l10n.paymentDateLabel,
+                          labelText: l10n.amountLabel,
                           border: const OutlineInputBorder(),
                         ),
-                        child: Text(
-                          '${paymentDate.year}-${paymentDate.month.toString().padLeft(2, '0')}-${paymentDate.day.toString().padLeft(2, '0')}',
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 14),
-                    TextField(
-                      controller: noteController,
-                      decoration: InputDecoration(
-                        labelText: l10n.noteOptionalLabel,
-                        border: const OutlineInputBorder(),
+                      const SizedBox(height: 14),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: paymentDate,
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null)
+                            setDialogState(() => paymentDate = picked);
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: l10n.paymentDateLabel,
+                            border: const OutlineInputBorder(),
+                          ),
+                          child: Text(
+                            '${paymentDate.year}-${paymentDate.month.toString().padLeft(2, '0')}-${paymentDate.day.toString().padLeft(2, '0')}',
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: noteController,
+                        decoration: InputDecoration(
+                          labelText: l10n.noteOptionalLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(onPressed: confirm, child: Text(l10n.save)),
+              ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(l10n.cancel),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  final amount = double.tryParse(amountController.text) ?? 0;
-                  if (amount <= 0) {
-                    setDialogState(() => error = l10n.enterValidAmount);
-                    return;
-                  }
-                  if (amount > _owed) {
-                    setDialogState(() => error = l10n.amountPaidExceedsTotal);
-                    return;
-                  }
-                  await _repo.recordPayment(
-                    supplierId: _supplier!.id,
-                    amount: amount,
-                    paymentDate: paymentDate,
-                    note: noteController.text.isEmpty
-                        ? null
-                        : noteController.text,
-                  );
-                  if (context.mounted) Navigator.pop(context, true);
-                },
-                child: Text(l10n.save),
-              ),
-            ],
           );
         },
       ),
@@ -407,7 +408,9 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                                               ),
                                             ),
                                             DataCell(
-                                              MoneyText(formatMoney(p.amountPaid)),
+                                              MoneyText(
+                                                formatMoney(p.amountPaid),
+                                              ),
                                             ),
                                             DataCell(
                                               MoneyText(
@@ -679,7 +682,12 @@ class _HighlightBox extends StatelessWidget {
   final String value;
   final Color? color;
   final bool isMoney;
-  const _HighlightBox(this.label, this.value, {this.color, this.isMoney = false});
+  const _HighlightBox(
+    this.label,
+    this.value, {
+    this.color,
+    this.isMoney = false,
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -16,6 +16,7 @@ import '../../widgets/money_text.dart';
 import '../../widgets/design/design_card.dart';
 import '../../widgets/design/kpi_card.dart';
 import '../../widgets/design/dashed_border_box.dart';
+import '../../widgets/enter_to_submit.dart';
 import '../../utils/formatting.dart';
 import '../../utils/product_images.dart';
 import 'product_form_dialog.dart';
@@ -65,7 +66,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ? await _repo.getVariants(product.name, excludeId: product.id)
         : <Product>[];
     final dailyVelocity = await _computeDailyVelocity();
-    final supplierPrices = await _repo.getSupplierPriceComparison(widget.productId);
+    final supplierPrices = await _repo.getSupplierPriceComparison(
+      widget.productId,
+    );
 
     String categoryName = '—';
     if (product?.categoryId != null) {
@@ -98,13 +101,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<double> _computeDailyVelocity() async {
     final db = _repo.db;
     final now = DateTime.now();
-    final start = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 30));
-    final recentSales = await (db.select(db.sales)..where((s) => s.date.isBiggerOrEqualValue(start))).get();
+    final start = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 30));
+    final recentSales = await (db.select(
+      db.sales,
+    )..where((s) => s.date.isBiggerOrEqualValue(start))).get();
     final saleIds = recentSales.map((s) => s.id).toSet();
     if (saleIds.isEmpty) return 0;
-    final items = await (db.select(db.saleItems)
-          ..where((i) => i.saleId.isIn(saleIds) & i.productId.equals(widget.productId)))
-        .get();
+    final items =
+        await (db.select(db.saleItems)..where(
+              (i) =>
+                  i.saleId.isIn(saleIds) & i.productId.equals(widget.productId),
+            ))
+            .get();
     final totalSold = items.fold<double>(0, (sum, i) => sum + i.quantity);
     return totalSold / 30;
   }
@@ -201,15 +213,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   // the redesign brief's own judgment call, so it doesn't look broken.
   void _showBarcodePrintComingSoon() {
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.barcodePrintComingSoon)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.barcodePrintComingSoon)));
   }
 
   String _formatDate(DateTime d) =>
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
-  String _unitLabel(AppLocalizations l10n, String unitType) => switch (unitType) {
+  String _unitLabel(AppLocalizations l10n, String unitType) =>
+      switch (unitType) {
         'kg' => l10n.unitTypeKg,
         'meter' => l10n.unitTypeMeter,
         _ => l10n.unitTypePiece,
@@ -232,11 +245,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final theme = Theme.of(context);
     final costPrice = _batches.isNotEmpty ? _batches.last.buyPrice : null;
     final sellingPrice = product.sellingPrice;
-    final margin = (sellingPrice != null && costPrice != null) ? sellingPrice - costPrice : null;
-    final marginPercent = (margin != null && sellingPrice != null && sellingPrice != 0)
+    final margin = (sellingPrice != null && costPrice != null)
+        ? sellingPrice - costPrice
+        : null;
+    final marginPercent =
+        (margin != null && sellingPrice != null && sellingPrice != 0)
         ? (margin / sellingPrice * 100)
         : null;
-    final stockValue = costPrice != null ? product.stockQuantity * costPrice : null;
+    final stockValue = costPrice != null
+        ? product.stockQuantity * costPrice
+        : null;
 
     return Scaffold(
       backgroundColor: DesignColors.background,
@@ -248,13 +266,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             children: [
               _buildHeaderCard(context, l10n, theme, product),
               const SizedBox(height: 20),
-              _buildKpiRow(context, l10n, theme, product, costPrice, margin, marginPercent, stockValue),
+              _buildKpiRow(
+                context,
+                l10n,
+                theme,
+                product,
+                costPrice,
+                margin,
+                marginPercent,
+                stockValue,
+              ),
               const SizedBox(height: 20),
               LayoutBuilder(
                 builder: (context, constraints) {
                   final narrow = constraints.maxWidth < 900;
                   final left = _buildLeftColumn(context, l10n, theme, product);
-                  final right = _buildRightColumn(context, l10n, theme, product);
+                  final right = _buildRightColumn(
+                    context,
+                    l10n,
+                    theme,
+                    product,
+                  );
                   if (narrow) {
                     return Column(
                       children: [left, const SizedBox(height: 20), right],
@@ -286,9 +318,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     ThemeData theme,
     Product product,
   ) {
-    final metaStyle = designSans(theme.textTheme.bodySmall, color: DesignColors.textMuted);
-    final metaMonoStyle = designMono(theme.textTheme.bodySmall, color: DesignColors.textMuted);
-    final hasVariant = product.variantSize != null && product.variantSize!.trim().isNotEmpty;
+    final metaStyle = designSans(
+      theme.textTheme.bodySmall,
+      color: DesignColors.textMuted,
+    );
+    final metaMonoStyle = designMono(
+      theme.textTheme.bodySmall,
+      color: DesignColors.textMuted,
+    );
+    final hasVariant =
+        product.variantSize != null && product.variantSize!.trim().isNotEmpty;
 
     return DesignCard(
       child: Row(
@@ -314,7 +353,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                     _CodePill(product.code),
-                    _ActiveStatusPill(isArchived: product.isArchived, label: product.isArchived ? l10n.statusArchived : l10n.statusActive),
+                    _ActiveStatusPill(
+                      isArchived: product.isArchived,
+                      label: product.isArchived
+                          ? l10n.statusArchived
+                          : l10n.statusActive,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -345,9 +389,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             children: [
               FilledButton.icon(
                 onPressed: _openAddStock,
-                style: FilledButton.styleFrom(backgroundColor: DesignColors.teal),
+                style: FilledButton.styleFrom(
+                  backgroundColor: DesignColors.teal,
+                ),
                 icon: const Icon(Icons.add_box_outlined, size: 18),
-                label: Text(l10n.addStock, style: designSans(theme.textTheme.labelLarge, color: Colors.white)),
+                label: Text(
+                  l10n.addStock,
+                  style: designSans(
+                    theme.textTheme.labelLarge,
+                    color: Colors.white,
+                  ),
+                ),
               ),
               OutlinedButton.icon(
                 onPressed: _editProduct,
@@ -356,7 +408,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   side: const BorderSide(color: DesignColors.cardBorder),
                 ),
                 icon: const Icon(Icons.edit_outlined, size: 18),
-                label: Text(l10n.editProduct, style: designSans(theme.textTheme.labelLarge, color: DesignColors.textPrimary)),
+                label: Text(
+                  l10n.editProduct,
+                  style: designSans(
+                    theme.textTheme.labelLarge,
+                    color: DesignColors.textPrimary,
+                  ),
+                ),
               ),
               OutlinedButton.icon(
                 onPressed: _openMovements,
@@ -365,7 +423,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   side: const BorderSide(color: DesignColors.cardBorder),
                 ),
                 icon: const Icon(Icons.history, size: 18),
-                label: Text(l10n.viewStockMovements, style: designSans(theme.textTheme.labelLarge, color: DesignColors.textPrimary)),
+                label: Text(
+                  l10n.viewStockMovements,
+                  style: designSans(
+                    theme.textTheme.labelLarge,
+                    color: DesignColors.textPrimary,
+                  ),
+                ),
               ),
               product.isArchived
                   ? OutlinedButton.icon(
@@ -375,16 +439,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         side: const BorderSide(color: Color(0xFF16A34A)),
                       ),
                       icon: const Icon(Icons.restore, size: 18),
-                      label: Text(l10n.restoreAction, style: designSans(theme.textTheme.labelLarge, color: const Color(0xFF16A34A))),
+                      label: Text(
+                        l10n.restoreAction,
+                        style: designSans(
+                          theme.textTheme.labelLarge,
+                          color: const Color(0xFF16A34A),
+                        ),
+                      ),
                     )
                   : OutlinedButton.icon(
                       onPressed: _deleteProduct,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: DesignColors.destructiveText,
-                        side: const BorderSide(color: DesignColors.destructiveBorder),
+                        side: const BorderSide(
+                          color: DesignColors.destructiveBorder,
+                        ),
                       ),
                       icon: const Icon(Icons.delete_outline, size: 18),
-                      label: Text(l10n.delete, style: designSans(theme.textTheme.labelLarge, color: DesignColors.destructiveText)),
+                      label: Text(
+                        l10n.delete,
+                        style: designSans(
+                          theme.textTheme.labelLarge,
+                          color: DesignColors.destructiveText,
+                        ),
+                      ),
                     ),
             ],
           ),
@@ -409,9 +487,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final stockDiff = product.stockQuantity - product.minStock;
     final String stockNote;
     if (stockDiff > 0) {
-      stockNote = l10n.aboveMinimumNote(formatQuantity(stockDiff, product.unitType));
+      stockNote = l10n.aboveMinimumNote(
+        formatQuantity(stockDiff, product.unitType),
+      );
     } else if (stockDiff < 0) {
-      stockNote = l10n.belowMinimumNote(formatQuantity(-stockDiff, product.unitType));
+      stockNote = l10n.belowMinimumNote(
+        formatQuantity(-stockDiff, product.unitType),
+      );
     } else {
       stockNote = l10n.atMinimumNote;
     }
@@ -472,12 +554,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   String sellingPriceText(Product product, AppLocalizations l10n) =>
-      product.sellingPrice != null ? formatMoney(product.sellingPrice!) : l10n.notSet;
+      product.sellingPrice != null
+      ? formatMoney(product.sellingPrice!)
+      : l10n.notSet;
 
   // -------------------------------------------------------------------
   // Left column: photo + stock status
   // -------------------------------------------------------------------
-  Widget _buildLeftColumn(BuildContext context, AppLocalizations l10n, ThemeData theme, Product product) {
+  Widget _buildLeftColumn(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+    Product product,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -494,7 +583,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   /// Only rendered when the product has been bought from 2+ suppliers — a
   /// single supplier means there's nothing to compare.
-  Widget _buildBestSupplierCard(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+  Widget _buildBestSupplierCard(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
     const brandTeal = Color(0xFF0E7C7B);
     final best = _supplierPrices.first;
     final others = _supplierPrices.skip(1);
@@ -517,7 +610,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   color: brandTeal.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.workspace_premium_outlined, size: 16, color: brandTeal),
+                child: const Icon(
+                  Icons.workspace_premium_outlined,
+                  size: 16,
+                  color: brandTeal,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -525,7 +622,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   best.supplierName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: designSans(theme.textTheme.bodyMedium, color: DesignColors.textPrimary, fontWeight: FontWeight.w700),
+                  style: designSans(
+                    theme.textTheme.bodyMedium,
+                    color: DesignColors.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
@@ -533,18 +634,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           const SizedBox(height: 10),
           MoneyText(
             formatMoney(best.avgBuyPrice),
-            style: designMono(theme.textTheme.headlineSmall, color: brandTeal, fontWeight: FontWeight.w700),
+            style: designMono(
+              theme.textTheme.headlineSmall,
+              color: brandTeal,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 2),
           Text(
             l10n.avgPriceAcrossPurchases(best.purchaseCount),
-            style: designSans(theme.textTheme.labelSmall, color: DesignColors.textMuted),
+            style: designSans(
+              theme.textTheme.labelSmall,
+              color: DesignColors.textMuted,
+            ),
           ),
           if (othersList.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
               l10n.alsoBoughtFromNote(othersList),
-              style: designSans(theme.textTheme.labelSmall, color: DesignColors.textMuted),
+              style: designSans(
+                theme.textTheme.labelSmall,
+                color: DesignColors.textMuted,
+              ),
             ),
           ],
         ],
@@ -552,7 +663,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildPhotoCard(BuildContext context, AppLocalizations l10n, ThemeData theme, Product product) {
+  Widget _buildPhotoCard(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+    Product product,
+  ) {
     return DesignCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,7 +682,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 if (resolved != null) {
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(DesignRadii.inner),
-                    child: Image.file(File(resolved), fit: BoxFit.cover, width: double.infinity),
+                    child: Image.file(
+                      File(resolved),
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
                   );
                 }
                 return DashedBorderBox(
@@ -576,9 +696,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.image_outlined, size: 40, color: DesignColors.textMuted),
+                          const Icon(
+                            Icons.image_outlined,
+                            size: 40,
+                            color: DesignColors.textMuted,
+                          ),
                           const SizedBox(height: 8),
-                          Text(l10n.noPhotoLabel, style: designSans(theme.textTheme.bodySmall, color: DesignColors.textMuted)),
+                          Text(
+                            l10n.noPhotoLabel,
+                            style: designSans(
+                              theme.textTheme.bodySmall,
+                              color: DesignColors.textMuted,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -597,7 +727,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 side: const BorderSide(color: DesignColors.teal),
               ),
               icon: const Icon(Icons.upload_outlined, size: 18),
-              label: Text(l10n.changePhotoAction, style: designSans(theme.textTheme.labelLarge, color: DesignColors.teal)),
+              label: Text(
+                l10n.changePhotoAction,
+                style: designSans(
+                  theme.textTheme.labelLarge,
+                  color: DesignColors.teal,
+                ),
+              ),
             ),
           ),
           if (product.imagePath != null) ...[
@@ -611,7 +747,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   side: const BorderSide(color: DesignColors.destructiveBorder),
                 ),
                 icon: const Icon(Icons.delete_outline, size: 18),
-                label: Text(l10n.removePhotoAction, style: designSans(theme.textTheme.labelLarge, color: DesignColors.destructiveText)),
+                label: Text(
+                  l10n.removePhotoAction,
+                  style: designSans(
+                    theme.textTheme.labelLarge,
+                    color: DesignColors.destructiveText,
+                  ),
+                ),
               ),
             ),
           ],
@@ -625,7 +767,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 side: const BorderSide(color: DesignColors.cardBorder),
               ),
               icon: const Icon(Icons.qr_code_2_outlined, size: 18),
-              label: Text(l10n.printBarcodeAction, style: designSans(theme.textTheme.labelLarge, color: DesignColors.textMuted)),
+              label: Text(
+                l10n.printBarcodeAction,
+                style: designSans(
+                  theme.textTheme.labelLarge,
+                  color: DesignColors.textMuted,
+                ),
+              ),
             ),
           ),
         ],
@@ -633,7 +781,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildStockStatusCard(BuildContext context, AppLocalizations l10n, ThemeData theme, Product product) {
+  Widget _buildStockStatusCard(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+    Product product,
+  ) {
     const brandTeal = Color(0xFF0E7C7B);
     const brandTerracotta = Color(0xFFE4572E);
     final isLowStock = product.stockQuantity <= product.minStock;
@@ -642,12 +795,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ? product.minStock * 3
         : (product.stockQuantity > 0 ? product.stockQuantity : 1.0);
     final ratio = (product.stockQuantity / ceiling).clamp(0.0, 1.0);
-    final minMarkerRatio = product.minStock > 0 ? (product.minStock / ceiling).clamp(0.0, 1.0) : null;
+    final minMarkerRatio = product.minStock > 0
+        ? (product.minStock / ceiling).clamp(0.0, 1.0)
+        : null;
 
     String? weeksNote;
     if (_dailyVelocity > 0) {
       final weeks = product.stockQuantity / (_dailyVelocity * 7);
-      weeksNote = l10n.stockWillLastNote('${weeks.toStringAsFixed(1)} ${l10n.weeksSuffix}');
+      weeksNote = l10n.stockWillLastNote(
+        '${weeks.toStringAsFixed(1)} ${l10n.weeksSuffix}',
+      );
     }
 
     return DesignCard(
@@ -656,7 +813,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         children: [
           DesignSectionTitle(l10n.stockStatusLabel),
           const SizedBox(height: 16),
-          _statRow(theme, l10n.minimumStockLabel, formatQuantity(product.minStock, product.unitType)),
+          _statRow(
+            theme,
+            l10n.minimumStockLabel,
+            formatQuantity(product.minStock, product.unitType),
+          ),
           const SizedBox(height: 6),
           _statRow(
             theme,
@@ -669,8 +830,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: _miniStat(theme, l10n.unitTypeLabel, _unitLabel(l10n, product.unitType))),
-              Expanded(child: _miniStat(theme, l10n.batchesLabel, '${_batches.length}', mono: true)),
+              Expanded(
+                child: _miniStat(
+                  theme,
+                  l10n.unitTypeLabel,
+                  _unitLabel(l10n, product.unitType),
+                ),
+              ),
+              Expanded(
+                child: _miniStat(
+                  theme,
+                  l10n.batchesLabel,
+                  '${_batches.length}',
+                  mono: true,
+                ),
+              ),
             ],
           ),
           if (weeksNote != null) ...[
@@ -679,15 +853,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isLowStock ? brandTerracotta.withValues(alpha: 0.1) : DesignColors.tealTint,
+                color: isLowStock
+                    ? brandTerracotta.withValues(alpha: 0.1)
+                    : DesignColors.tealTint,
                 borderRadius: BorderRadius.circular(DesignRadii.inner),
-                border: isLowStock ? Border.all(color: brandTerracotta.withValues(alpha: 0.3)) : null,
+                border: isLowStock
+                    ? Border.all(color: brandTerracotta.withValues(alpha: 0.3))
+                    : null,
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(
-                    isLowStock ? Icons.warning_amber_rounded : Icons.insights_outlined,
+                    isLowStock
+                        ? Icons.warning_amber_rounded
+                        : Icons.insights_outlined,
                     size: 16,
                     color: isLowStock ? brandTerracotta : DesignColors.teal,
                   ),
@@ -697,7 +877,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       weeksNote,
                       style: designSans(
                         theme.textTheme.bodySmall,
-                        color: isLowStock ? brandTerracotta : DesignColors.tealHover,
+                        color: isLowStock
+                            ? brandTerracotta
+                            : DesignColors.tealHover,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -711,30 +893,64 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _statRow(ThemeData theme, String label, String value, {Color? valueColor}) {
+  Widget _statRow(
+    ThemeData theme,
+    String label,
+    String value, {
+    Color? valueColor,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: designSans(theme.textTheme.bodyMedium, color: DesignColors.textMuted)),
+        Text(
+          label,
+          style: designSans(
+            theme.textTheme.bodyMedium,
+            color: DesignColors.textMuted,
+          ),
+        ),
         Text(
           value,
-          style: designMono(theme.textTheme.bodyMedium, color: valueColor ?? DesignColors.textPrimary, fontWeight: FontWeight.w700),
+          style: designMono(
+            theme.textTheme.bodyMedium,
+            color: valueColor ?? DesignColors.textPrimary,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ],
     );
   }
 
-  Widget _miniStat(ThemeData theme, String label, String value, {bool mono = false}) {
+  Widget _miniStat(
+    ThemeData theme,
+    String label,
+    String value, {
+    bool mono = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(), style: designSans(theme.textTheme.labelSmall, color: DesignColors.textMuted)),
+        Text(
+          label.toUpperCase(),
+          style: designSans(
+            theme.textTheme.labelSmall,
+            color: DesignColors.textMuted,
+          ),
+        ),
         const SizedBox(height: 2),
         Text(
           value,
           style: mono
-              ? designMono(theme.textTheme.bodyMedium, color: DesignColors.textPrimary, fontWeight: FontWeight.w700)
-              : designSans(theme.textTheme.bodyMedium, color: DesignColors.textPrimary, fontWeight: FontWeight.w700),
+              ? designMono(
+                  theme.textTheme.bodyMedium,
+                  color: DesignColors.textPrimary,
+                  fontWeight: FontWeight.w700,
+                )
+              : designSans(
+                  theme.textTheme.bodyMedium,
+                  color: DesignColors.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
         ),
       ],
     );
@@ -743,7 +959,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   // -------------------------------------------------------------------
   // Right column: product info + batches + movements (+ variants)
   // -------------------------------------------------------------------
-  Widget _buildRightColumn(BuildContext context, AppLocalizations l10n, ThemeData theme, Product product) {
+  Widget _buildRightColumn(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+    Product product,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -760,10 +981,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildInfoCard(BuildContext context, AppLocalizations l10n, ThemeData theme, Product product) {
+  Widget _buildInfoCard(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+    Product product,
+  ) {
     final status = statusOf(product);
-    final hasBarcode = product.barcode != null && product.barcode!.trim().isNotEmpty;
-    final hasVariant = product.variantSize != null && product.variantSize!.trim().isNotEmpty;
+    final hasBarcode =
+        product.barcode != null && product.barcode!.trim().isNotEmpty;
+    final hasVariant =
+        product.variantSize != null && product.variantSize!.trim().isNotEmpty;
 
     final rows = <(String, String, bool)>[
       (l10n.productCodeLabel, product.code, true),
@@ -774,8 +1002,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       if (hasVariant) (l10n.sizeVariantLabel, product.variantSize!, false),
       (l10n.unitTypeLabel, _unitLabel(l10n, product.unitType), false),
       (l10n.sellingPriceLabel, sellingPriceText(product, l10n), true),
-      (l10n.currentStockLabel, formatQuantity(product.stockQuantity, product.unitType), true),
-      (l10n.minimumStockLabel, formatQuantity(product.minStock, product.unitType), true),
+      (
+        l10n.currentStockLabel,
+        formatQuantity(product.stockQuantity, product.unitType),
+        true,
+      ),
+      (
+        l10n.minimumStockLabel,
+        formatQuantity(product.minStock, product.unitType),
+        true,
+      ),
       (l10n.colStatus, statusLabel(status, l10n), false),
       (l10n.colPurchaseDate, _formatDate(product.createdAt), true),
     ];
@@ -794,7 +1030,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 spacing: spacing,
                 runSpacing: 14,
                 children: rows
-                    .map((r) => SizedBox(width: itemWidth, child: _infoItem(theme, r.$1, r.$2, r.$3)))
+                    .map(
+                      (r) => SizedBox(
+                        width: itemWidth,
+                        child: _infoItem(theme, r.$1, r.$2, r.$3),
+                      ),
+                    )
                     .toList(),
               );
             },
@@ -809,7 +1050,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: designSans(theme.textTheme.bodySmall, color: DesignColors.textMuted)),
+        Text(
+          label,
+          style: designSans(
+            theme.textTheme.bodySmall,
+            color: DesignColors.textMuted,
+          ),
+        ),
         const SizedBox(width: 8),
         Flexible(
           child: Text(
@@ -817,26 +1064,50 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             textAlign: TextAlign.end,
             overflow: TextOverflow.ellipsis,
             style: mono
-                ? designMono(theme.textTheme.bodyMedium, color: DesignColors.textPrimary, fontWeight: FontWeight.w600)
-                : designSans(theme.textTheme.bodyMedium, color: DesignColors.textPrimary, fontWeight: FontWeight.w600),
+                ? designMono(
+                    theme.textTheme.bodyMedium,
+                    color: DesignColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  )
+                : designSans(
+                    theme.textTheme.bodyMedium,
+                    color: DesignColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildBatchesCard(BuildContext context, AppLocalizations l10n, ThemeData theme, Product product) {
+  Widget _buildBatchesCard(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+    Product product,
+  ) {
     return DesignCard(
-      padding: _batches.isEmpty ? const EdgeInsets.all(20) : const EdgeInsets.fromLTRB(20, 20, 20, 8),
+      padding: _batches.isEmpty
+          ? const EdgeInsets.all(20)
+          : const EdgeInsets.fromLTRB(20, 20, 20, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DesignSectionTitle(l10n.batchesLabel),
           const SizedBox(height: 4),
-          Text(l10n.batchesPanelDesc, style: designSans(theme.textTheme.bodySmall, color: DesignColors.textMuted)),
+          Text(
+            l10n.batchesPanelDesc,
+            style: designSans(
+              theme.textTheme.bodySmall,
+              color: DesignColors.textMuted,
+            ),
+          ),
           const SizedBox(height: 16),
           if (_batches.isEmpty)
-            EmptyState(icon: Icons.inventory_2_outlined, title: l10n.noBatchesYet)
+            EmptyState(
+              icon: Icons.inventory_2_outlined,
+              title: l10n.noBatchesYet,
+            )
           else
             LayoutBuilder(
               builder: (context, constraints) {
@@ -846,44 +1117,113 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     constraints: BoxConstraints(minWidth: constraints.maxWidth),
                     child: DataTable(
                       columns: [
-                        DataColumn(label: Text(l10n.colBatch, style: designSans(theme.textTheme.labelMedium))),
-                        DataColumn(label: Text(l10n.colRemainingQuantity, style: designSans(theme.textTheme.labelMedium)), numeric: true),
-                        DataColumn(label: Text(l10n.colBuyPrice, style: designSans(theme.textTheme.labelMedium)), numeric: true),
-                        DataColumn(label: Text(l10n.colTotalValue, style: designSans(theme.textTheme.labelMedium)), numeric: true),
-                        DataColumn(label: Text(l10n.colPurchaseDate, style: designSans(theme.textTheme.labelMedium))),
+                        DataColumn(
+                          label: Text(
+                            l10n.colBatch,
+                            style: designSans(theme.textTheme.labelMedium),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            l10n.colRemainingQuantity,
+                            style: designSans(theme.textTheme.labelMedium),
+                          ),
+                          numeric: true,
+                        ),
+                        DataColumn(
+                          label: Text(
+                            l10n.colBuyPrice,
+                            style: designSans(theme.textTheme.labelMedium),
+                          ),
+                          numeric: true,
+                        ),
+                        DataColumn(
+                          label: Text(
+                            l10n.colTotalValue,
+                            style: designSans(theme.textTheme.labelMedium),
+                          ),
+                          numeric: true,
+                        ),
+                        DataColumn(
+                          label: Text(
+                            l10n.colPurchaseDate,
+                            style: designSans(theme.textTheme.labelMedium),
+                          ),
+                        ),
                       ],
                       rows: _batches.asMap().entries.map((entry) {
                         final i = entry.key;
                         final b = entry.value;
-                        final isNextOut = i == 0; // getBatches() is oldest-first — index 0 sells first (FIFO)
+                        final isNextOut =
+                            i ==
+                            0; // getBatches() is oldest-first — index 0 sells first (FIFO)
                         return DataRow(
                           cells: [
                             DataCell(
                               Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text('BT-${b.id}', style: designMono(theme.textTheme.bodyMedium, fontWeight: FontWeight.w600)),
+                                  Text(
+                                    'BT-${b.id}',
+                                    style: designMono(
+                                      theme.textTheme.bodyMedium,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                   if (isNextOut) ...[
                                     const SizedBox(width: 8),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: DesignColors.tealTint,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
                                         l10n.nextOutTag,
-                                        style: designSans(theme.textTheme.labelSmall, color: DesignColors.teal, fontWeight: FontWeight.w700),
+                                        style: designSans(
+                                          theme.textTheme.labelSmall,
+                                          color: DesignColors.teal,
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ],
                               ),
                             ),
-                            DataCell(Text(formatQuantity(b.quantity, product.unitType), style: designMono(theme.textTheme.bodyMedium))),
-                            DataCell(MoneyText(formatMoney(b.buyPrice), style: designMono(theme.textTheme.bodyMedium))),
-                            DataCell(MoneyText(formatMoney(b.quantity * b.buyPrice), style: designMono(theme.textTheme.bodyMedium, fontWeight: FontWeight.w600))),
-                            DataCell(Text(_formatDate(b.purchaseDate), style: designMono(theme.textTheme.bodyMedium, color: DesignColors.textMuted))),
+                            DataCell(
+                              Text(
+                                formatQuantity(b.quantity, product.unitType),
+                                style: designMono(theme.textTheme.bodyMedium),
+                              ),
+                            ),
+                            DataCell(
+                              MoneyText(
+                                formatMoney(b.buyPrice),
+                                style: designMono(theme.textTheme.bodyMedium),
+                              ),
+                            ),
+                            DataCell(
+                              MoneyText(
+                                formatMoney(b.quantity * b.buyPrice),
+                                style: designMono(
+                                  theme.textTheme.bodyMedium,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Text(
+                                _formatDate(b.purchaseDate),
+                                style: designMono(
+                                  theme.textTheme.bodyMedium,
+                                  color: DesignColors.textMuted,
+                                ),
+                              ),
+                            ),
                           ],
                         );
                       }).toList(),
@@ -897,7 +1237,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildMovementsCard(BuildContext context, AppLocalizations l10n, ThemeData theme, Product product) {
+  Widget _buildMovementsCard(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+    Product product,
+  ) {
     // _movements is newest-first; the running total right after the newest
     // movement is simply the product's current stock, and each older
     // movement's running total is derived by undoing the newer ones in turn.
@@ -920,7 +1265,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ? null
                 : TextButton(
                     onPressed: _openMovements,
-                    child: Text(l10n.viewAllAction, style: designSans(theme.textTheme.labelMedium, color: DesignColors.teal, fontWeight: FontWeight.w600)),
+                    child: Text(
+                      l10n.viewAllAction,
+                      style: designSans(
+                        theme.textTheme.labelMedium,
+                        color: DesignColors.teal,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
           ),
           const SizedBox(height: 12),
@@ -931,9 +1283,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               children: List.generate(preview.length, (i) {
                 final m = preview[i];
                 final isOut = m.direction == 'out';
-                final dotColor = isOut ? const Color(0xFFE4572E) : const Color(0xFF16A34A);
+                final dotColor = isOut
+                    ? const Color(0xFFE4572E)
+                    : const Color(0xFF16A34A);
                 return Padding(
-                  padding: EdgeInsets.only(bottom: i == preview.length - 1 ? 0 : 12),
+                  padding: EdgeInsets.only(
+                    bottom: i == preview.length - 1 ? 0 : 12,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -942,7 +1298,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         child: Container(
                           width: 8,
                           height: 8,
-                          decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                            color: dotColor,
+                            shape: BoxShape.circle,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -954,9 +1313,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               m.note ?? m.type,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: designSans(theme.textTheme.bodyMedium, color: DesignColors.textPrimary, fontWeight: FontWeight.w600),
+                              style: designSans(
+                                theme.textTheme.bodyMedium,
+                                color: DesignColors.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            Text(_formatDate(m.createdAt), style: designMono(theme.textTheme.labelSmall, color: DesignColors.textMuted)),
+                            Text(
+                              _formatDate(m.createdAt),
+                              style: designMono(
+                                theme.textTheme.labelSmall,
+                                color: DesignColors.textMuted,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -966,11 +1335,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         children: [
                           Text(
                             '${isOut ? '-' : '+'}${formatQuantity(m.quantity, product.unitType)}',
-                            style: designMono(theme.textTheme.bodyMedium, color: dotColor, fontWeight: FontWeight.w700),
+                            style: designMono(
+                              theme.textTheme.bodyMedium,
+                              color: dotColor,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                           Text(
                             formatQuantity(runningTotals[i], product.unitType),
-                            style: designMono(theme.textTheme.labelSmall, color: DesignColors.textMuted),
+                            style: designMono(
+                              theme.textTheme.labelSmall,
+                              color: DesignColors.textMuted,
+                            ),
                           ),
                         ],
                       ),
@@ -984,7 +1360,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildVariantsCard(BuildContext context, AppLocalizations l10n, ThemeData theme) {
+  Widget _buildVariantsCard(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
     return DesignCard(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
       child: Column(
@@ -992,23 +1372,48 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         children: [
           DesignSectionTitle(l10n.variantsPanel),
           const SizedBox(height: 4),
-          Text(l10n.variantsPanelDesc, style: designSans(theme.textTheme.bodySmall, color: DesignColors.textMuted)),
+          Text(
+            l10n.variantsPanelDesc,
+            style: designSans(
+              theme.textTheme.bodySmall,
+              color: DesignColors.textMuted,
+            ),
+          ),
           const SizedBox(height: 8),
           ..._variants.map((v) {
             final vLowStock = v.stockQuantity <= v.minStock;
             return ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.swap_horiz, color: DesignColors.teal),
-              title: Text(productDisplayName(v), style: designSans(theme.textTheme.bodyMedium, fontWeight: FontWeight.w600)),
+              title: Text(
+                productDisplayName(v),
+                style: designSans(
+                  theme.textTheme.bodyMedium,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               subtitle: Text(
                 vLowStock
-                    ? l10n.lowStockLeftSuffix(formatQuantity(v.stockQuantity, v.unitType))
-                    : l10n.inStockCount(formatQuantity(v.stockQuantity, v.unitType)),
-                style: designSans(theme.textTheme.bodySmall, color: DesignColors.textMuted),
+                    ? l10n.lowStockLeftSuffix(
+                        formatQuantity(v.stockQuantity, v.unitType),
+                      )
+                    : l10n.inStockCount(
+                        formatQuantity(v.stockQuantity, v.unitType),
+                      ),
+                style: designSans(
+                  theme.textTheme.bodySmall,
+                  color: DesignColors.textMuted,
+                ),
               ),
               trailing: MoneyText(
-                v.sellingPrice != null ? formatMoney(v.sellingPrice!) : l10n.notSet,
-                style: designMono(theme.textTheme.bodyMedium, color: DesignColors.teal, fontWeight: FontWeight.w700),
+                v.sellingPrice != null
+                    ? formatMoney(v.sellingPrice!)
+                    : l10n.notSet,
+                style: designMono(
+                  theme.textTheme.bodyMedium,
+                  color: DesignColors.teal,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               onTap: () => _openVariant(v),
             );
@@ -1034,7 +1439,11 @@ class _CodePill extends StatelessWidget {
       ),
       child: Text(
         code,
-        style: designMono(theme.textTheme.labelMedium, color: DesignColors.teal, fontWeight: FontWeight.w700),
+        style: designMono(
+          theme.textTheme.labelMedium,
+          color: DesignColors.teal,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -1052,14 +1461,24 @@ class _ActiveStatusPill extends StatelessWidget {
     final theme = Theme.of(context);
     const success = Color(0xFF16A34A);
     final (bg, fg) = isArchived
-        ? (DesignColors.cardBorder.withValues(alpha: 0.5), DesignColors.textMuted)
+        ? (
+            DesignColors.cardBorder.withValues(alpha: 0.5),
+            DesignColors.textMuted,
+          )
         : (success.withValues(alpha: 0.12), success);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
       child: Text(
         label,
-        style: designSans(theme.textTheme.labelSmall, color: fg, fontWeight: FontWeight.w700),
+        style: designSans(
+          theme.textTheme.labelSmall,
+          color: fg,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -1093,7 +1512,10 @@ class _StockBar extends StatelessWidget {
                   left: (width * minMarkerRatio!).clamp(0, width - 2),
                   top: 0,
                   bottom: 0,
-                  child: Container(width: 2, color: DesignColors.warningText.withValues(alpha: 0.7)),
+                  child: Container(
+                    width: 2,
+                    color: DesignColors.warningText.withValues(alpha: 0.7),
+                  ),
                 ),
             ],
           ),
@@ -1125,6 +1547,7 @@ class _AddStockDialogState extends State<_AddStockDialog> {
   );
   DateTime _purchaseDate = DateTime.now();
   bool _saving = false;
+  bool _isOpeningStock = false;
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
@@ -1143,7 +1566,8 @@ class _AddStockDialogState extends State<_AddStockDialog> {
     if (_isPiece) quantity = quantity.roundToDouble();
     final buyPrice = double.tryParse(_buyPriceController.text) ?? 0;
     final sellingPrice = double.tryParse(_sellingPriceController.text) ?? 0;
-    if (quantity <= 0 || buyPrice <= 0 || sellingPrice <= 0) return;
+    if (quantity <= 0 || sellingPrice <= 0) return;
+    if (!_isOpeningStock && buyPrice <= 0) return;
 
     setState(() => _saving = true);
     await widget.repo.addStock(
@@ -1159,151 +1583,171 @@ class _AddStockDialogState extends State<_AddStockDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return AlertDialog(
-      contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: const Color(0xFF16A34A).withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
+    return EnterToSubmit(
+      onSubmit: _saving ? null : _save,
+      child: AlertDialog(
+        contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: const Color(0xFF16A34A).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.add_box_outlined,
+                color: Color(0xFF16A34A),
+                size: 22,
+              ),
             ),
-            child: const Icon(
-              Icons.add_box_outlined,
-              color: Color(0xFF16A34A),
-              size: 22,
+            const SizedBox(height: 14),
+            Text(
+              l10n.addStock,
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: 360,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CheckboxListTile(
+                  value: _isOpeningStock,
+                  onChanged: (v) =>
+                      setState(() => _isOpeningStock = v ?? false),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  title: Text(
+                    l10n.openingStockToggleLabel,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _quantityController,
+                        decoration: InputDecoration(
+                          labelText: l10n.quantityLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                        keyboardType: _isPiece
+                            ? TextInputType.number
+                            : const TextInputType.numberWithOptions(
+                                decimal: true,
+                              ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: _buyPriceController,
+                        decoration: InputDecoration(
+                          labelText: _isOpeningStock
+                              ? l10n.estimatedCostOptionalLabel
+                              : l10n.buyPriceLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: _sellingPriceController,
+                  decoration: InputDecoration(
+                    labelText: l10n.sellingPriceFieldLabel,
+                    border: const OutlineInputBorder(),
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                ),
+                if (widget.product.categoryId != null &&
+                    (double.tryParse(_buyPriceController.text) ?? 0) > 0)
+                  FutureBuilder<double?>(
+                    future: _insightsRepo.suggestSellingPrice(
+                      widget.product.categoryId!,
+                      double.tryParse(_buyPriceController.text) ?? 0,
+                    ),
+                    builder: (context, snapshot) {
+                      final suggestion = snapshot.data;
+                      if (suggestion == null) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l10n.suggestedPriceHint(
+                                  formatMoney(suggestion),
+                                ),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => setState(
+                                () => _sellingPriceController.text =
+                                    plainNumber(suggestion),
+                              ),
+                              child: Text(l10n.useSuggestionAction),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                const SizedBox(height: 14),
+                InkWell(
+                  onTap: _pickDate,
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: l10n.purchaseDateLabel,
+                      border: const OutlineInputBorder(),
+                    ),
+                    child: Text(
+                      '${_purchaseDate.year}-${_purchaseDate.month.toString().padLeft(2, '0')}-${_purchaseDate.day.toString().padLeft(2, '0')}',
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 14),
-          Text(
-            l10n.addStock,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFF16A34A),
+            ),
+            onPressed: _saving ? null : _save,
+            child: Text(
+              _isOpeningStock ? l10n.addOpeningStockAction : l10n.addStock,
+            ),
           ),
         ],
       ),
-      content: SizedBox(
-        width: 360,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _quantityController,
-                      decoration: InputDecoration(
-                        labelText: l10n.quantityLabel,
-                        border: const OutlineInputBorder(),
-                      ),
-                      keyboardType: _isPiece
-                          ? TextInputType.number
-                          : const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      controller: _buyPriceController,
-                      decoration: InputDecoration(
-                        labelText: l10n.buyPriceLabel,
-                        border: const OutlineInputBorder(),
-                      ),
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _sellingPriceController,
-                decoration: InputDecoration(
-                  labelText: l10n.sellingPriceFieldLabel,
-                  border: const OutlineInputBorder(),
-                ),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-              ),
-              if (widget.product.categoryId != null &&
-                  (double.tryParse(_buyPriceController.text) ?? 0) > 0)
-                FutureBuilder<double?>(
-                  future: _insightsRepo.suggestSellingPrice(
-                    widget.product.categoryId!,
-                    double.tryParse(_buyPriceController.text) ?? 0,
-                  ),
-                  builder: (context, snapshot) {
-                    final suggestion = snapshot.data;
-                    if (suggestion == null) return const SizedBox.shrink();
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              l10n.suggestedPriceHint(formatMoney(suggestion)),
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.6),
-                              ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => setState(
-                              () => _sellingPriceController.text = plainNumber(
-                                suggestion,
-                              ),
-                            ),
-                            child: Text(l10n.useSuggestionAction),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              const SizedBox(height: 14),
-              InkWell(
-                onTap: _pickDate,
-                child: InputDecorator(
-                  decoration: InputDecoration(
-                    labelText: l10n.purchaseDateLabel,
-                    border: const OutlineInputBorder(),
-                  ),
-                  child: Text(
-                    '${_purchaseDate.year}-${_purchaseDate.month.toString().padLeft(2, '0')}-${_purchaseDate.day.toString().padLeft(2, '0')}',
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text(l10n.cancel),
-        ),
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: const Color(0xFF16A34A),
-          ),
-          onPressed: _saving ? null : _save,
-          child: Text(l10n.addStock),
-        ),
-      ],
     );
   }
 }

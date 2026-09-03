@@ -86,9 +86,37 @@ class CustomerRepository {
   Future<double> getRemainingBalance(int customerId) async {
     final sales = await getSalesForCustomer(customerId);
     final owedFromSales = sales.fold<double>(0, (sum, s) => sum + (s.totalAmount - s.amountPaid));
+    final adjustments = await getDebtAdjustments(customerId);
+    final manualDebt = adjustments.fold<double>(0, (sum, a) => sum + a.amount);
     final payments = await getPaymentsForCustomer(customerId);
     final paidAfterSale = payments.fold<double>(0, (sum, p) => sum + p.amount);
-    return roundMoney(owedFromSales - paidAfterSale);
+    return roundMoney(owedFromSales + manualDebt - paidAfterSale);
+  }
+
+  /// A manually-entered debt amount not tied to any sale — e.g. an opening
+  /// balance the customer already owed before this app was used.
+  Future<void> addDebtAdjustment({
+    required int customerId,
+    required double amount,
+    required DateTime date,
+    String? note,
+  }) async {
+    await db.into(db.customerDebtAdjustments).insert(CustomerDebtAdjustmentsCompanion.insert(
+          customerId: customerId,
+          amount: roundMoney(amount),
+          date: date,
+          note: Value(note?.trim()),
+        ));
+    final customer = await (db.select(db.customers)..where((c) => c.id.equals(customerId))).getSingleOrNull();
+    await _activityLog.log('debt_adjustment', 'created', amount: roundMoney(amount), entityName: customer?.name, refId: customerId);
+  }
+
+  /// Newest first.
+  Future<List<CustomerDebtAdjustment>> getDebtAdjustments(int customerId) async {
+    return (db.select(db.customerDebtAdjustments)
+          ..where((a) => a.customerId.equals(customerId))
+          ..orderBy([(a) => OrderingTerm.desc(a.createdAt)]))
+        .get();
   }
 
   Future<int> recordPayment({

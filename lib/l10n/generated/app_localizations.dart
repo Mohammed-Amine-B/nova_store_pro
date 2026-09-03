@@ -484,6 +484,42 @@ abstract class AppLocalizations {
   /// **'e.g. 4mm, Large, 1kg'**
   String get variantSizeHint;
 
+  /// No description provided for @normalProductOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal Product'**
+  String get normalProductOption;
+
+  /// No description provided for @productWithSizesOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Product with Sizes'**
+  String get productWithSizesOption;
+
+  /// No description provided for @sizeLabelFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get sizeLabelFieldLabel;
+
+  /// No description provided for @addAnotherSizeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Another Size'**
+  String get addAnotherSizeAction;
+
+  /// No description provided for @removeSizeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this size'**
+  String get removeSizeTooltip;
+
+  /// No description provided for @sizesSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sizes'**
+  String get sizesSectionLabel;
+
   /// No description provided for @variantsPanel.
   ///
   /// In en, this message translates to:
@@ -633,6 +669,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Buy Price'**
   String get buyPriceLabel;
+
+  /// No description provided for @estimatedCostOptionalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated Cost (optional)'**
+  String get estimatedCostOptionalLabel;
+
+  /// No description provided for @openingStockToggleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'This is stock I already had (not a new purchase)'**
+  String get openingStockToggleLabel;
+
+  /// No description provided for @addOpeningStockAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Opening Stock'**
+  String get addOpeningStockAction;
 
   /// No description provided for @sellingPriceFieldLabel.
   ///
@@ -1377,6 +1431,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No payments recorded yet.'**
   String get noPaymentsYet;
+
+  /// No description provided for @historyPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get historyPanel;
+
+  /// No description provided for @historyCountDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} entries'**
+  String historyCountDesc(int count);
+
+  /// No description provided for @noHistoryYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No history yet for this customer.'**
+  String get noHistoryYet;
+
+  /// No description provided for @debtAddedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt Added'**
+  String get debtAddedLabel;
+
+  /// No description provided for @addDebtAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Debt'**
+  String get addDebtAction;
+
+  /// No description provided for @debtNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Opening balance before using this app'**
+  String get debtNoteHint;
 
   /// No description provided for @supplierDetailFallbackTitle.
   ///
@@ -2331,6 +2421,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change Photo'**
   String get changePhotoAction;
+
+  /// No description provided for @searchImagesOnlineAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Images Online'**
+  String get searchImagesOnlineAction;
+
+  /// No description provided for @searchImagesOnlineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens your browser — right-click and save any image you like, then use Choose Photo to add it here.'**
+  String get searchImagesOnlineHint;
+
+  /// No description provided for @searchImagesOnlineDisabledHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a product name first'**
+  String get searchImagesOnlineDisabledHint;
 
   /// No description provided for @removePhotoAction.
   ///
