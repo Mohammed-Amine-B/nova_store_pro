@@ -9,12 +9,12 @@ import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
 
 List<String> securityQuestionOptions(AppLocalizations l10n) => [
-      l10n.securityQuestionShopName,
-      l10n.securityQuestionMotherName,
-      l10n.securityQuestionBirthCity,
-      l10n.securityQuestionFirstPet,
-      l10n.securityQuestionFavoriteProduct,
-    ];
+  l10n.securityQuestionShopName,
+  l10n.securityQuestionMotherName,
+  l10n.securityQuestionBirthCity,
+  l10n.securityQuestionFirstPet,
+  l10n.securityQuestionFavoriteProduct,
+];
 
 class SettingsScreen extends StatefulWidget {
   final AppDatabase db;
@@ -70,7 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-    Future<void> _openPasswordDialog() async {
+  Future<void> _openPasswordDialog() async {
     final currentController = TextEditingController();
     final newController = TextEditingController();
     final confirmController = TextEditingController();
@@ -84,91 +84,129 @@ class _SettingsScreenState extends State<SettingsScreen> {
         builder: (context, setDialogState) {
           final l10n = AppLocalizations.of(context)!;
           return AlertDialog(
-          title: Text(_hasPassword ? l10n.changePasswordDialogTitle : l10n.setPasswordDialogTitle),
-          content: SizedBox(
-            width: 320,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (_hasPassword)
-                  TextField(
-                    controller: currentController,
-                    obscureText: true,
-                    decoration: InputDecoration(labelText: l10n.currentPasswordLabel),
-                  ),
-                if (_hasPassword) const SizedBox(height: 12),
-                TextField(
-                  controller: newController,
-                  obscureText: true,
-                  decoration: InputDecoration(labelText: l10n.newPasswordLabel),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: confirmController,
-                  obscureText: true,
-                  decoration: InputDecoration(labelText: l10n.confirmNewPasswordLabel),
-                ),
-                if (!_hasPassword) ...[
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedSecurityQuestion,
-                    isExpanded: true,
-                    decoration: InputDecoration(labelText: l10n.securityQuestionLabel),
-                    items: securityQuestionOptions(l10n)
-                        .map((q) => DropdownMenuItem(value: q, child: Text(q, overflow: TextOverflow.ellipsis)))
-                        .toList(),
-                    onChanged: (v) => setDialogState(() => selectedSecurityQuestion = v),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: securityAnswerController,
-                    decoration: InputDecoration(labelText: l10n.securityAnswerLabel),
-                  ),
-                ],
-                if (error != null) ...[
-                  const SizedBox(height: 8),
-                  Text(error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                ],
-              ],
+            title: Text(
+              _hasPassword
+                  ? l10n.changePasswordDialogTitle
+                  : l10n.setPasswordDialogTitle,
             ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-            FilledButton(
-              onPressed: () async {
-                if (newController.text.isEmpty) {
-                  setDialogState(() => error = l10n.enterNewPassword);
-                  return;
-                }
-                if (newController.text != confirmController.text) {
-                  setDialogState(() => error = l10n.passwordsDoNotMatch);
-                  return;
-                }
-                if (!_hasPassword) {
-                  if (selectedSecurityQuestion == null) {
-                    setDialogState(() => error = l10n.securityQuestionRequired);
+            content: SizedBox(
+              width: 320,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_hasPassword)
+                      TextField(
+                        controller: currentController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: l10n.currentPasswordLabel,
+                        ),
+                      ),
+                    if (_hasPassword) const SizedBox(height: 12),
+                    TextField(
+                      controller: newController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: l10n.newPasswordLabel,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: confirmController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: l10n.confirmNewPasswordLabel,
+                      ),
+                    ),
+                    if (!_hasPassword) ...[
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedSecurityQuestion,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          labelText: l10n.securityQuestionLabel,
+                        ),
+                        items: securityQuestionOptions(l10n)
+                            .map(
+                              (q) => DropdownMenuItem(
+                                value: q,
+                                child: Text(q, overflow: TextOverflow.ellipsis),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (v) =>
+                            setDialogState(() => selectedSecurityQuestion = v),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: securityAnswerController,
+                        decoration: InputDecoration(
+                          labelText: l10n.securityAnswerLabel,
+                        ),
+                      ),
+                    ],
+                    if (error != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  if (newController.text.isEmpty) {
+                    setDialogState(() => error = l10n.enterNewPassword);
                     return;
                   }
-                  if (securityAnswerController.text.trim().isEmpty) {
-                    setDialogState(() => error = l10n.securityAnswerRequired);
+                  if (newController.text != confirmController.text) {
+                    setDialogState(() => error = l10n.passwordsDoNotMatch);
                     return;
                   }
-                }
-                final setResult = await _repo.setPassword(
-                  newController.text,
-                  currentPassword: _hasPassword ? currentController.text : null,
-                  securityQuestion: _hasPassword ? null : selectedSecurityQuestion,
-                  securityAnswer: _hasPassword ? null : securityAnswerController.text,
-                );
-                if (setResult.success) {
-                  if (context.mounted) Navigator.pop(context, setResult);
-                } else {
-                  setDialogState(() => error = l10n.currentPasswordIncorrect);
-                }
-              },
-              child: Text(l10n.save),
-            ),
-          ],
+                  if (!_hasPassword) {
+                    if (selectedSecurityQuestion == null) {
+                      setDialogState(
+                        () => error = l10n.securityQuestionRequired,
+                      );
+                      return;
+                    }
+                    if (securityAnswerController.text.trim().isEmpty) {
+                      setDialogState(() => error = l10n.securityAnswerRequired);
+                      return;
+                    }
+                  }
+                  final setResult = await _repo.setPassword(
+                    newController.text,
+                    currentPassword: _hasPassword
+                        ? currentController.text
+                        : null,
+                    securityQuestion: _hasPassword
+                        ? null
+                        : selectedSecurityQuestion,
+                    securityAnswer: _hasPassword
+                        ? null
+                        : securityAnswerController.text,
+                  );
+                  if (setResult.success) {
+                    if (context.mounted) Navigator.pop(context, setResult);
+                  } else {
+                    setDialogState(() => error = l10n.currentPasswordIncorrect);
+                  }
+                },
+                child: Text(l10n.save),
+              ),
+            ],
           );
         },
       ),
@@ -194,53 +232,69 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: Text(l10n.recoveryCodeDialogTitle),
             content: SizedBox(
               width: 320,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.recoveryCodeSaveWarning),
-                  const SizedBox(height: 12),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            code,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 2),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.recoveryCodeSaveWarning),
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              code,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 2,
+                              ),
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(text: code));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(l10n.codeCopiedMessage)),
-                            );
-                          },
-                          icon: const Icon(Icons.copy_outlined, size: 20),
-                          tooltip: l10n.copyCodeAction,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ],
+                          IconButton(
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(text: code));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(l10n.codeCopiedMessage)),
+                              );
+                            },
+                            icon: const Icon(Icons.copy_outlined, size: 20),
+                            tooltip: l10n.copyCodeAction,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  CheckboxListTile(
-                    value: acknowledged,
-                    onChanged: (v) => setDialogState(() => acknowledged = v ?? false),
-                    title: Text(l10n.recoveryCodeAckCheckbox),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    CheckboxListTile(
+                      value: acknowledged,
+                      onChanged: (v) =>
+                          setDialogState(() => acknowledged = v ?? false),
+                      title: Text(l10n.recoveryCodeAckCheckbox),
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ],
+                ),
               ),
             ),
             actions: [
@@ -255,7 +309,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  
   Future<void> _openRemovePasswordDialog() async {
     final currentController = TextEditingController();
     String? error;
@@ -266,52 +319,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
         builder: (context, setDialogState) {
           final l10n = AppLocalizations.of(context)!;
           return AlertDialog(
-          title: Text(l10n.removePasswordDialogTitle),
-          content: SizedBox(
-            width: 320,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: currentController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: l10n.currentPasswordLabel,
-                  ),
-                ),
-                if (error != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    error!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
+            title: Text(l10n.removePasswordDialogTitle),
+            content: SizedBox(
+              width: 320,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: currentController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: l10n.currentPasswordLabel,
+                      ),
                     ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.cancel),
-            ),
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.error,
+                    if (error != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
-              onPressed: () async {
-                final ok = await _repo.removePassword(currentController.text);
-                if (ok) {
-                  if (context.mounted) Navigator.pop(context);
-                  setState(() => _hasPassword = false);
-                } else {
-                  setDialogState(() => error = l10n.incorrectPassword);
-                }
-              },
-              child: Text(l10n.removeAction),
             ),
-          ],
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+                onPressed: () async {
+                  final ok = await _repo.removePassword(currentController.text);
+                  if (ok) {
+                    if (context.mounted) Navigator.pop(context);
+                    setState(() => _hasPassword = false);
+                  } else {
+                    setDialogState(() => error = l10n.incorrectPassword);
+                  }
+                },
+                child: Text(l10n.removeAction),
+              ),
+            ],
           );
         },
       ),
@@ -362,9 +417,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _backingUp = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Backup failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Backup failed: $e')));
     }
   }
 
@@ -388,17 +443,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: const Text('Backup Created'),
         content: SizedBox(
           width: 380,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Your backup was saved to:'),
-              const SizedBox(height: 8),
-              SelectableText(
-                zipPath,
-                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-              ),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Your backup was saved to:'),
+                const SizedBox(height: 8),
+                SelectableText(
+                  zipPath,
+                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                ),
+              ],
+            ),
           ),
         ),
         actions: [
@@ -496,9 +553,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               padding: const EdgeInsets.all(20),
               child: SegmentedButton<String>(
                 segments: [
-                  ButtonSegment(value: 'small', label: Text(l10n.fontSizeSmall)),
-                  ButtonSegment(value: 'medium', label: Text(l10n.fontSizeMedium)),
-                  ButtonSegment(value: 'large', label: Text(l10n.fontSizeLarge)),
+                  ButtonSegment(
+                    value: 'small',
+                    label: Text(l10n.fontSizeSmall),
+                  ),
+                  ButtonSegment(
+                    value: 'medium',
+                    label: Text(l10n.fontSizeMedium),
+                  ),
+                  ButtonSegment(
+                    value: 'large',
+                    label: Text(l10n.fontSizeLarge),
+                  ),
                 ],
                 selected: {_fontSize},
                 onSelectionChanged: (s) => _onFontSizeSelected(s.first),
@@ -548,7 +614,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   OutlinedButton(
                     onPressed: _openPasswordDialog,
-                    child: Text(_hasPassword ? l10n.changeAction : l10n.setPasswordAction),
+                    child: Text(
+                      _hasPassword ? l10n.changeAction : l10n.setPasswordAction,
+                    ),
                   ),
                   if (_hasPassword) ...[
                     const SizedBox(width: 8),
@@ -567,7 +635,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 20),
           Panel(
             title: 'Backup',
-            description: 'Save a copy of your database and product photos for safekeeping.',
+            description:
+                'Save a copy of your database and product photos for safekeeping.',
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -575,16 +644,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const Icon(Icons.backup_outlined, color: Color(0xFF0E7C7B)),
                   const SizedBox(width: 12),
                   const Expanded(
-                    child: Text('Creates a dated .zip you can save to a USB drive or cloud folder.'),
+                    child: Text(
+                      'Creates a dated .zip you can save to a USB drive or cloud folder.',
+                    ),
                   ),
                   FilledButton.icon(
                     onPressed: _backingUp ? null : _backupNow,
-                    style: FilledButton.styleFrom(backgroundColor: const Color(0xFF0E7C7B)),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF0E7C7B),
+                    ),
                     icon: _backingUp
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
                           )
                         : const Icon(Icons.backup_outlined, size: 18),
                     label: const Text('Backup Now'),

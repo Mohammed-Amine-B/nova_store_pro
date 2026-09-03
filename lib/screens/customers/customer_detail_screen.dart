@@ -7,6 +7,7 @@ import '../../widgets/panel.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
 import 'customer_form_dialog.dart';
 import 'customer_sale_screen.dart';
@@ -92,12 +93,15 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
     _load();
   }
 
-    Future<void> _newSale() async {
+  Future<void> _newSale() async {
     final l10n = AppLocalizations.of(context)!;
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          appBar: AppBar(title: Text(l10n.newSaleAction), leading: const BackButton()),
+          appBar: AppBar(
+            title: Text(l10n.newSaleAction),
+            leading: const BackButton(),
+          ),
           body: Padding(
             padding: const EdgeInsets.all(24),
             child: CustomerSaleScreen(db: widget.db, customerId: _customer!.id),
@@ -123,51 +127,61 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
             title: Text(l10n.recordPaymentTitle),
             content: SizedBox(
               width: 320,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (error != null) ...[
-                    Text(error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                    const SizedBox(height: 8),
-                  ],
-                  TextField(
-                    controller: amountController,
-                    decoration: InputDecoration(
-                      labelText: l10n.amountLabel,
-                      border: const OutlineInputBorder(),
-                    ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  ),
-                  const SizedBox(height: 14),
-                  InkWell(
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: paymentDate,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime.now(),
-                      );
-                      if (picked != null) setDialogState(() => paymentDate = picked);
-                    },
-                    child: InputDecorator(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (error != null) ...[
+                      Text(
+                        error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    TextField(
+                      controller: amountController,
                       decoration: InputDecoration(
-                        labelText: l10n.paymentDateLabel,
+                        labelText: l10n.amountLabel,
                         border: const OutlineInputBorder(),
                       ),
-                      child: Text(
-                        '${paymentDate.year}-${paymentDate.month.toString().padLeft(2, '0')}-${paymentDate.day.toString().padLeft(2, '0')}',
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  TextField(
-                    controller: noteController,
-                    decoration: InputDecoration(
-                      labelText: l10n.noteOptionalLabel,
-                      border: const OutlineInputBorder(),
+                    const SizedBox(height: 14),
+                    InkWell(
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: paymentDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (picked != null)
+                          setDialogState(() => paymentDate = picked);
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: l10n.paymentDateLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                        child: Text(
+                          '${paymentDate.year}-${paymentDate.month.toString().padLeft(2, '0')}-${paymentDate.day.toString().padLeft(2, '0')}',
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: noteController,
+                      decoration: InputDecoration(
+                        labelText: l10n.noteOptionalLabel,
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             actions: [
@@ -190,7 +204,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                     customerId: _customer!.id,
                     amount: amount,
                     paymentDate: paymentDate,
-                    note: noteController.text.isEmpty ? null : noteController.text,
+                    note: noteController.text.isEmpty
+                        ? null
+                        : noteController.text,
                   );
                   if (context.mounted) Navigator.pop(context, true);
                 },
@@ -206,7 +222,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
   Future<void> _viewInvoice(Sale sale) async {
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => InvoiceViewScreen(db: widget.db, saleId: sale.id)),
+      MaterialPageRoute(
+        builder: (context) => InvoiceViewScreen(db: widget.db, saleId: sale.id),
+      ),
     );
   }
 
@@ -268,9 +286,15 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                               spacing: 32,
                               runSpacing: 16,
                               children: [
-                                _InfoField(l10n.colPhone, customer.phone ?? '—'),
+                                _InfoField(
+                                  l10n.colPhone,
+                                  customer.phone ?? '—',
+                                ),
                                 _InfoField(l10n.colNote, customer.note ?? '—'),
-                                _InfoField(l10n.memberSinceLabel, _formatDate(customer.createdAt)),
+                                _InfoField(
+                                  l10n.memberSinceLabel,
+                                  _formatDate(customer.createdAt),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 20),
@@ -290,27 +314,45 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                       title: l10n.salesHistoryPanel,
                       description: l10n.salesHistoryCountDesc(_sales.length),
                       child: _sales.isEmpty
-                          ? EmptyState(icon: Icons.receipt_long_outlined, title: l10n.noSalesYetForCustomer)
+                          ? EmptyState(
+                              icon: Icons.receipt_long_outlined,
+                              title: l10n.noSalesYetForCustomer,
+                            )
                           : LayoutBuilder(
                               builder: (context, constraints) {
                                 return SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                                    constraints: BoxConstraints(
+                                      minWidth: constraints.maxWidth,
+                                    ),
                                     child: DataTable(
                                       showCheckboxColumn: false,
                                       columns: [
                                         DataColumn(label: Text(l10n.colDate)),
                                         DataColumn(label: Text(l10n.colItems)),
-                                        DataColumn(label: Text(l10n.totalLabel), numeric: true),
-                                        DataColumn(label: Text(l10n.colPaid), numeric: true),
-                                        DataColumn(label: Text(l10n.colRemaining), numeric: true),
+                                        DataColumn(
+                                          label: Text(l10n.totalLabel),
+                                          numeric: true,
+                                        ),
+                                        DataColumn(
+                                          label: Text(l10n.colPaid),
+                                          numeric: true,
+                                        ),
+                                        DataColumn(
+                                          label: Text(l10n.colRemaining),
+                                          numeric: true,
+                                        ),
                                         DataColumn(label: Text(l10n.colMethod)),
-                                        DataColumn(label: Text(l10n.colActions)),
+                                        DataColumn(
+                                          label: Text(l10n.colActions),
+                                        ),
                                       ],
                                       rows: _sales.map((s) {
-                                        final items = _itemsBySale[s.id] ?? <SaleItem>[];
-                                        final remaining = s.totalAmount - s.amountPaid;
+                                        final items =
+                                            _itemsBySale[s.id] ?? <SaleItem>[];
+                                        final remaining =
+                                            s.totalAmount - s.amountPaid;
                                         final tone = switch (s.paymentMethod) {
                                           'cash' => BadgeTone.success,
                                           'card' => BadgeTone.neutral,
@@ -318,15 +360,26 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                                           'split' => BadgeTone.warning,
                                           _ => BadgeTone.neutral,
                                         };
-                                                                                return DataRow(
+                                        return DataRow(
                                           onSelectChanged: (_) async {
                                             await Navigator.of(context).push(
                                               MaterialPageRoute(
                                                 builder: (context) => Scaffold(
-                                                  appBar: AppBar(title: Text(l10n.editSaleTitle), leading: const BackButton()),
+                                                  appBar: AppBar(
+                                                    title: Text(
+                                                      l10n.editSaleTitle,
+                                                    ),
+                                                    leading: const BackButton(),
+                                                  ),
                                                   body: Padding(
-                                                    padding: const EdgeInsets.all(24),
-                                                    child: CustomerSaleScreen(db: widget.db, saleId: s.id),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                          24,
+                                                        ),
+                                                    child: CustomerSaleScreen(
+                                                      db: widget.db,
+                                                      saleId: s.id,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -335,11 +388,21 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                                           },
                                           cells: [
                                             DataCell(Text(_formatDate(s.date))),
-                                            DataCell(Text(l10n.saleItemsCount(items.length))),
-                                            DataCell(Text(formatMoney(s.totalAmount))),
-                                            DataCell(Text(formatMoney(s.amountPaid))),
                                             DataCell(
                                               Text(
+                                                l10n.saleItemsCount(
+                                                  items.length,
+                                                ),
+                                              ),
+                                            ),
+                                            DataCell(
+                                              MoneyText(formatMoney(s.totalAmount)),
+                                            ),
+                                            DataCell(
+                                              MoneyText(formatMoney(s.amountPaid)),
+                                            ),
+                                            DataCell(
+                                              MoneyText(
                                                 formatMoney(remaining),
                                                 style: TextStyle(
                                                   color: remaining > 0
@@ -349,41 +412,79 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                                                 ),
                                               ),
                                             ),
-                                            DataCell(StatusBadge(label: s.paymentMethod, tone: tone)),
-                                                                                    DataCell(
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              IconButton(
-                                                icon: const Icon(Icons.edit_outlined, size: 18),
-                                                tooltip: l10n.editSaleTitle,
-                                                onPressed: () async {
-                                                  await Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                      builder: (context) => Scaffold(
-                                                        appBar: AppBar(title: Text(l10n.editSaleTitle), leading: const BackButton()),
-                                                        body: Padding(
-                                                          padding: const EdgeInsets.all(24),
-                                                          child: CustomerSaleScreen(db: widget.db, saleId: s.id),
-                                                        ),
-                                                      ),
+                                            DataCell(
+                                              StatusBadge(
+                                                label: s.paymentMethod,
+                                                tone: tone,
+                                              ),
+                                            ),
+                                            DataCell(
+                                              Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  IconButton(
+                                                    icon: const Icon(
+                                                      Icons.edit_outlined,
+                                                      size: 18,
                                                     ),
-                                                  );
-                                                  _load();
-                                                },
+                                                    tooltip: l10n.editSaleTitle,
+                                                    onPressed: () async {
+                                                      await Navigator.of(
+                                                        context,
+                                                      ).push(
+                                                        MaterialPageRoute(
+                                                          builder: (context) => Scaffold(
+                                                            appBar: AppBar(
+                                                              title: Text(
+                                                                l10n.editSaleTitle,
+                                                              ),
+                                                              leading:
+                                                                  const BackButton(),
+                                                            ),
+                                                            body: Padding(
+                                                              padding:
+                                                                  const EdgeInsets.all(
+                                                                    24,
+                                                                  ),
+                                                              child:
+                                                                  CustomerSaleScreen(
+                                                                    db: widget
+                                                                        .db,
+                                                                    saleId:
+                                                                        s.id,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                      _load();
+                                                    },
+                                                  ),
+                                                  IconButton(
+                                                    icon: const Icon(
+                                                      Icons
+                                                          .receipt_long_outlined,
+                                                      size: 18,
+                                                    ),
+                                                    tooltip:
+                                                        l10n.viewInvoiceTooltip,
+                                                    onPressed: () =>
+                                                        _viewInvoice(s),
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(
+                                                      Icons.delete_outline,
+                                                      size: 18,
+                                                      color: theme
+                                                          .colorScheme
+                                                          .error,
+                                                    ),
+                                                    onPressed: () =>
+                                                        _deleteSale(s),
+                                                  ),
+                                                ],
                                               ),
-                                              IconButton(
-                                                icon: const Icon(Icons.receipt_long_outlined, size: 18),
-                                                tooltip: l10n.viewInvoiceTooltip,
-                                                onPressed: () => _viewInvoice(s),
-                                              ),
-                                              IconButton(
-                                                icon: Icon(Icons.delete_outline, size: 18, color: theme.colorScheme.error),
-                                                onPressed: () => _deleteSale(s),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                            ),
                                           ],
                                         );
                                       }).toList(),
@@ -398,33 +499,45 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                       title: l10n.paymentsHistoryPanel,
                       description: l10n.paymentCountDesc(_payments.length),
                       child: _payments.isEmpty
-                          ? EmptyState(icon: Icons.payments_outlined, title: l10n.noPaymentsYet)
+                          ? EmptyState(
+                              icon: Icons.payments_outlined,
+                              title: l10n.noPaymentsYet,
+                            )
                           : LayoutBuilder(
                               builder: (context, constraints) {
                                 return SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                                    constraints: BoxConstraints(
+                                      minWidth: constraints.maxWidth,
+                                    ),
                                     child: DataTable(
                                       columns: [
                                         DataColumn(label: Text(l10n.colDate)),
-                                        DataColumn(label: Text(l10n.colAmount), numeric: true),
+                                        DataColumn(
+                                          label: Text(l10n.colAmount),
+                                          numeric: true,
+                                        ),
                                         DataColumn(label: Text(l10n.colNote)),
                                       ],
                                       rows: _payments.map((p) {
-                                        return DataRow(cells: [
-                                          DataCell(Text(_formatDate(p.paymentDate))),
-                                          DataCell(
-                                            Text(
-                                              formatMoney(p.amount),
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xFF16A34A),
+                                        return DataRow(
+                                          cells: [
+                                            DataCell(
+                                              Text(_formatDate(p.paymentDate)),
+                                            ),
+                                            DataCell(
+                                              MoneyText(
+                                                formatMoney(p.amount),
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFF16A34A),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          DataCell(Text(p.note ?? '—')),
-                                        ]);
+                                            DataCell(Text(p.note ?? '—')),
+                                          ],
+                                        );
                                       }).toList(),
                                     ),
                                   ),
@@ -463,9 +576,17 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                           width: double.infinity,
                           child: OutlinedButton.icon(
                             onPressed: _editCustomer,
-                            icon: const Icon(Icons.edit_outlined, color: Color(0xFFF2A93B)),
-                            label: Text(l10n.editCustomer, style: const TextStyle(color: Color(0xFFF2A93B))),
-                            style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFF2A93B))),
+                            icon: const Icon(
+                              Icons.edit_outlined,
+                              color: Color(0xFFF2A93B),
+                            ),
+                            label: Text(
+                              l10n.editCustomer,
+                              style: const TextStyle(color: Color(0xFFF2A93B)),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFFF2A93B)),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -474,15 +595,39 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                           child: customer.isArchived
                               ? OutlinedButton.icon(
                                   onPressed: _restoreCustomer,
-                                  icon: const Icon(Icons.restore, color: Color(0xFF16A34A)),
-                                  label: Text(l10n.restoreAction, style: const TextStyle(color: Color(0xFF16A34A))),
-                                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFF16A34A))),
+                                  icon: const Icon(
+                                    Icons.restore,
+                                    color: Color(0xFF16A34A),
+                                  ),
+                                  label: Text(
+                                    l10n.restoreAction,
+                                    style: const TextStyle(
+                                      color: Color(0xFF16A34A),
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                      color: Color(0xFF16A34A),
+                                    ),
+                                  ),
                                 )
                               : OutlinedButton.icon(
                                   onPressed: _archiveCustomer,
-                                  icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
-                                  label: Text(l10n.delete, style: TextStyle(color: theme.colorScheme.error)),
-                                  style: OutlinedButton.styleFrom(side: BorderSide(color: theme.colorScheme.error)),
+                                  icon: Icon(
+                                    Icons.delete_outline,
+                                    color: theme.colorScheme.error,
+                                  ),
+                                  label: Text(
+                                    l10n.delete,
+                                    style: TextStyle(
+                                      color: theme.colorScheme.error,
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(
+                                      color: theme.colorScheme.error,
+                                    ),
+                                  ),
                                 ),
                         ),
                       ],
@@ -491,7 +636,9 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 );
 
                 if (narrow) {
-                  return Column(children: [left, const SizedBox(height: 20), right]);
+                  return Column(
+                    children: [left, const SizedBox(height: 20), right],
+                  );
                 }
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -525,13 +672,17 @@ class _InfoField extends StatelessWidget {
           Text(
             label.toUpperCase(),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
       ),

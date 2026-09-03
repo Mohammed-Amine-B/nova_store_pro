@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 import '../database/database.dart';
 import '../../utils/rounding.dart';
 import 'report_repository.dart';
+import 'customer_repository.dart';
+import 'supplier_repository.dart';
 
 class ReorderSuggestion {
   final int productId;
@@ -183,5 +185,73 @@ class InsightsRepository {
     if (markups.isEmpty) return null;
     final avgMarkup = markups.reduce((a, b) => a + b) / markups.length;
     return roundMoney(buyPrice * (1 + avgMarkup));
+  }
+
+  /// Customers who owe money but haven't shown any activity — a payment, or
+  /// a customer-sale purchase that itself left a balance — in over 30 days.
+  /// "Last activity" falls back to the customer's createdAt if they have
+  /// neither. Sorted oldest-activity-first (most overdue first).
+  Future<List<({Customer customer, double balance, DateTime lastActivity})>>
+      getOldDebtCustomers() async {
+    final customerRepo = CustomerRepository(db);
+    final customers = await customerRepo.getAllActive();
+    final cutoff = DateTime.now().subtract(const Duration(days: 30));
+
+    final results = <({Customer customer, double balance, DateTime lastActivity})>[];
+    for (final customer in customers) {
+      final balance = await customerRepo.getRemainingBalance(customer.id);
+      if (balance <= 0) continue;
+
+      final sales = await customerRepo.getSalesForCustomer(customer.id);
+      DateTime? lastSaleWithBalance;
+      for (final s in sales) {
+        if (s.source != 'customer_sale') continue;
+        if (s.totalAmount - s.amountPaid <= 0) continue;
+        if (lastSaleWithBalance == null || s.date.isAfter(lastSaleWithBalance)) {
+          lastSaleWithBalance = s.date;
+        }
+      }
+
+      final payments = await customerRepo.getPaymentsForCustomer(customer.id);
+      DateTime? lastPayment;
+      for (final p in payments) {
+        if (lastPayment == null || p.paymentDate.isAfter(lastPayment)) {
+          lastPayment = p.paymentDate;
+        }
+      }
+
+      DateTime lastActivity;
+      if (lastSaleWithBalance != null && lastPayment != null) {
+        lastActivity =
+            lastSaleWithBalance.isAfter(lastPayment) ? lastSaleWithBalance : lastPayment;
+      } else {
+        lastActivity = lastSaleWithBalance ?? lastPayment ?? customer.createdAt;
+      }
+
+      if (lastActivity.isBefore(cutoff)) {
+        results.add((customer: customer, balance: roundMoney(balance), lastActivity: lastActivity));
+      }
+    }
+
+    results.sort((a, b) => a.lastActivity.compareTo(b.lastActivity));
+    return results;
+  }
+
+  /// Suppliers with an outstanding balance, biggest-owed first — who to
+  /// prioritize paying.
+  Future<List<({Supplier supplier, double owed})>> getSupplierPriorityPayments() async {
+    final supplierRepo = SupplierRepository(db);
+    final suppliers = await supplierRepo.getAllActive();
+
+    final results = <({Supplier supplier, double owed})>[];
+    for (final supplier in suppliers) {
+      final owed = await supplierRepo.getRemainingOwed(supplier.id);
+      if (owed > 0) {
+        results.add((supplier: supplier, owed: roundMoney(owed)));
+      }
+    }
+
+    results.sort((a, b) => b.owed.compareTo(a.owed));
+    return results;
   }
 }

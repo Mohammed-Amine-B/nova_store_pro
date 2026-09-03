@@ -8,6 +8,7 @@ import '../../widgets/panel.dart';
 import '../../widgets/return_dialog.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/product_thumbnail.dart';
+import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
 
 class _CartLine {
@@ -321,7 +322,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                         leading: ProductThumbnail(imagePath: p.imagePath, size: 36),
                         title: Text(productDisplayName(p)),
                         subtitle: Text(p.barcode ?? p.code),
-                        trailing: Text(
+                        trailing: MoneyText(
                           p.sellingPrice != null ? formatMoney(p.sellingPrice!) : '—',
                           style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF0E7C7B)),
                         ),
@@ -369,7 +370,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                                           child: Text(productDisplayName(p), maxLines: 1, overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(fontWeight: FontWeight.w600)),
                                         ),
-                                        Text(
+                                        MoneyText(
                                           p.sellingPrice != null ? formatMoney(p.sellingPrice!) : '—',
                                           style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF0E7C7B)),
                                         ),
@@ -423,10 +424,20 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                           ],
                           rows: _lines.map((line) {
                             return DataRow(cells: [
-                              DataCell(Text(productDisplayName(line.product))),
+                              DataCell(Tooltip(
+                                message: productDisplayName(line.product),
+                                child: SizedBox(
+                                  width: 200,
+                                  child: Text(
+                                    productDisplayName(line.product),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              )),
                               DataCell(Text(formatQuantity(line.quantity, line.product.unitType))),
-                              DataCell(Text(formatMoney(line.unitPrice))),
-                              DataCell(Text(formatMoney(line.lineTotal), style: const TextStyle(fontWeight: FontWeight.w700))),
+                              DataCell(MoneyText(formatMoney(line.unitPrice))),
+                              DataCell(MoneyText(formatMoney(line.lineTotal), style: const TextStyle(fontWeight: FontWeight.w700))),
                               DataCell(Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -466,7 +477,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
               children: [
                 _SummaryRow(l10n.colItems, l10n.itemsUnitsCount(formatQuantity(_totalItems, 'unit'))),
                 const SizedBox(height: 10),
-                _SummaryRow(l10n.subtotalRow, formatMoney(_total)),
+                _SummaryRow(l10n.subtotalRow, formatMoney(_total), isMoney: true),
                 if (!widget.isEditMode) ...[
                   const SizedBox(height: 10),
                   _SummaryRow(l10n.previousBalanceRow, formatBalance(_previousBalance).$1),
@@ -478,7 +489,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(widget.isEditMode ? l10n.totalLabel : l10n.totalDueRow, style: theme.textTheme.bodyMedium),
-                    Text(
+                    MoneyText(
                       formatMoney(widget.isEditMode ? _total : _total + _previousBalance),
                       style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF0E7C7B)),
                     ),
@@ -497,11 +508,12 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SummaryRow(l10n.colPaid, formatMoney(_existingSale?.amountPaid ?? 0)),
+                      _SummaryRow(l10n.colPaid, formatMoney(_existingSale?.amountPaid ?? 0), isMoney: true),
                       const SizedBox(height: 10),
                       _SummaryRow(
                         l10n.colRemaining,
                         formatMoney((_existingSale?.totalAmount ?? 0) - (_existingSale?.amountPaid ?? 0)),
+                        isMoney: true,
                       ),
                       const SizedBox(height: 12),
                       Text(
@@ -632,16 +644,18 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
 class _SummaryRow extends StatelessWidget {
   final String label;
   final String value;
-  const _SummaryRow(this.label, this.value);
+  final bool isMoney;
+  const _SummaryRow(this.label, this.value, {this.isMoney = false});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final valueStyle = theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
-        Text(value, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+        isMoney ? MoneyText(value, style: valueStyle) : Text(value, style: valueStyle),
       ],
     );
   }

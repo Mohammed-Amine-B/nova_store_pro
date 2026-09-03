@@ -54,7 +54,8 @@ class _ReturnDialogState extends State<ReturnDialog> {
     final lines = <ReturnLineInput>[];
     for (final item in _items) {
       final qty = double.tryParse(_qtyControllers[item.id]!.text) ?? 0;
-      if (qty > 0) lines.add(ReturnLineInput(saleItemId: item.id, quantity: qty));
+      if (qty > 0)
+        lines.add(ReturnLineInput(saleItemId: item.id, quantity: qty));
     }
     if (lines.isEmpty) {
       setState(() => _error = l10n.enterQtyAtLeastOne);
@@ -89,64 +90,116 @@ class _ReturnDialogState extends State<ReturnDialog> {
       content: SizedBox(
         width: 400,
         child: _loading
-            ? const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()))
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ..._items.map((item) {
-                    final product = _products[item.productId];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(l10n.returnLineDesc(product != null ? productDisplayName(product) : l10n.unknownProductLabel, '${item.quantity}', item.unitPrice.toStringAsFixed(2))),
-                          ),
-                          SizedBox(
-                            width: 100,
-                            child: TextField(
-                              controller: _qtyControllers[item.id],
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              decoration: InputDecoration(labelText: l10n.returnQtyLabel, isDense: true),
+            ? const SizedBox(
+                height: 100,
+                child: Center(child: CircularProgressIndicator()),
+              )
+            : SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ..._items.map((item) {
+                      final product = _products[item.productId];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l10n.returnLineDesc(
+                                  product != null
+                                      ? productDisplayName(product)
+                                      : l10n.unknownProductLabel,
+                                  '${item.quantity}',
+                                  item.unitPrice.toStringAsFixed(2),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                            SizedBox(
+                              width: 100,
+                              child: TextField(
+                                controller: _qtyControllers[item.id],
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
+                                decoration: InputDecoration(
+                                  labelText: l10n.returnQtyLabel,
+                                  isDense: true,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      initialValue: _reason,
+                      decoration: InputDecoration(
+                        labelText: l10n.reasonLabel,
+                        border: const OutlineInputBorder(),
                       ),
-                    );
-                  }),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: _reason,
-                    decoration: InputDecoration(labelText: l10n.reasonLabel, border: const OutlineInputBorder()),
-                    items: [
-                      DropdownMenuItem(value: 'damaged', child: Text(l10n.reasonDamaged)),
-                      DropdownMenuItem(value: 'wrong_item', child: Text(l10n.reasonWrongItem)),
-                      DropdownMenuItem(value: 'changed_mind', child: Text(l10n.reasonChangedMind)),
-                      DropdownMenuItem(value: 'other', child: Text(l10n.reasonOther)),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'damaged',
+                          child: Text(l10n.reasonDamaged),
+                        ),
+                        DropdownMenuItem(
+                          value: 'wrong_item',
+                          child: Text(l10n.reasonWrongItem),
+                        ),
+                        DropdownMenuItem(
+                          value: 'changed_mind',
+                          child: Text(l10n.reasonChangedMind),
+                        ),
+                        DropdownMenuItem(
+                          value: 'other',
+                          child: Text(l10n.reasonOther),
+                        ),
+                      ],
+                      onChanged: (v) => setState(() => _reason = v!),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _noteController,
+                      decoration: InputDecoration(
+                        labelText: l10n.noteOptionalLabel,
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        _error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
                     ],
-                    onChanged: (v) => setState(() => _reason = v!),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _noteController,
-                    decoration: InputDecoration(labelText: l10n.noteOptionalLabel, border: const OutlineInputBorder()),
-                  ),
-                  if (_error != null) ...[
-                    const SizedBox(height: 8),
-                    Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                   ],
-                ],
+                ),
               ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-        FilledButton(onPressed: _submitting ? null : _submit, child: Text(l10n.confirmReturnAction)),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: _submitting ? null : _submit,
+          child: Text(l10n.confirmReturnAction),
+        ),
       ],
     );
   }
 }
 
-Future<void> showReturnDialog(BuildContext context, AppDatabase db, int saleId) async {
+Future<void> showReturnDialog(
+  BuildContext context,
+  AppDatabase db,
+  int saleId,
+) async {
   final l10n = AppLocalizations.of(context)!;
   final result = await showDialog<ReturnResult>(
     context: context,
@@ -156,6 +209,8 @@ Future<void> showReturnDialog(BuildContext context, AppDatabase db, int saleId) 
     final message = result.cashRefund > 0
         ? l10n.returnRecordedCashMsg(result.cashRefund.toStringAsFixed(2))
         : l10n.returnRecordedDebtMsg(result.totalRefunded.toStringAsFixed(2));
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }

@@ -18,13 +18,16 @@ class AppScaffold extends StatefulWidget {
   });
 
   @override
-  State<AppScaffold> createState() => _AppScaffoldState();
+  State<AppScaffold> createState() => AppScaffoldState();
 }
 
-class _AppScaffoldState extends State<AppScaffold> {
+class AppScaffoldState extends State<AppScaffold> {
   int _selectedIndex = 0;
 
-  void _openNewSale() {
+  /// Switches to the Today Sales tab and focuses its search field — same
+  /// action as the Ctrl+N shortcut. Public so other pages (e.g. a Dashboard
+  /// "New Sale" quick action) can trigger it via a `GlobalKey<AppScaffoldState>`.
+  void openNewSale() {
     final tabIndex = widget.newSaleTabIndex;
     final focusNode = widget.newSaleSearchFocusNode;
     if (tabIndex == null || focusNode == null) return;
@@ -38,12 +41,20 @@ class _AppScaffoldState extends State<AppScaffold> {
     });
   }
 
+  /// Switches to an arbitrary tab by its index in [AppScaffold.pages] — for
+  /// quick-action shortcuts elsewhere that need to jump to a specific page
+  /// (e.g. Reports) without going through the sidebar.
+  void switchToTab(int index) {
+    if (index == _selectedIndex) return;
+    setState(() => _selectedIndex = index);
+  }
+
   @override
   Widget build(BuildContext context) {
     return CallbackShortcuts(
       bindings: {
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyN):
-            _openNewSale,
+            openNewSale,
       },
       child: Focus(
         autofocus: true,

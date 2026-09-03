@@ -172,6 +172,24 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get close;
 
+  /// No description provided for @exitConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit Nova Pro'**
+  String get exitConfirmTitle;
+
+  /// No description provided for @exitConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to exit Nova Pro?'**
+  String get exitConfirmMessage;
+
+  /// No description provided for @exitConfirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get exitConfirmButton;
+
   /// No description provided for @dashboardTitle.
   ///
   /// In en, this message translates to:
@@ -357,6 +375,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current Stock'**
   String get colCurrentStock;
+
+  /// No description provided for @productDetailsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Product Details'**
+  String get productDetailsAction;
 
   /// No description provided for @colStatus.
   ///
@@ -634,6 +658,126 @@ abstract class AppLocalizations {
   /// **'No movements recorded.'**
   String get noMovementsRecorded;
 
+  /// No description provided for @colProductId.
+  ///
+  /// In en, this message translates to:
+  /// **'Product ID'**
+  String get colProductId;
+
+  /// No description provided for @sizeVariantLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Size / Variant'**
+  String get sizeVariantLabel;
+
+  /// No description provided for @profitMarginLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Profit Margin'**
+  String get profitMarginLabel;
+
+  /// No description provided for @stockStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock Status'**
+  String get stockStatusLabel;
+
+  /// No description provided for @bestSupplierPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Supplier'**
+  String get bestSupplierPanel;
+
+  /// No description provided for @avgPriceAcrossPurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'avg. price across {count} purchases'**
+  String avgPriceAcrossPurchases(int count);
+
+  /// No description provided for @alsoBoughtFromNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Also bought from: {list}'**
+  String alsoBoughtFromNote(String list);
+
+  /// No description provided for @viewAllAction.
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAllAction;
+
+  /// No description provided for @perUnitNote.
+  ///
+  /// In en, this message translates to:
+  /// **'per unit'**
+  String get perUnitNote;
+
+  /// No description provided for @latestBatchAverageNote.
+  ///
+  /// In en, this message translates to:
+  /// **'latest batch average'**
+  String get latestBatchAverageNote;
+
+  /// No description provided for @colTotalValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Value'**
+  String get colTotalValue;
+
+  /// No description provided for @printBarcodeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Print Barcode'**
+  String get printBarcodeAction;
+
+  /// No description provided for @barcodePrintComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode printing is coming soon.'**
+  String get barcodePrintComingSoon;
+
+  /// No description provided for @stockValueFormulaNote.
+  ///
+  /// In en, this message translates to:
+  /// **'{qty} × {cost} cost'**
+  String stockValueFormulaNote(String qty, String cost);
+
+  /// No description provided for @aboveMinimumNote.
+  ///
+  /// In en, this message translates to:
+  /// **'{qty} above minimum'**
+  String aboveMinimumNote(String qty);
+
+  /// No description provided for @belowMinimumNote.
+  ///
+  /// In en, this message translates to:
+  /// **'{qty} below minimum'**
+  String belowMinimumNote(String qty);
+
+  /// No description provided for @atMinimumNote.
+  ///
+  /// In en, this message translates to:
+  /// **'At minimum threshold'**
+  String get atMinimumNote;
+
+  /// No description provided for @percentOfSellingPriceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% of selling price'**
+  String percentOfSellingPriceNote(String percent);
+
+  /// No description provided for @weeksSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'weeks'**
+  String get weeksSuffix;
+
+  /// No description provided for @stockWillLastNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock will last about {weeks} based on recent sales'**
+  String stockWillLastNote(String weeks);
+
   /// No description provided for @categoriesTitle.
   ///
   /// In en, this message translates to:
@@ -718,6 +862,12 @@ abstract class AppLocalizations {
   /// **'Sales Today'**
   String get salesTodayPanel;
 
+  /// No description provided for @colTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get colTime;
+
   /// No description provided for @colProduct.
   ///
   /// In en, this message translates to:
@@ -759,6 +909,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sold Items'**
   String get statSoldItems;
+
+  /// No description provided for @statTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get statTransactions;
 
   /// No description provided for @fifoHint.
   ///
@@ -1846,6 +2002,12 @@ abstract class AppLocalizations {
   /// **'Reports'**
   String get reportsTitle;
 
+  /// No description provided for @viewReportsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'View Reports'**
+  String get viewReportsAction;
+
   /// No description provided for @reportsSubtitle.
   ///
   /// In en, this message translates to:
@@ -2062,6 +2224,12 @@ abstract class AppLocalizations {
   /// **'{count}h ago'**
   String hoursAgo(int count);
 
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days ago'**
+  String daysAgo(int count);
+
   /// No description provided for @passwordLabel.
   ///
   /// In en, this message translates to:
@@ -2193,6 +2361,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete Permanently'**
   String get deletePermanentlyAction;
+
+  /// No description provided for @forceDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Force Delete'**
+  String get forceDeleteAction;
+
+  /// No description provided for @forceDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Force delete product?'**
+  String get forceDeleteTitle;
+
+  /// No description provided for @forceDeleteWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete \"{name}\" AND all its sales, purchases, and stock history. This cannot be undone.'**
+  String forceDeleteWarning(String name);
+
+  /// No description provided for @forceDeleteTypeToConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Type \"{name}\" to confirm'**
+  String forceDeleteTypeToConfirm(String name);
+
+  /// No description provided for @forceDeleteSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" and all its history were permanently deleted.'**
+  String forceDeleteSuccessMessage(String name);
 
   /// No description provided for @securityPanel.
   ///
@@ -2584,12 +2782,6 @@ abstract class AppLocalizations {
   /// **'Recent Activity'**
   String get recentActivityPanel;
 
-  /// No description provided for @viewAllAction.
-  ///
-  /// In en, this message translates to:
-  /// **'View All'**
-  String get viewAllAction;
-
   /// No description provided for @noRecentActivity.
   ///
   /// In en, this message translates to:
@@ -2865,6 +3057,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No slow-moving stock right now.'**
   String get noStagnantProducts;
+
+  /// No description provided for @oldDebtCustomersPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Customers with Old Debt'**
+  String get oldDebtCustomersPanel;
+
+  /// No description provided for @oldDebtCustomersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Balances with no payment or purchase activity in over 30 days'**
+  String get oldDebtCustomersDesc;
+
+  /// No description provided for @noOldDebtCustomers.
+  ///
+  /// In en, this message translates to:
+  /// **'No overdue customer debt right now.'**
+  String get noOldDebtCustomers;
+
+  /// No description provided for @lastActivityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Activity'**
+  String get lastActivityLabel;
+
+  /// No description provided for @supplierPriorityPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Suppliers to Pay First'**
+  String get supplierPriorityPanel;
+
+  /// No description provided for @supplierPriorityDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Suppliers you owe the most, ordered by amount owed'**
+  String get supplierPriorityDesc;
+
+  /// No description provided for @noSupplierPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t owe any suppliers right now.'**
+  String get noSupplierPriority;
 
   /// No description provided for @reorderNoticeMessage.
   ///

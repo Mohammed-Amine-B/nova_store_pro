@@ -7,6 +7,7 @@ import '../../widgets/panel.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
 import '../../utils/text_scale.dart';
 import 'supplier_form_dialog.dart';
@@ -40,7 +41,9 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
   }
 
   Future<void> _load() async {
-    final all = _showingArchived ? await _repo.getArchived() : await _repo.getAllActive();
+    final all = _showingArchived
+        ? await _repo.getArchived()
+        : await _repo.getAllActive();
     final totals = <int, double>{};
     final owed = <int, double>{};
     for (final s in all) {
@@ -90,7 +93,8 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
   Future<void> _openDetail(Supplier supplier) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SupplierDetailScreen(db: widget.db, supplierId: supplier.id),
+        builder: (context) =>
+            SupplierDetailScreen(db: widget.db, supplierId: supplier.id),
       ),
     );
     _load();
@@ -106,7 +110,10 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
     final saved = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          appBar: AppBar(title: Text(l10n.newPurchaseAction), leading: const BackButton()),
+          appBar: AppBar(
+            title: Text(l10n.newPurchaseAction),
+            leading: const BackButton(),
+          ),
           body: Padding(
             padding: const EdgeInsets.all(24),
             child: NewPurchaseScreen(db: widget.db, supplierId: supplierId),
@@ -136,8 +143,15 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
               children: [
                 OutlinedButton.icon(
                   onPressed: _toggleArchivedView,
-                  icon: Icon(_showingArchived ? Icons.local_shipping_outlined : Icons.archive_outlined, size: 18),
-                  label: Text(_showingArchived ? l10n.viewActive : l10n.viewArchived),
+                  icon: Icon(
+                    _showingArchived
+                        ? Icons.local_shipping_outlined
+                        : Icons.archive_outlined,
+                    size: 18,
+                  ),
+                  label: Text(
+                    _showingArchived ? l10n.viewActive : l10n.viewArchived,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 OutlinedButton.icon(
@@ -154,27 +168,35 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
               ],
             ),
           ),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 2.6,
-            children: [
-              StatCard(
-                label: l10n.statTotalSuppliers,
-                value: '${_all.length}',
-                icon: Icons.local_shipping_outlined,
-                accentColor: const Color(0xFF0E7C7B),
-              ),
-              StatCard(
-                label: l10n.statTotalPurchased,
-                value: formatMoney(totalPurchased),
-                icon: Icons.account_balance_wallet_outlined,
-                accentColor: const Color(0xFF16A34A),
-              ),
-            ],
+          Builder(
+            builder: (context) {
+              final stats = [
+                StatCard(
+                  label: l10n.statTotalSuppliers,
+                  value: '${_all.length}',
+                  icon: Icons.local_shipping_outlined,
+                  accentColor: const Color(0xFF0E7C7B),
+                ),
+                StatCard(
+                  label: l10n.statTotalPurchased,
+                  value: formatMoney(totalPurchased),
+                  icon: Icons.account_balance_wallet_outlined,
+                  accentColor: const Color(0xFF16A34A),
+                ),
+              ];
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  mainAxisExtent: 128,
+                ),
+                itemCount: stats.length,
+                itemBuilder: (context, i) => stats[i],
+              );
+            },
           ),
           const SizedBox(height: 24),
           Panel(
@@ -194,21 +216,32 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
               ),
             ),
             child: rows.isEmpty
-                ? EmptyState(icon: Icons.local_shipping_outlined, title: l10n.noSuppliersMatch)
+                ? EmptyState(
+                    icon: Icons.local_shipping_outlined,
+                    title: l10n.noSuppliersMatch,
+                  )
                 : LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: ConstrainedBox(
-                          constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                          constraints: BoxConstraints(
+                            minWidth: constraints.maxWidth,
+                          ),
                           child: DataTable(
                             showCheckboxColumn: false,
                             headingRowColor: WidgetStateProperty.all(
-                              Theme.of(context).colorScheme.primary.withValues(alpha: 0.06),
+                              Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.06),
                             ),
-                            dataRowColor: WidgetStateProperty.resolveWith((states) {
+                            dataRowColor: WidgetStateProperty.resolveWith((
+                              states,
+                            ) {
                               if (states.contains(WidgetState.hovered)) {
-                                return Theme.of(context).colorScheme.primary.withValues(alpha: 0.04);
+                                return Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.04);
                               }
                               return null;
                             }),
@@ -220,10 +253,17 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                               DataColumn(label: Text(l10n.colName)),
                               DataColumn(label: Text(l10n.colLocation)),
                               DataColumn(label: Text(l10n.colPhone)),
-                              DataColumn(label: Text(l10n.statTotalPurchased), numeric: true),
-                              DataColumn(label: Text(l10n.colOwed), numeric: true),
+                              DataColumn(
+                                label: Text(l10n.statTotalPurchased),
+                                numeric: true,
+                              ),
+                              DataColumn(
+                                label: Text(l10n.colOwed),
+                                numeric: true,
+                              ),
                               DataColumn(label: Text(l10n.colStatus)),
-                              if (_showingArchived) DataColumn(label: Text(l10n.restoreAction)),
+                              if (_showingArchived)
+                                DataColumn(label: Text(l10n.restoreAction)),
                             ],
                             rows: rows.map((s) {
                               return DataRow(
@@ -235,9 +275,13 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                       children: [
                                         CircleAvatar(
                                           radius: 15,
-                                          backgroundColor: const Color(0xFF0E7C7B).withValues(alpha: 0.15),
+                                          backgroundColor: const Color(
+                                            0xFF0E7C7B,
+                                          ).withValues(alpha: 0.15),
                                           child: Text(
-                                            s.name.isNotEmpty ? s.name[0].toUpperCase() : '?',
+                                            s.name.isNotEmpty
+                                                ? s.name[0].toUpperCase()
+                                                : '?',
                                             style: const TextStyle(
                                               color: Color(0xFF0E7C7B),
                                               fontWeight: FontWeight.w700,
@@ -246,11 +290,21 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                           ),
                                         ),
                                         const SizedBox(width: 10),
-                                        Text(
-                                          s.name,
-                                          style: TextStyle(
-                                            color: Theme.of(context).colorScheme.primary,
-                                            fontWeight: FontWeight.w600,
+                                        Tooltip(
+                                          message: s.name,
+                                          child: SizedBox(
+                                            width: 200,
+                                            child: Text(
+                                              s.name,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -259,7 +313,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                   DataCell(Text(s.location ?? '—')),
                                   DataCell(Text(s.phone ?? '—')),
                                   DataCell(
-                                    Text(
+                                    MoneyText(
                                       formatMoney(_totals[s.id] ?? 0),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w700,
@@ -280,14 +334,23 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                   ),
                                   DataCell(
                                     _showingArchived
-                                        ? StatusBadge(label: l10n.statusArchived, tone: BadgeTone.neutral)
-                                        : StatusBadge(label: l10n.statusActive, tone: BadgeTone.success),
+                                        ? StatusBadge(
+                                            label: l10n.statusArchived,
+                                            tone: BadgeTone.neutral,
+                                          )
+                                        : StatusBadge(
+                                            label: l10n.statusActive,
+                                            tone: BadgeTone.success,
+                                          ),
                                   ),
                                   if (_showingArchived)
                                     DataCell(
                                       TextButton.icon(
                                         onPressed: () => _restoreSupplier(s),
-                                        icon: const Icon(Icons.restore, size: 16),
+                                        icon: const Icon(
+                                          Icons.restore,
+                                          size: 16,
+                                        ),
                                         label: Text(l10n.restoreAction),
                                       ),
                                     ),

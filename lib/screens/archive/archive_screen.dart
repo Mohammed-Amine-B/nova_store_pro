@@ -7,6 +7,7 @@ import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/status_badge.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
 import 'sales_day_detail_screen.dart';
 import '../reports/invoice_view_screen.dart';
@@ -123,8 +124,8 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                                       onSelectChanged: (_) => _openDay(d.date),
                                       cells: [
                                         DataCell(Text(_formatDate(d.date))),
-                                        DataCell(Text(formatMoney(d.revenue))),
-                                        DataCell(Text(formatMoney(d.profit), style: const TextStyle(color: Colors.green))),
+                                        DataCell(MoneyText(formatMoney(d.revenue))),
+                                        DataCell(MoneyText(formatMoney(d.profit), style: const TextStyle(color: Colors.green))),
                                         DataCell(Text('${d.count}')),
                                         DataCell(TextButton.icon(
                                           onPressed: () => _openDay(d.date),
@@ -186,10 +187,20 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                                       onSelectChanged: (_) => _openInvoice(s.id),
                                       cells: [
                                         DataCell(Text(_formatDate(s.date))),
-                                        DataCell(Text(entry.customerName)),
-                                        DataCell(Text(formatMoney(s.totalAmount))),
-                                        DataCell(Text(formatMoney(s.amountPaid))),
-                                        DataCell(Text(
+                                        DataCell(Tooltip(
+                                          message: entry.customerName,
+                                          child: SizedBox(
+                                            width: 200,
+                                            child: Text(
+                                              entry.customerName,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                          ),
+                                        )),
+                                        DataCell(MoneyText(formatMoney(s.totalAmount))),
+                                        DataCell(MoneyText(formatMoney(s.amountPaid))),
+                                        DataCell(MoneyText(
                                           formatMoney(remaining),
                                           style: TextStyle(
                                             color: remaining > 0 ? const Color(0xFFE4572E) : const Color(0xFF16A34A),
@@ -262,10 +273,20 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                                       onSelectChanged: (_) => _openReceipt(p.id),
                                       cells: [
                                         DataCell(Text(_formatDate(p.purchaseDate))),
-                                        DataCell(Text(entry.supplierName)),
-                                        DataCell(Text(formatMoney(p.totalAmount))),
-                                        DataCell(Text(formatMoney(p.amountPaid))),
-                                        DataCell(Text(
+                                        DataCell(Tooltip(
+                                          message: entry.supplierName,
+                                          child: SizedBox(
+                                            width: 200,
+                                            child: Text(
+                                              entry.supplierName,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                          ),
+                                        )),
+                                        DataCell(MoneyText(formatMoney(p.totalAmount))),
+                                        DataCell(MoneyText(formatMoney(p.amountPaid))),
+                                        DataCell(MoneyText(
                                           formatMoney(remaining),
                                           style: TextStyle(
                                             color: remaining > 0 ? const Color(0xFFE4572E) : const Color(0xFF16A34A),

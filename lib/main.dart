@@ -1,8 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:nova_pro/l10n/generated/app_localizations.dart';
+import 'package:window_manager/window_manager.dart';
 import 'theme/app_theme.dart';
 import 'widgets/app_scaffold.dart';
+import 'widgets/confirm_dialog.dart';
 import 'data/database/database.dart';
 import 'data/repositories/settings_repository.dart';
 import 'screens/dashboard/dashboard_screen.dart';
@@ -19,7 +22,31 @@ import 'screens/reports/reports_screen.dart';
 import 'screens/insights/insights_screen.dart';
 import 'screens/activity_log/activity_log_screen.dart';
 
-void main() {
+const _singleInstancePort = 48291; // arbitrary fixed local port, unlikely to collide with anything else
+// ignore: unused_element
+ServerSocket? _singleInstanceServer;
+
+Future<bool> _acquireSingleInstanceLock() async {
+  try {
+    // Kept alive for the app's lifetime in the top-level variable so the port stays held.
+    _singleInstanceServer = await ServerSocket.bind(
+      InternetAddress.loopbackIPv4,
+      _singleInstancePort,
+    );
+    return true;
+  } catch (_) {
+    return false; // port already bound = another instance is already running
+  }
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final acquired = await _acquireSingleInstanceLock();
+  if (!acquired) {
+    exit(0); // another instance is already running — quit immediately, don't open a second window
+  }
+  await windowManager.ensureInitialized();
+  await windowManager.setPreventClose(true);
   runApp(NovaStoreApp(db: AppDatabase()));
 }
 
@@ -31,7 +58,7 @@ class NovaStoreApp extends StatefulWidget {
   State<NovaStoreApp> createState() => _NovaStoreAppState();
 }
 
-class _NovaStoreAppState extends State<NovaStoreApp> {
+class _NovaStoreAppState extends State<NovaStoreApp> with WindowListener {
   late final SettingsRepository _settingsRepo = SettingsRepository(widget.db);
   ThemeMode _themeMode = ThemeMode.system;
   Locale _locale = const Locale('en');
@@ -40,17 +67,40 @@ class _NovaStoreAppState extends State<NovaStoreApp> {
   bool _loading = true;
   bool _unlocked = false;
   final _todaySalesSearchFocusNode = FocusNode();
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  final _appScaffoldKey = GlobalKey<AppScaffoldState>();
 
   @override
   void initState() {
     super.initState();
+    windowManager.addListener(this);
     _loadSettings();
   }
 
   @override
   void dispose() {
+    windowManager.removeListener(this);
     _todaySalesSearchFocusNode.dispose();
     super.dispose();
+  }
+
+  @override
+  void onWindowClose() async {
+    final context = _navigatorKey.currentContext;
+    if (context == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final shouldExit = await ConfirmDialog.show(
+      context,
+      title: l10n.exitConfirmTitle,
+      message: l10n.exitConfirmMessage,
+      confirmLabel: l10n.exitConfirmButton,
+      tone: ConfirmTone.destructive,
+      icon: Icons.logout,
+    );
+    if (shouldExit) {
+      await widget.db.close();
+      await windowManager.destroy();
+    }
   }
 
   Future<void> _loadSettings() async {
@@ -99,6 +149,7 @@ class _NovaStoreAppState extends State<NovaStoreApp> {
     final isArabic = _locale.languageCode == 'ar';
     final fontWeight = isArabic ? FontWeight.w400 : FontWeight.w700;
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       theme: AppTheme.light.copyWith(
         textTheme: _withScale(
           _withWeight(AppTheme.light.textTheme, fontWeight),
@@ -122,11 +173,17 @@ class _NovaStoreAppState extends State<NovaStoreApp> {
       supportedLocales: const [Locale('en'), Locale('ar'), Locale('fr')],
       home: _unlocked
           ? AppScaffold(
+              key: _appScaffoldKey,
               shopName: _shopName,
               newSaleTabIndex: 5, // TodaySalesScreen's index in `pages` below
               newSaleSearchFocusNode: _todaySalesSearchFocusNode,
               pages: [
-                DashboardScreen(db: widget.db),
+                DashboardScreen(
+                  db: widget.db,
+                  onNewSale: () => _appScaffoldKey.currentState?.openNewSale(),
+                  onViewReports: () =>
+                      _appScaffoldKey.currentState?.switchToTab(8), // ReportsScreen's index in `pages` below
+                ),
                 ProductsScreen(db: widget.db),
                 SuppliersScreen(db: widget.db),
                 CustomersScreen(db: widget.db),
@@ -160,9 +217,9 @@ class _NovaStoreAppState extends State<NovaStoreApp> {
 }
 
 double _scaleForFontSize(String size) => switch (size) {
-  'small' => 1,
-  'large' => 1.4,
-  _ => 1.2, // medium = current baseline, unchanged
+  'small' => 0.8,
+  'large' => 1,
+  _ => 0.9, // medium = current baseline, unchanged
 };
 
 TextTheme _withScale(TextTheme t, double scale) {

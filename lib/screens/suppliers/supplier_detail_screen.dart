@@ -6,6 +6,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
 import 'supplier_form_dialog.dart';
 import 'new_purchase_screen.dart';
@@ -44,7 +45,9 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
 
   Future<void> _load() async {
     final supplier = await _repo.getById(widget.supplierId);
-    final purchases = await _purchaseRepo.getPurchasesForSupplier(widget.supplierId);
+    final purchases = await _purchaseRepo.getPurchasesForSupplier(
+      widget.supplierId,
+    );
     final total = await _repo.totalPurchasedFrom(widget.supplierId);
     final owed = await _repo.getRemainingOwed(widget.supplierId);
     final payments = await _repo.getPaymentsForSupplier(widget.supplierId);
@@ -100,7 +103,10 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          appBar: AppBar(title: Text(l10n.newPurchaseAction), leading: const BackButton()),
+          appBar: AppBar(
+            title: Text(l10n.newPurchaseAction),
+            leading: const BackButton(),
+          ),
           body: Padding(
             padding: const EdgeInsets.all(24),
             child: NewPurchaseScreen(db: widget.db, supplierId: _supplier!.id),
@@ -116,7 +122,10 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          appBar: AppBar(title: Text(l10n.editPurchaseTooltip), leading: const BackButton()),
+          appBar: AppBar(
+            title: Text(l10n.editPurchaseTooltip),
+            leading: const BackButton(),
+          ),
           body: Padding(
             padding: const EdgeInsets.all(24),
             child: NewPurchaseScreen(db: widget.db, purchaseId: purchase.id),
@@ -142,51 +151,61 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
             title: Text(l10n.recordPaymentTitle),
             content: SizedBox(
               width: 320,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (error != null) ...[
-                    Text(error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                    const SizedBox(height: 8),
-                  ],
-                  TextField(
-                    controller: amountController,
-                    decoration: InputDecoration(
-                      labelText: l10n.amountLabel,
-                      border: const OutlineInputBorder(),
-                    ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  ),
-                  const SizedBox(height: 14),
-                  InkWell(
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: paymentDate,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime.now(),
-                      );
-                      if (picked != null) setDialogState(() => paymentDate = picked);
-                    },
-                    child: InputDecorator(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (error != null) ...[
+                      Text(
+                        error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    TextField(
+                      controller: amountController,
                       decoration: InputDecoration(
-                        labelText: l10n.paymentDateLabel,
+                        labelText: l10n.amountLabel,
                         border: const OutlineInputBorder(),
                       ),
-                      child: Text(
-                        '${paymentDate.year}-${paymentDate.month.toString().padLeft(2, '0')}-${paymentDate.day.toString().padLeft(2, '0')}',
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  TextField(
-                    controller: noteController,
-                    decoration: InputDecoration(
-                      labelText: l10n.noteOptionalLabel,
-                      border: const OutlineInputBorder(),
+                    const SizedBox(height: 14),
+                    InkWell(
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: paymentDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (picked != null)
+                          setDialogState(() => paymentDate = picked);
+                      },
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: l10n.paymentDateLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                        child: Text(
+                          '${paymentDate.year}-${paymentDate.month.toString().padLeft(2, '0')}-${paymentDate.day.toString().padLeft(2, '0')}',
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: noteController,
+                      decoration: InputDecoration(
+                        labelText: l10n.noteOptionalLabel,
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             actions: [
@@ -209,7 +228,9 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                     supplierId: _supplier!.id,
                     amount: amount,
                     paymentDate: paymentDate,
-                    note: noteController.text.isEmpty ? null : noteController.text,
+                    note: noteController.text.isEmpty
+                        ? null
+                        : noteController.text,
                   );
                   if (context.mounted) Navigator.pop(context, true);
                 },
@@ -281,17 +302,30 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                               spacing: 32,
                               runSpacing: 16,
                               children: [
-                                _InfoField(l10n.colLocation, supplier.location ?? '—'),
-                                _InfoField(l10n.colPhone, supplier.phone ?? '—'),
+                                _InfoField(
+                                  l10n.colLocation,
+                                  supplier.location ?? '—',
+                                ),
+                                _InfoField(
+                                  l10n.colPhone,
+                                  supplier.phone ?? '—',
+                                ),
                                 _InfoField(l10n.colNote, supplier.note ?? '—'),
-                                _InfoField(l10n.purchasesLabel, '${_purchases.length}'),
+                                _InfoField(
+                                  l10n.purchasesLabel,
+                                  '${_purchases.length}',
+                                ),
                               ],
                             ),
                             const SizedBox(height: 20),
                             Row(
                               children: [
                                 Expanded(
-                                  child: _HighlightBox(l10n.statTotalPurchased, formatMoney(_totalPurchased)),
+                                  child: _HighlightBox(
+                                    l10n.statTotalPurchased,
+                                    formatMoney(_totalPurchased),
+                                    isMoney: true,
+                                  ),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
@@ -314,32 +348,57 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                       title: l10n.purchaseHistoryPanel,
                       description: l10n.mostRecentFirst,
                       child: _purchases.isEmpty
-                          ? EmptyState(icon: Icons.shopping_cart_outlined, title: l10n.noPurchasesYet)
+                          ? EmptyState(
+                              icon: Icons.shopping_cart_outlined,
+                              title: l10n.noPurchasesYet,
+                            )
                           : LayoutBuilder(
                               builder: (context, constraints) {
                                 return SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                                    constraints: BoxConstraints(
+                                      minWidth: constraints.maxWidth,
+                                    ),
                                     child: DataTable(
                                       showCheckboxColumn: false,
                                       columns: [
                                         DataColumn(label: Text(l10n.colDate)),
-                                        DataColumn(label: Text(l10n.colItems), numeric: true),
-                                        DataColumn(label: Text(l10n.totalLabel), numeric: true),
-                                        DataColumn(label: Text(l10n.colPaid), numeric: true),
-                                        DataColumn(label: Text(l10n.colRemaining), numeric: true),
-                                        DataColumn(label: Text(l10n.colActions)),
+                                        DataColumn(
+                                          label: Text(l10n.colItems),
+                                          numeric: true,
+                                        ),
+                                        DataColumn(
+                                          label: Text(l10n.totalLabel),
+                                          numeric: true,
+                                        ),
+                                        DataColumn(
+                                          label: Text(l10n.colPaid),
+                                          numeric: true,
+                                        ),
+                                        DataColumn(
+                                          label: Text(l10n.colRemaining),
+                                          numeric: true,
+                                        ),
+                                        DataColumn(
+                                          label: Text(l10n.colActions),
+                                        ),
                                       ],
                                       rows: _purchases.map((p) {
-                                        final remaining = p.totalAmount - p.amountPaid;
+                                        final remaining =
+                                            p.totalAmount - p.amountPaid;
                                         return DataRow(
-                                          onSelectChanged: (_) => _editPurchase(p),
+                                          onSelectChanged: (_) =>
+                                              _editPurchase(p),
                                           cells: [
-                                            DataCell(Text(_formatDate(p.purchaseDate))),
-                                            DataCell(Text('${_itemCounts[p.id] ?? 0}')),
                                             DataCell(
-                                              Text(
+                                              Text(_formatDate(p.purchaseDate)),
+                                            ),
+                                            DataCell(
+                                              Text('${_itemCounts[p.id] ?? 0}'),
+                                            ),
+                                            DataCell(
+                                              MoneyText(
                                                 formatMoney(p.totalAmount),
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w700,
@@ -347,9 +406,11 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                                                 ),
                                               ),
                                             ),
-                                            DataCell(Text(formatMoney(p.amountPaid))),
                                             DataCell(
-                                              Text(
+                                              MoneyText(formatMoney(p.amountPaid)),
+                                            ),
+                                            DataCell(
+                                              MoneyText(
                                                 formatMoney(remaining),
                                                 style: TextStyle(
                                                   color: remaining > 0
@@ -364,22 +425,46 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   IconButton(
-                                                    icon: const Icon(Icons.receipt_long_outlined, size: 18),
-                                                    tooltip: l10n.viewAction,
-                                                    onPressed: () => Navigator.of(context).push(
-                                                      MaterialPageRoute(
-                                                        builder: (context) => PurchaseReceiptScreen(db: widget.db, purchaseId: p.id),
-                                                      ),
+                                                    icon: const Icon(
+                                                      Icons
+                                                          .receipt_long_outlined,
+                                                      size: 18,
                                                     ),
+                                                    tooltip: l10n.viewAction,
+                                                    onPressed: () =>
+                                                        Navigator.of(
+                                                          context,
+                                                        ).push(
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                PurchaseReceiptScreen(
+                                                                  db: widget.db,
+                                                                  purchaseId:
+                                                                      p.id,
+                                                                ),
+                                                          ),
+                                                        ),
                                                   ),
                                                   IconButton(
-                                                    icon: const Icon(Icons.edit_outlined, size: 18),
-                                                    tooltip: l10n.editPurchaseTooltip,
-                                                    onPressed: () => _editPurchase(p),
+                                                    icon: const Icon(
+                                                      Icons.edit_outlined,
+                                                      size: 18,
+                                                    ),
+                                                    tooltip: l10n
+                                                        .editPurchaseTooltip,
+                                                    onPressed: () =>
+                                                        _editPurchase(p),
                                                   ),
                                                   IconButton(
-                                                    icon: Icon(Icons.delete_outline, size: 18, color: theme.colorScheme.error),
-                                                    onPressed: () => _deletePurchase(p),
+                                                    icon: Icon(
+                                                      Icons.delete_outline,
+                                                      size: 18,
+                                                      color: theme
+                                                          .colorScheme
+                                                          .error,
+                                                    ),
+                                                    onPressed: () =>
+                                                        _deletePurchase(p),
                                                   ),
                                                 ],
                                               ),
@@ -398,33 +483,45 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                       title: l10n.paymentsHistoryPanel,
                       description: l10n.paymentCountDesc(_payments.length),
                       child: _payments.isEmpty
-                          ? EmptyState(icon: Icons.payments_outlined, title: l10n.noPaymentsYet)
+                          ? EmptyState(
+                              icon: Icons.payments_outlined,
+                              title: l10n.noPaymentsYet,
+                            )
                           : LayoutBuilder(
                               builder: (context, constraints) {
                                 return SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                                    constraints: BoxConstraints(
+                                      minWidth: constraints.maxWidth,
+                                    ),
                                     child: DataTable(
                                       columns: [
                                         DataColumn(label: Text(l10n.colDate)),
-                                        DataColumn(label: Text(l10n.colAmount), numeric: true),
+                                        DataColumn(
+                                          label: Text(l10n.colAmount),
+                                          numeric: true,
+                                        ),
                                         DataColumn(label: Text(l10n.colNote)),
                                       ],
                                       rows: _payments.map((p) {
-                                        return DataRow(cells: [
-                                          DataCell(Text(_formatDate(p.paymentDate))),
-                                          DataCell(
-                                            Text(
-                                              formatMoney(p.amount),
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xFF16A34A),
+                                        return DataRow(
+                                          cells: [
+                                            DataCell(
+                                              Text(_formatDate(p.paymentDate)),
+                                            ),
+                                            DataCell(
+                                              MoneyText(
+                                                formatMoney(p.amount),
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFF16A34A),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          DataCell(Text(p.note ?? '—')),
-                                        ]);
+                                            DataCell(Text(p.note ?? '—')),
+                                          ],
+                                        );
                                       }).toList(),
                                     ),
                                   ),
@@ -463,9 +560,17 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                           width: double.infinity,
                           child: OutlinedButton.icon(
                             onPressed: _editSupplier,
-                            icon: const Icon(Icons.edit_outlined, color: Color(0xFFF2A93B)),
-                            label: Text(l10n.editSupplier, style: const TextStyle(color: Color(0xFFF2A93B))),
-                            style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFF2A93B))),
+                            icon: const Icon(
+                              Icons.edit_outlined,
+                              color: Color(0xFFF2A93B),
+                            ),
+                            label: Text(
+                              l10n.editSupplier,
+                              style: const TextStyle(color: Color(0xFFF2A93B)),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFFF2A93B)),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -474,15 +579,39 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                           child: supplier.isArchived
                               ? OutlinedButton.icon(
                                   onPressed: _restoreSupplier,
-                                  icon: const Icon(Icons.restore, color: Color(0xFF16A34A)),
-                                  label: Text(l10n.restoreAction, style: const TextStyle(color: Color(0xFF16A34A))),
-                                  style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFF16A34A))),
+                                  icon: const Icon(
+                                    Icons.restore,
+                                    color: Color(0xFF16A34A),
+                                  ),
+                                  label: Text(
+                                    l10n.restoreAction,
+                                    style: const TextStyle(
+                                      color: Color(0xFF16A34A),
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                      color: Color(0xFF16A34A),
+                                    ),
+                                  ),
                                 )
                               : OutlinedButton.icon(
                                   onPressed: _archiveSupplier,
-                                  icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
-                                  label: Text(l10n.delete, style: TextStyle(color: theme.colorScheme.error)),
-                                  style: OutlinedButton.styleFrom(side: BorderSide(color: theme.colorScheme.error)),
+                                  icon: Icon(
+                                    Icons.delete_outline,
+                                    color: theme.colorScheme.error,
+                                  ),
+                                  label: Text(
+                                    l10n.delete,
+                                    style: TextStyle(
+                                      color: theme.colorScheme.error,
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(
+                                      color: theme.colorScheme.error,
+                                    ),
+                                  ),
                                 ),
                         ),
                       ],
@@ -491,7 +620,9 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                 );
 
                 if (narrow) {
-                  return Column(children: [left, const SizedBox(height: 20), right]);
+                  return Column(
+                    children: [left, const SizedBox(height: 20), right],
+                  );
                 }
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -525,13 +656,17 @@ class _InfoField extends StatelessWidget {
           Text(
             label.toUpperCase(),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -543,7 +678,8 @@ class _HighlightBox extends StatelessWidget {
   final String label;
   final String value;
   final Color? color;
-  const _HighlightBox(this.label, this.value, {this.color});
+  final bool isMoney;
+  const _HighlightBox(this.label, this.value, {this.color, this.isMoney = false});
 
   @override
   Widget build(BuildContext context) {
@@ -565,10 +701,21 @@ class _HighlightBox extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            value,
-            style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700, color: color),
-          ),
+          isMoney
+              ? MoneyText(
+                  value,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                )
+              : Text(
+                  value,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
         ],
       ),
     );

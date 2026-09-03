@@ -45,6 +45,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get close => 'Close';
 
   @override
+  String get exitConfirmTitle => 'Exit Nova Pro';
+
+  @override
+  String get exitConfirmMessage => 'Are you sure you want to exit Nova Pro?';
+
+  @override
+  String get exitConfirmButton => 'Exit';
+
+  @override
   String get dashboardTitle => 'Dashboard';
 
   @override
@@ -144,6 +153,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get colCurrentStock => 'Current Stock';
+
+  @override
+  String get productDetailsAction => 'Product Details';
 
   @override
   String get colStatus => 'Status';
@@ -287,6 +299,80 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noMovementsRecorded => 'No movements recorded.';
 
   @override
+  String get colProductId => 'Product ID';
+
+  @override
+  String get sizeVariantLabel => 'Size / Variant';
+
+  @override
+  String get profitMarginLabel => 'Profit Margin';
+
+  @override
+  String get stockStatusLabel => 'Stock Status';
+
+  @override
+  String get bestSupplierPanel => 'Best Supplier';
+
+  @override
+  String avgPriceAcrossPurchases(int count) {
+    return 'avg. price across $count purchases';
+  }
+
+  @override
+  String alsoBoughtFromNote(String list) {
+    return 'Also bought from: $list';
+  }
+
+  @override
+  String get viewAllAction => 'View All';
+
+  @override
+  String get perUnitNote => 'per unit';
+
+  @override
+  String get latestBatchAverageNote => 'latest batch average';
+
+  @override
+  String get colTotalValue => 'Total Value';
+
+  @override
+  String get printBarcodeAction => 'Print Barcode';
+
+  @override
+  String get barcodePrintComingSoon => 'Barcode printing is coming soon.';
+
+  @override
+  String stockValueFormulaNote(String qty, String cost) {
+    return '$qty × $cost cost';
+  }
+
+  @override
+  String aboveMinimumNote(String qty) {
+    return '$qty above minimum';
+  }
+
+  @override
+  String belowMinimumNote(String qty) {
+    return '$qty below minimum';
+  }
+
+  @override
+  String get atMinimumNote => 'At minimum threshold';
+
+  @override
+  String percentOfSellingPriceNote(String percent) {
+    return '$percent% of selling price';
+  }
+
+  @override
+  String get weeksSuffix => 'weeks';
+
+  @override
+  String stockWillLastNote(String weeks) {
+    return 'Stock will last about $weeks based on recent sales';
+  }
+
+  @override
   String get categoriesTitle => 'Categories';
 
   @override
@@ -335,6 +421,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get salesTodayPanel => 'Sales Today';
 
   @override
+  String get colTime => 'Time';
+
+  @override
   String get colProduct => 'Product';
 
   @override
@@ -354,6 +443,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statSoldItems => 'Sold Items';
+
+  @override
+  String get statTransactions => 'Transactions';
 
   @override
   String get fifoHint => 'FIFO';
@@ -946,6 +1038,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportsTitle => 'Reports';
 
   @override
+  String get viewReportsAction => 'View Reports';
+
+  @override
   String get reportsSubtitle => 'Sales performance and exports';
 
   @override
@@ -1072,6 +1167,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String daysAgo(int count) {
+    return '$count days ago';
+  }
+
+  @override
   String get passwordLabel => 'Password';
 
   @override
@@ -1143,6 +1243,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deletePermanentlyAction => 'Delete Permanently';
+
+  @override
+  String get forceDeleteAction => 'Force Delete';
+
+  @override
+  String get forceDeleteTitle => 'Force delete product?';
+
+  @override
+  String forceDeleteWarning(String name) {
+    return 'This will permanently delete \"$name\" AND all its sales, purchases, and stock history. This cannot be undone.';
+  }
+
+  @override
+  String forceDeleteTypeToConfirm(String name) {
+    return 'Type \"$name\" to confirm';
+  }
+
+  @override
+  String forceDeleteSuccessMessage(String name) {
+    return '\"$name\" and all its history were permanently deleted.';
+  }
 
   @override
   String get securityPanel => 'Security';
@@ -1398,9 +1519,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recentActivityPanel => 'Recent Activity';
 
   @override
-  String get viewAllAction => 'View All';
-
-  @override
   String get noRecentActivity => 'No activity yet.';
 
   @override
@@ -1548,6 +1666,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noStagnantProducts => 'No slow-moving stock right now.';
+
+  @override
+  String get oldDebtCustomersPanel => 'Customers with Old Debt';
+
+  @override
+  String get oldDebtCustomersDesc =>
+      'Balances with no payment or purchase activity in over 30 days';
+
+  @override
+  String get noOldDebtCustomers => 'No overdue customer debt right now.';
+
+  @override
+  String get lastActivityLabel => 'Last Activity';
+
+  @override
+  String get supplierPriorityPanel => 'Suppliers to Pay First';
+
+  @override
+  String get supplierPriorityDesc =>
+      'Suppliers you owe the most, ordered by amount owed';
+
+  @override
+  String get noSupplierPriority => 'You don\'t owe any suppliers right now.';
 
   @override
   String reorderNoticeMessage(int count) {

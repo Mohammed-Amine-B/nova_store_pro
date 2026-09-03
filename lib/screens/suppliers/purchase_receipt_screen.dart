@@ -8,6 +8,7 @@ import '../../data/repositories/supplier_repository.dart';
 import '../../data/repositories/product_repository.dart';
 import '../../data/repositories/settings_repository.dart';
 import '../../utils/formatting.dart';
+import '../../widgets/money_text.dart';
 
 class PurchaseReceiptScreen extends StatefulWidget {
   final AppDatabase db;
@@ -275,8 +276,8 @@ class _PurchaseReceiptScreenState extends State<PurchaseReceiptScreen> {
                         return TableRow(children: [
                           _Cell('${item.quantity}'),
                           _Cell(product != null ? productDisplayName(product) : 'Unknown'),
-                          _Cell(formatMoney(item.buyPrice), align: TextAlign.right),
-                          _Cell(formatMoney(item.quantity * item.buyPrice), align: TextAlign.right),
+                          _Cell(formatMoney(item.buyPrice), align: TextAlign.right, isMoney: true),
+                          _Cell(formatMoney(item.quantity * item.buyPrice), align: TextAlign.right, isMoney: true),
                         ]);
                       }),
                     ],
@@ -330,7 +331,7 @@ Widget _totalsRow(String label, String value, {bool bold = false, Color? color})
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       Text(label, style: style),
-      Text(value, style: style),
+      MoneyText(value, style: style),
     ],
   );
 }
@@ -339,17 +340,17 @@ class _Cell extends StatelessWidget {
   final String text;
   final bool bold;
   final TextAlign align;
-  const _Cell(this.text, {this.bold = false, this.align = TextAlign.left});
+  final bool isMoney;
+  const _Cell(this.text, {this.bold = false, this.align = TextAlign.left, this.isMoney = false});
 
   @override
   Widget build(BuildContext context) {
+    final style = TextStyle(fontWeight: bold ? FontWeight.bold : FontWeight.normal, fontSize: 12);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Text(
-        text,
-        textAlign: align,
-        style: TextStyle(fontWeight: bold ? FontWeight.bold : FontWeight.normal, fontSize: 12),
-      ),
+      child: isMoney
+          ? MoneyText(text, style: style, textAlign: align)
+          : Text(text, textAlign: align, style: style),
     );
   }
 }

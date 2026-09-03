@@ -21,6 +21,7 @@ class _TodaySalesScreenState extends State<TodaySalesScreen> {
   final _viewKey = GlobalKey<SalesDayViewState>();
   late final FocusNode _searchFocusNode = widget.searchFocusNode ?? FocusNode();
   late final DateTime _today = DateTime.now();
+  int _salesCount = 0;
 
   @override
   void dispose() {
@@ -52,12 +53,27 @@ class _TodaySalesScreenState extends State<TodaySalesScreen> {
                 'EEEE, MMMM d',
                 Localizations.localeOf(context).toString(),
               ).format(_today),
+              actions: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => _viewKey.currentState?.printSummary(),
+                    icon: const Icon(Icons.print_outlined, size: 18),
+                    label: Text(l10n.printSavePdfTooltip),
+                  ),
+                  const SizedBox(width: 12),
+                  FilledButton.icon(
+                    onPressed: () => _searchFocusNode.requestFocus(),
+                    icon: const Icon(Icons.add),
+                    label: Text(l10n.newSaleAction),
+                  ),
+                ],
+              ),
             ),
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  flex: 4,
                   child: QuickAddSaleBar(
                     db: widget.db,
                     date: _today,
@@ -67,21 +83,30 @@ class _TodaySalesScreenState extends State<TodaySalesScreen> {
                     onAdded: () => _viewKey.currentState?.reload(),
                   ),
                 ),
-                const SizedBox(width: 24),
-                Expanded(
-                  flex: 8,
-                  child: SalesDayView(
-                    key: _viewKey,
-                    db: widget.db,
-                    date: _today,
-                    title: '',
-                    panelTitle: l10n.salesTodayPanel,
-                    compact: true,
-                    dividedMetrics: true,
-                    showTotalFooter: true,
+                const SizedBox(width: 16),
+                Text(
+                  l10n.salesCount(_salesCount),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 20),
+            SalesDayView(
+              key: _viewKey,
+              db: widget.db,
+              date: _today,
+              title: '',
+              panelTitle: l10n.salesTodayPanel,
+              compact: true,
+              fourStatCards: true,
+              showTimeColumn: true,
+              showTotalFooter: true,
+              onSalesCountChanged: (count) =>
+                  setState(() => _salesCount = count),
             ),
           ],
         ),

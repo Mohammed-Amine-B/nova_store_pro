@@ -12,6 +12,9 @@
   "delete": "Supprimer",
   "edit": "Modifier",
   "close": "Fermer",
+  "exitConfirmTitle": "Quitter Nova Pro",
+  "exitConfirmMessage": "Êtes-vous sûr de vouloir quitter Nova Pro ?",
+  "exitConfirmButton": "Quitter",
   "dashboardTitle": "Tableau de bord",
   "dashboardSubtitle": "Vue d'ensemble du magasin",
   "statProducts": "Produits",
@@ -43,6 +46,7 @@
   "colCategory": "Catégorie",
   "colSellingPrice": "Prix de vente",
   "colCurrentStock": "Stock actuel",
+  "productDetailsAction": "Détails du produit",
   "colStatus": "Statut",
   "colActions": "Actions",
   "statusInStock": "En stock",
@@ -89,6 +93,52 @@
   "purchaseDateLabel": "Date d'achat",
   "stockMovementsTitle": "Mouvements de stock",
   "noMovementsRecorded": "Aucun mouvement enregistré.",
+  "colProductId": "ID Produit",
+  "sizeVariantLabel": "Taille / Variante",
+  "profitMarginLabel": "Marge bénéficiaire",
+  "stockStatusLabel": "État du stock",
+  "bestSupplierPanel": "Meilleur fournisseur",
+  "avgPriceAcrossPurchases": "prix moyen sur {count} achats",
+  "alsoBoughtFromNote": "Également acheté auprès de : {list}",
+  "viewAllAction": "Voir tout",
+  "perUnitNote": "par unité",
+  "latestBatchAverageNote": "moyenne du dernier lot",
+  "colTotalValue": "Valeur totale",
+  "printBarcodeAction": "Imprimer le code-barres",
+  "barcodePrintComingSoon": "L'impression du code-barres arrive bientôt.",
+  "stockValueFormulaNote": "{qty} × {cost} coût",
+  "@stockValueFormulaNote": {
+    "placeholders": {
+      "qty": { "type": "String" },
+      "cost": { "type": "String" }
+    }
+  },
+  "aboveMinimumNote": "{qty} au-dessus du minimum",
+  "@aboveMinimumNote": {
+    "placeholders": {
+      "qty": { "type": "String" }
+    }
+  },
+  "belowMinimumNote": "{qty} en dessous du minimum",
+  "@belowMinimumNote": {
+    "placeholders": {
+      "qty": { "type": "String" }
+    }
+  },
+  "atMinimumNote": "Au seuil minimum",
+  "percentOfSellingPriceNote": "{percent}% du prix de vente",
+  "@percentOfSellingPriceNote": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "weeksSuffix": "semaines",
+  "stockWillLastNote": "Le stock durera environ {weeks} selon les ventes récentes",
+  "@stockWillLastNote": {
+    "placeholders": {
+      "weeks": { "type": "String" }
+    }
+  },
   "categoriesTitle": "Catégories",
   "categoriesCount": "{count} catégories",
   "addCategory": "Ajouter une catégorie",
@@ -103,6 +153,7 @@
   "addProductLabel": "Ajouter un produit",
   "searchToSellHint": "Rechercher un produit à vendre...",
   "salesTodayPanel": "Ventes du jour",
+  "colTime": "Heure",
   "colProduct": "Produit",
   "colQuantity": "Quantité",
   "colUnitPrice": "Prix unitaire",
@@ -110,6 +161,7 @@
   "statRevenue": "Revenus",
   "statProfit": "Profit",
   "statSoldItems": "Articles vendus",
+  "statTransactions": "Transactions",
   "fifoHint": "FIFO",
   "totalLabel": "Total",
   "inStockCount": "{count} en stock",
@@ -291,6 +343,7 @@
   "returnRecordedCashMsg": "Retour enregistré. Remboursement de {amount} DA en espèces.",
   "returnRecordedDebtMsg": "Retour enregistré. Dette réduite de {amount} DA.",
   "reportsTitle": "Rapports",
+  "viewReportsAction": "Voir les rapports",
   "reportsSubtitle": "Performance des ventes et exports",
   "csvExportAction": "CSV",
   "pdfExportAction": "PDF",
@@ -327,6 +380,7 @@
   "justNow": "À l'instant",
   "minutesAgo": "il y a {count} min",
   "hoursAgo": "il y a {count} h",
+  "daysAgo": "il y a {count} jours",
   "passwordLabel": "Mot de passe",
   "incorrectPassword": "Mot de passe incorrect",
   "unlockAction": "Déverrouiller",
@@ -349,6 +403,11 @@
   "deletePermanentlyTitle": "Supprimer définitivement ?",
   "deletePermanentlyMessage": "Supprimer définitivement \"{name}\" ? Cette action est irréversible.",
   "deletePermanentlyAction": "Supprimer définitivement",
+  "forceDeleteAction": "Suppression forcée",
+  "forceDeleteTitle": "Forcer la suppression du produit ?",
+  "forceDeleteWarning": "Ceci supprimera définitivement \"{name}\" AINSI QUE tout son historique de ventes, d'achats et de stock. Cette action est irréversible.",
+  "forceDeleteTypeToConfirm": "Tapez \"{name}\" pour confirmer",
+  "forceDeleteSuccessMessage": "\"{name}\" et tout son historique ont été supprimés définitivement.",
   "securityPanel": "Sécurité",
   "securityPanelDesc": "Protégez l'application avec un mot de passe",
   "passwordIsSet": "Mot de passe défini",
@@ -468,6 +527,13 @@
   "stagnantProductsPanel": "Stock à rotation lente",
   "stagnantProductsDesc": "En stock mais aucune vente depuis 30 jours",
   "noStagnantProducts": "Aucun stock à rotation lente pour l'instant.",
+  "oldDebtCustomersPanel": "Clients avec dette ancienne",
+  "oldDebtCustomersDesc": "Soldes sans paiement ni achat depuis plus de 30 jours",
+  "noOldDebtCustomers": "Aucune dette client en retard pour l'instant.",
+  "lastActivityLabel": "Dernière activité",
+  "supplierPriorityPanel": "Fournisseurs à payer en priorité",
+  "supplierPriorityDesc": "Fournisseurs auxquels vous devez le plus, triés par montant dû",
+  "noSupplierPriority": "Vous ne devez rien à aucun fournisseur pour l'instant.",
   "reorderNoticeMessage": "{count} produits à réapprovisionner bientôt",
   "suggestedPriceHint": "Suggéré : {price} (basé sur des produits similaires)",
   "useSuggestionAction": "Utiliser"

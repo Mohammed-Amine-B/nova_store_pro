@@ -5,6 +5,7 @@ import '../data/repositories/sales_repository.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../utils/formatting.dart';
 import 'product_thumbnail.dart';
+import 'money_text.dart';
 
 class QuickAddSaleBar extends StatefulWidget {
   final AppDatabase db;
@@ -124,7 +125,7 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text(
+                              MoneyText(
                                 p.sellingPrice != null
                                     ? formatMoney(p.sellingPrice!)
                                     : '—',
@@ -225,73 +226,75 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
             ),
             content: SizedBox(
               width: 320,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.inventory_2_outlined,
-                        size: 14,
-                        color: p.stockQuantity <= 0
-                            ? Theme.of(context).colorScheme.error
-                            : const Color(0xFF16A34A),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        l10n.inStockCount(
-                          formatQuantity(p.stockQuantity, p.unitType),
-                        ),
-                        style: TextStyle(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          size: 14,
                           color: p.stockQuantity <= 0
                               ? Theme.of(context).colorScheme.error
-                              : null,
+                              : const Color(0xFF16A34A),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  if (error != null) ...[
-                    Text(
-                      error!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
+                        const SizedBox(width: 6),
+                        Text(
+                          l10n.inStockCount(
+                            formatQuantity(p.stockQuantity, p.unitType),
+                          ),
+                          style: TextStyle(
+                            color: p.stockQuantity <= 0
+                                ? Theme.of(context).colorScheme.error
+                                : null,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                  ],
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: quantityController,
-                          decoration: InputDecoration(
-                            labelText: l10n.quantityLabel,
-                            border: const OutlineInputBorder(),
-                          ),
-                          keyboardType: isPiece
-                              ? TextInputType.number
-                              : const TextInputType.numberWithOptions(
-                                  decimal: true,
-                                ),
+                    const SizedBox(height: 16),
+                    if (error != null) ...[
+                      Text(
+                        error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: priceController,
-                          decoration: InputDecoration(
-                            labelText: l10n.sellingPriceFieldLabel,
-                            border: const OutlineInputBorder(),
-                          ),
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                        ),
-                      ),
+                      const SizedBox(height: 8),
                     ],
-                  ),
-                ],
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: quantityController,
+                            decoration: InputDecoration(
+                              labelText: l10n.quantityLabel,
+                              border: const OutlineInputBorder(),
+                            ),
+                            keyboardType: isPiece
+                                ? TextInputType.number
+                                : const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: priceController,
+                            decoration: InputDecoration(
+                              labelText: l10n.sellingPriceFieldLabel,
+                              border: const OutlineInputBorder(),
+                            ),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
@@ -347,6 +350,79 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final field = Focus(
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape &&
+            _overlayEntry != null) {
+          _removeOverlay();
+          setState(() => _matches = []);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: CompositedTransformTarget(
+        link: _layerLink,
+        child: TextField(
+          key: _fieldKey,
+          controller: _searchController,
+          focusNode: _focusNode,
+          decoration: InputDecoration(
+            hintText: l10n.searchToSellHint,
+            prefixIcon: const Icon(Icons.search, size: 18),
+            suffixIcon: Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Align(
+                alignment: Alignment.center,
+                widthFactor: 1,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(
+                      alpha: 0.06,
+                    ),
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: theme.dividerColor),
+                  ),
+                  child: Text(
+                    l10n.ctrlFHint,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.5,
+                      ),
+                      fontSize: 10.5,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 12,
+              horizontal: 12,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: theme.dividerColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(
+                color: theme.colorScheme.primary,
+                width: 2,
+              ),
+            ),
+          ),
+          onChanged: _onSearchChanged,
+        ),
+      ),
+    );
+
+    if (widget.minimalHeader) return field;
+
     return Container(
       decoration: BoxDecoration(
         color: theme.cardColor,
@@ -365,76 +441,7 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
             ),
           ),
           const SizedBox(height: 8),
-          Focus(
-            onKeyEvent: (node, event) {
-              if (event is KeyDownEvent &&
-                  event.logicalKey == LogicalKeyboardKey.escape &&
-                  _overlayEntry != null) {
-                _removeOverlay();
-                setState(() => _matches = []);
-                return KeyEventResult.handled;
-              }
-              return KeyEventResult.ignored;
-            },
-            child: CompositedTransformTarget(
-              link: _layerLink,
-              child: TextField(
-                key: _fieldKey,
-                controller: _searchController,
-                focusNode: _focusNode,
-                decoration: InputDecoration(
-                  hintText: l10n.searchToSellHint,
-                  prefixIcon: const Icon(Icons.search, size: 18),
-                  suffixIcon: Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: Align(
-                      alignment: Alignment.center,
-                      widthFactor: 1,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 7,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.onSurface.withValues(
-                            alpha: 0.06,
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: theme.dividerColor),
-                        ),
-                        child: Text(
-                          l10n.ctrlFHint,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(
-                              alpha: 0.5,
-                            ),
-                            fontSize: 10.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 12,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: theme.dividerColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(
-                      color: theme.colorScheme.primary,
-                      width: 2,
-                    ),
-                  ),
-                ),
-                onChanged: _onSearchChanged,
-              ),
-            ),
-          ),
+          field,
         ],
       ),
     );

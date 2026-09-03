@@ -7,20 +7,22 @@ class CustomerFormDialog extends StatefulWidget {
   final CustomerRepository repo;
   final Customer? editing;
 
-  const CustomerFormDialog({
-    super.key,
-    required this.repo,
-    this.editing,
-  });
+  const CustomerFormDialog({super.key, required this.repo, this.editing});
 
   @override
   State<CustomerFormDialog> createState() => _CustomerFormDialogState();
 }
 
 class _CustomerFormDialogState extends State<CustomerFormDialog> {
-  late final _nameController = TextEditingController(text: widget.editing?.name ?? '');
-  late final _phoneController = TextEditingController(text: widget.editing?.phone ?? '');
-  late final _noteController = TextEditingController(text: widget.editing?.note ?? '');
+  late final _nameController = TextEditingController(
+    text: widget.editing?.name ?? '',
+  );
+  late final _phoneController = TextEditingController(
+    text: widget.editing?.phone ?? '',
+  );
+  late final _noteController = TextEditingController(
+    text: widget.editing?.note ?? '',
+  );
 
   Future<void> _save() async {
     if (_nameController.text.trim().isEmpty) return;
@@ -55,7 +57,9 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -67,40 +71,44 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
           const SizedBox(height: 14),
           Text(
             widget.editing == null ? l10n.addCustomer : l10n.editCustomer,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
         ],
       ),
       content: SizedBox(
         width: 380,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: l10n.colName,
-                border: const OutlineInputBorder(),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: l10n.colName,
+                  border: const OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: _phoneController,
-              decoration: InputDecoration(
-                labelText: l10n.phoneOptionalLabel,
-                border: const OutlineInputBorder(),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _phoneController,
+                decoration: InputDecoration(
+                  labelText: l10n.phoneOptionalLabel,
+                  border: const OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: _noteController,
-              decoration: InputDecoration(
-                labelText: l10n.noteOptionalLabel,
-                border: const OutlineInputBorder(),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _noteController,
+                decoration: InputDecoration(
+                  labelText: l10n.noteOptionalLabel,
+                  border: const OutlineInputBorder(),
+                ),
+                maxLines: 3,
               ),
-              maxLines: 3,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),

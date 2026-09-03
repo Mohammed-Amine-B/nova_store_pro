@@ -132,7 +132,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-enum _RecoveryStep { choose, question, code, newPassword, showNewCode, unavailable }
+enum _RecoveryStep {
+  choose,
+  question,
+  code,
+  newPassword,
+  showNewCode,
+  unavailable,
+}
 
 class _RecoveryDialog extends StatefulWidget {
   final SettingsRepository repo;
@@ -242,7 +249,9 @@ class _RecoveryDialogState extends State<_RecoveryDialog> {
       _busy = true;
       _error = null;
     });
-    final newCode = await widget.repo.resetPasswordAfterRecovery(_newPasswordController.text);
+    final newCode = await widget.repo.resetPasswordAfterRecovery(
+      _newPasswordController.text,
+    );
     if (!mounted) return;
     setState(() {
       _busy = false;
@@ -256,7 +265,10 @@ class _RecoveryDialogState extends State<_RecoveryDialog> {
     final l10n = AppLocalizations.of(context)!;
     if (_loading) {
       return const AlertDialog(
-        content: SizedBox(height: 80, child: Center(child: CircularProgressIndicator())),
+        content: SizedBox(
+          height: 80,
+          child: Center(child: CircularProgressIndicator()),
+        ),
       );
     }
 
@@ -266,24 +278,29 @@ class _RecoveryDialogState extends State<_RecoveryDialog> {
           title: Text(l10n.recoveryChooseMethodTitle),
           content: SizedBox(
             width: 320,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.quiz_outlined),
-                  title: Text(l10n.recoveryMethodQuestion),
-                  onTap: _chooseQuestion,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.key_outlined),
-                  title: Text(l10n.recoveryMethodCode),
-                  onTap: _chooseCode,
-                ),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.quiz_outlined),
+                    title: Text(l10n.recoveryMethodQuestion),
+                    onTap: _chooseQuestion,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.key_outlined),
+                    title: Text(l10n.recoveryMethodCode),
+                    onTap: _chooseCode,
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancel),
+            ),
           ],
         );
 
@@ -292,27 +309,45 @@ class _RecoveryDialogState extends State<_RecoveryDialog> {
           title: Text(l10n.recoveryMethodQuestion),
           content: SizedBox(
             width: 320,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(_securityQuestion ?? '', style: const TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _answerController,
-                  decoration: InputDecoration(labelText: l10n.securityAnswerLabel),
-                  onSubmitted: (_) => _verifyAnswer(),
-                ),
-                if (_error != null) ...[
-                  const SizedBox(height: 8),
-                  Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _securityQuestion ?? '',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _answerController,
+                    decoration: InputDecoration(
+                      labelText: l10n.securityAnswerLabel,
+                    ),
+                    onSubmitted: (_) => _verifyAnswer(),
+                  ),
+                  if (_error != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _error!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-            FilledButton(onPressed: _busy ? null : _verifyAnswer, child: Text(l10n.verifyAction)),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: _busy ? null : _verifyAnswer,
+              child: Text(l10n.verifyAction),
+            ),
           ],
         );
 
@@ -321,25 +356,40 @@ class _RecoveryDialogState extends State<_RecoveryDialog> {
           title: Text(l10n.recoveryMethodCode),
           content: SizedBox(
             width: 320,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _codeController,
-                  textCapitalization: TextCapitalization.characters,
-                  decoration: InputDecoration(labelText: l10n.recoveryCodeFieldLabel),
-                  onSubmitted: (_) => _verifyCode(),
-                ),
-                if (_error != null) ...[
-                  const SizedBox(height: 8),
-                  Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _codeController,
+                    textCapitalization: TextCapitalization.characters,
+                    decoration: InputDecoration(
+                      labelText: l10n.recoveryCodeFieldLabel,
+                    ),
+                    onSubmitted: (_) => _verifyCode(),
+                  ),
+                  if (_error != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _error!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-            FilledButton(onPressed: _busy ? null : _verifyCode, child: Text(l10n.verifyAction)),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: _busy ? null : _verifyCode,
+              child: Text(l10n.verifyAction),
+            ),
           ],
         );
 
@@ -348,30 +398,47 @@ class _RecoveryDialogState extends State<_RecoveryDialog> {
           title: Text(l10n.recoveryNewPasswordTitle),
           content: SizedBox(
             width: 320,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _newPasswordController,
-                  obscureText: true,
-                  decoration: InputDecoration(labelText: l10n.newPasswordLabel),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _confirmPasswordController,
-                  obscureText: true,
-                  decoration: InputDecoration(labelText: l10n.confirmNewPasswordLabel),
-                ),
-                if (_error != null) ...[
-                  const SizedBox(height: 8),
-                  Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _newPasswordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: l10n.newPasswordLabel,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _confirmPasswordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: l10n.confirmNewPasswordLabel,
+                    ),
+                  ),
+                  if (_error != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _error!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-            FilledButton(onPressed: _busy ? null : _resetPassword, child: Text(l10n.save)),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: _busy ? null : _resetPassword,
+              child: Text(l10n.save),
+            ),
           ],
         );
 
@@ -380,58 +447,78 @@ class _RecoveryDialogState extends State<_RecoveryDialog> {
           title: Text(l10n.recoveryCodeDialogTitle),
           content: SizedBox(
             width: 320,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l10n.recoveryCodeSaveWarning),
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _newCode ?? '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 2),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.recoveryCodeSaveWarning),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _newCode ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 2,
+                            ),
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: _newCode ?? ''));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.codeCopiedMessage)),
-                          );
-                        },
-                        icon: const Icon(Icons.copy_outlined, size: 20),
-                        tooltip: l10n.copyCodeAction,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ],
+                        IconButton(
+                          onPressed: () {
+                            Clipboard.setData(
+                              ClipboardData(text: _newCode ?? ''),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l10n.codeCopiedMessage)),
+                            );
+                          },
+                          icon: const Icon(Icons.copy_outlined, size: 20),
+                          tooltip: l10n.copyCodeAction,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                CheckboxListTile(
-                  value: _codeAcknowledged,
-                  onChanged: (v) => setState(() => _codeAcknowledged = v ?? false),
-                  title: Text(l10n.recoveryCodeAckCheckbox),
-                  controlAffinity: ListTileControlAffinity.leading,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  CheckboxListTile(
+                    value: _codeAcknowledged,
+                    onChanged: (v) =>
+                        setState(() => _codeAcknowledged = v ?? false),
+                    title: Text(l10n.recoveryCodeAckCheckbox),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
             FilledButton(
-              onPressed: _codeAcknowledged ? () => Navigator.pop(context, true) : null,
+              onPressed: _codeAcknowledged
+                  ? () => Navigator.pop(context, true)
+                  : null,
               child: Text(l10n.continueAction),
             ),
           ],
@@ -440,9 +527,15 @@ class _RecoveryDialogState extends State<_RecoveryDialog> {
       case _RecoveryStep.unavailable:
         return AlertDialog(
           title: Text(l10n.recoveryNotAvailableTitle),
-          content: SizedBox(width: 320, child: Text(l10n.recoveryNotAvailableMessage)),
+          content: SizedBox(
+            width: 320,
+            child: Text(l10n.recoveryNotAvailableMessage),
+          ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.close)),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.close),
+            ),
           ],
         );
     }

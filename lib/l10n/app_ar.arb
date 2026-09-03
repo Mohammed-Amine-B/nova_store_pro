@@ -12,6 +12,9 @@
   "delete": "حذف",
   "edit": "تعديل",
   "close": "إغلاق",
+  "exitConfirmTitle": "الخروج من Nova Pro",
+  "exitConfirmMessage": "هل أنت متأكد أنك تريد الخروج من Nova Pro؟",
+  "exitConfirmButton": "خروج",
   "dashboardTitle": "لوحة التحكم",
   "dashboardSubtitle": "نظرة عامة على المحل",
   "statProducts": "المنتجات",
@@ -43,6 +46,7 @@
   "colCategory": "التصنيف",
   "colSellingPrice": "سعر البيع",
   "colCurrentStock": "المخزون الحالي",
+  "productDetailsAction": "تفاصيل المنتج",
   "colStatus": "الحالة",
   "colActions": "الإجراءات",
   "statusInStock": "متوفر",
@@ -89,6 +93,52 @@
   "purchaseDateLabel": "تاريخ الشراء",
   "stockMovementsTitle": "حركات المخزون",
   "noMovementsRecorded": "لا توجد حركات مسجلة.",
+  "colProductId": "رقم المنتج",
+  "sizeVariantLabel": "الحجم / الصنف",
+  "profitMarginLabel": "هامش الربح",
+  "stockStatusLabel": "حالة المخزون",
+  "bestSupplierPanel": "أفضل مورد",
+  "avgPriceAcrossPurchases": "متوسط السعر عبر {count} عملية شراء",
+  "alsoBoughtFromNote": "تم الشراء أيضًا من: {list}",
+  "viewAllAction": "عرض الكل",
+  "perUnitNote": "لكل وحدة",
+  "latestBatchAverageNote": "متوسط آخر دفعة",
+  "colTotalValue": "القيمة الإجمالية",
+  "printBarcodeAction": "طباعة الباركود",
+  "barcodePrintComingSoon": "طباعة الباركود قريباً.",
+  "stockValueFormulaNote": "{qty} × {cost} تكلفة",
+  "@stockValueFormulaNote": {
+    "placeholders": {
+      "qty": { "type": "String" },
+      "cost": { "type": "String" }
+    }
+  },
+  "aboveMinimumNote": "{qty} فوق الحد الأدنى",
+  "@aboveMinimumNote": {
+    "placeholders": {
+      "qty": { "type": "String" }
+    }
+  },
+  "belowMinimumNote": "{qty} تحت الحد الأدنى",
+  "@belowMinimumNote": {
+    "placeholders": {
+      "qty": { "type": "String" }
+    }
+  },
+  "atMinimumNote": "عند الحد الأدنى",
+  "percentOfSellingPriceNote": "{percent}% من سعر البيع",
+  "@percentOfSellingPriceNote": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "weeksSuffix": "أسابيع",
+  "stockWillLastNote": "سيدوم المخزون حوالي {weeks} بناءً على المبيعات الأخيرة",
+  "@stockWillLastNote": {
+    "placeholders": {
+      "weeks": { "type": "String" }
+    }
+  },
   "categoriesTitle": "التصنيفات",
   "categoriesCount": "{count} تصنيف",
   "addCategory": "إضافة تصنيف",
@@ -103,6 +153,7 @@
   "addProductLabel": "إضافة منتج",
   "searchToSellHint": "ابحث عن منتج للبيع...",
   "salesTodayPanel": "مبيعات اليوم",
+  "colTime": "الوقت",
   "colProduct": "المنتج",
   "colQuantity": "الكمية",
   "colUnitPrice": "سعر الوحدة",
@@ -110,6 +161,7 @@
   "statRevenue": "الإيرادات",
   "statProfit": "الربح",
   "statSoldItems": "الوحدات المباعة",
+  "statTransactions": "العمليات",
   "fifoHint": "FIFO",
   "totalLabel": "الإجمالي",
   "inStockCount": "{count} في المخزون",
@@ -291,6 +343,7 @@
   "returnRecordedCashMsg": "تم تسجيل الإرجاع. استرجاع {amount} د.ج نقدًا.",
   "returnRecordedDebtMsg": "تم تسجيل الإرجاع. تم تخفيض الدين بمقدار {amount} د.ج.",
   "reportsTitle": "التقارير",
+  "viewReportsAction": "عرض التقارير",
   "reportsSubtitle": "أداء المبيعات والتصدير",
   "csvExportAction": "CSV",
   "pdfExportAction": "PDF",
@@ -327,6 +380,7 @@
   "justNow": "الآن",
   "minutesAgo": "منذ {count} د",
   "hoursAgo": "منذ {count} س",
+  "daysAgo": "منذ {count} يوم",
   "passwordLabel": "كلمة المرور",
   "incorrectPassword": "كلمة المرور غير صحيحة",
   "unlockAction": "فتح",
@@ -349,6 +403,11 @@
   "deletePermanentlyTitle": "حذف نهائي؟",
   "deletePermanentlyMessage": "حذف \"{name}\" نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.",
   "deletePermanentlyAction": "حذف نهائي",
+  "forceDeleteAction": "حذف قسري",
+  "forceDeleteTitle": "حذف المنتج قسريًا؟",
+  "forceDeleteWarning": "سيؤدي هذا إلى حذف \"{name}\" نهائيًا مع جميع مبيعاته ومشترياته وسجل مخزونه. لا يمكن التراجع عن هذا الإجراء.",
+  "forceDeleteTypeToConfirm": "اكتب \"{name}\" للتأكيد",
+  "forceDeleteSuccessMessage": "تم حذف \"{name}\" وكل سجله نهائيًا.",
   "securityPanel": "الأمان",
   "securityPanelDesc": "احمِ التطبيق بكلمة مرور",
   "passwordIsSet": "تم تعيين كلمة المرور",
@@ -468,6 +527,13 @@
   "stagnantProductsPanel": "مخزون بطيء الحركة",
   "stagnantProductsDesc": "متوفر في المخزون لكن بدون مبيعات خلال 30 يومًا",
   "noStagnantProducts": "لا يوجد مخزون بطيء الحركة حاليًا.",
+  "oldDebtCustomersPanel": "عملاء بديون قديمة",
+  "oldDebtCustomersDesc": "أرصدة لم تشهد أي دفعة أو عملية شراء منذ أكثر من 30 يومًا",
+  "noOldDebtCustomers": "لا توجد ديون عملاء متأخرة حاليًا.",
+  "lastActivityLabel": "آخر نشاط",
+  "supplierPriorityPanel": "الموردون الأولى بالدفع",
+  "supplierPriorityDesc": "الموردون الذين يُدان لهم بأكبر المبالغ، مرتبين حسب المبلغ المستحق",
+  "noSupplierPriority": "لا توجد مستحقات لأي مورد حاليًا.",
   "reorderNoticeMessage": "{count} منتج يحتاج إعادة طلب قريبًا",
   "suggestedPriceHint": "مقترح: {price} (بناءً على منتجات مشابهة)",
   "useSuggestionAction": "استخدام"

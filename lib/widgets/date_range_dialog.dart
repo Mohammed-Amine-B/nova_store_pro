@@ -22,7 +22,11 @@ class _DateRangeDialog extends StatefulWidget {
   final DateTimeRange? initialRange;
   final DateTime firstDate;
   final DateTime lastDate;
-  const _DateRangeDialog({this.initialRange, required this.firstDate, required this.lastDate});
+  const _DateRangeDialog({
+    this.initialRange,
+    required this.firstDate,
+    required this.lastDate,
+  });
 
   @override
   State<_DateRangeDialog> createState() => _DateRangeDialogState();
@@ -69,31 +73,47 @@ class _DateRangeDialogState extends State<_DateRangeDialog> {
       title: const Text('Select Date Range'),
       content: SizedBox(
         width: 320,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            InkWell(
-              onTap: _pickStart,
-              child: InputDecorator(
-                decoration: const InputDecoration(labelText: 'Start Date', border: OutlineInputBorder()),
-                child: Text(_start != null ? _format(_start!) : '—'),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              InkWell(
+                onTap: _pickStart,
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Start Date',
+                    border: OutlineInputBorder(),
+                  ),
+                  child: Text(_start != null ? _format(_start!) : '—'),
+                ),
               ),
-            ),
-            const SizedBox(height: 14),
-            InkWell(
-              onTap: _pickEnd,
-              child: InputDecorator(
-                decoration: const InputDecoration(labelText: 'End Date', border: OutlineInputBorder()),
-                child: Text(_end != null ? _format(_end!) : '—'),
+              const SizedBox(height: 14),
+              InkWell(
+                onTap: _pickEnd,
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'End Date',
+                    border: OutlineInputBorder(),
+                  ),
+                  child: Text(_end != null ? _format(_end!) : '—'),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
         FilledButton(
-          onPressed: canApply ? () => Navigator.pop(context, DateTimeRange(start: _start!, end: _end!)) : null,
+          onPressed: canApply
+              ? () => Navigator.pop(
+                  context,
+                  DateTimeRange(start: _start!, end: _end!),
+                )
+              : null,
           child: const Text('Apply'),
         ),
       ],

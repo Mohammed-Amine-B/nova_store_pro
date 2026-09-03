@@ -12,6 +12,9 @@
   "delete": "Delete",
   "edit": "Edit",
   "close": "Close",
+  "exitConfirmTitle": "Exit Nova Pro",
+  "exitConfirmMessage": "Are you sure you want to exit Nova Pro?",
+  "exitConfirmButton": "Exit",
   "dashboardTitle": "Dashboard",
   "dashboardSubtitle": "Store overview",
   "statProducts": "Products",
@@ -74,6 +77,7 @@
   "colCategory": "Category",
   "colSellingPrice": "Selling Price",
   "colCurrentStock": "Current Stock",
+  "productDetailsAction": "Product Details",
   "colStatus": "Status",
   "colActions": "Actions",
   "statusInStock": "In Stock",
@@ -127,6 +131,62 @@
   "purchaseDateLabel": "Purchase Date",
   "stockMovementsTitle": "Stock Movements",
   "noMovementsRecorded": "No movements recorded.",
+  "colProductId": "Product ID",
+  "sizeVariantLabel": "Size / Variant",
+  "profitMarginLabel": "Profit Margin",
+  "stockStatusLabel": "Stock Status",
+  "bestSupplierPanel": "Best Supplier",
+  "avgPriceAcrossPurchases": "avg. price across {count} purchases",
+  "@avgPriceAcrossPurchases": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "alsoBoughtFromNote": "Also bought from: {list}",
+  "@alsoBoughtFromNote": {
+    "placeholders": {
+      "list": { "type": "String" }
+    }
+  },
+  "viewAllAction": "View All",
+  "perUnitNote": "per unit",
+  "latestBatchAverageNote": "latest batch average",
+  "colTotalValue": "Total Value",
+  "printBarcodeAction": "Print Barcode",
+  "barcodePrintComingSoon": "Barcode printing is coming soon.",
+  "stockValueFormulaNote": "{qty} × {cost} cost",
+  "@stockValueFormulaNote": {
+    "placeholders": {
+      "qty": { "type": "String" },
+      "cost": { "type": "String" }
+    }
+  },
+  "aboveMinimumNote": "{qty} above minimum",
+  "@aboveMinimumNote": {
+    "placeholders": {
+      "qty": { "type": "String" }
+    }
+  },
+  "belowMinimumNote": "{qty} below minimum",
+  "@belowMinimumNote": {
+    "placeholders": {
+      "qty": { "type": "String" }
+    }
+  },
+  "atMinimumNote": "At minimum threshold",
+  "percentOfSellingPriceNote": "{percent}% of selling price",
+  "@percentOfSellingPriceNote": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "weeksSuffix": "weeks",
+  "stockWillLastNote": "Stock will last about {weeks} based on recent sales",
+  "@stockWillLastNote": {
+    "placeholders": {
+      "weeks": { "type": "String" }
+    }
+  },
   "categoriesTitle": "Categories",
   "categoriesCount": "{count} categories",
   "@categoriesCount": {
@@ -162,6 +222,7 @@
   "addProductLabel": "Add Product",
   "searchToSellHint": "Search a product to sell...",
   "salesTodayPanel": "Sales Today",
+  "colTime": "Time",
   "colProduct": "Product",
   "colQuantity": "Quantity",
   "colUnitPrice": "Unit Price",
@@ -169,6 +230,7 @@
   "statRevenue": "Revenue",
   "statProfit": "Profit",
   "statSoldItems": "Sold Items",
+  "statTransactions": "Transactions",
   "fifoHint": "FIFO",
   "totalLabel": "Total",
   "inStockCount": "{count} in stock",
@@ -495,6 +557,7 @@
     }
   },
   "reportsTitle": "Reports",
+  "viewReportsAction": "View Reports",
   "reportsSubtitle": "Sales performance and exports",
   "csvExportAction": "CSV",
   "pdfExportAction": "PDF",
@@ -603,6 +666,14 @@
       }
     }
   },
+  "daysAgo": "{count} days ago",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "passwordLabel": "Password",
   "incorrectPassword": "Incorrect password",
   "unlockAction": "Unlock",
@@ -646,6 +717,32 @@
     }
   },
   "deletePermanentlyAction": "Delete Permanently",
+  "forceDeleteAction": "Force Delete",
+  "forceDeleteTitle": "Force delete product?",
+  "forceDeleteWarning": "This will permanently delete \"{name}\" AND all its sales, purchases, and stock history. This cannot be undone.",
+  "@forceDeleteWarning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "forceDeleteTypeToConfirm": "Type \"{name}\" to confirm",
+  "@forceDeleteTypeToConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "forceDeleteSuccessMessage": "\"{name}\" and all its history were permanently deleted.",
+  "@forceDeleteSuccessMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "securityPanel": "Security",
   "securityPanelDesc": "Protect the app with a password",
   "passwordIsSet": "Password is set",
@@ -996,6 +1093,13 @@
   "stagnantProductsPanel": "Slow-Moving Stock",
   "stagnantProductsDesc": "In stock but no sales in the last 30 days",
   "noStagnantProducts": "No slow-moving stock right now.",
+  "oldDebtCustomersPanel": "Customers with Old Debt",
+  "oldDebtCustomersDesc": "Balances with no payment or purchase activity in over 30 days",
+  "noOldDebtCustomers": "No overdue customer debt right now.",
+  "lastActivityLabel": "Last Activity",
+  "supplierPriorityPanel": "Suppliers to Pay First",
+  "supplierPriorityDesc": "Suppliers you owe the most, ordered by amount owed",
+  "noSupplierPriority": "You don't owe any suppliers right now.",
   "reorderNoticeMessage": "{count} products need reordering soon",
   "@reorderNoticeMessage": {
     "placeholders": {

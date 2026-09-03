@@ -9,8 +9,8 @@ import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/status_badge.dart';
-import '../../widgets/confirm_dialog.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/money_text.dart';
 import 'product_form_dialog.dart';
 import 'product_detail_screen.dart';
 import '../../widgets/category_chip.dart';
@@ -49,7 +49,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   Future<void> _load() async {
-    final all = _showingArchived ? await _repo.getArchived() : await _repo.getAllActive();
+    final all = _showingArchived
+        ? await _repo.getArchived()
+        : await _repo.getAllActive();
     final cats = await _categoryRepo.getAllWithCounts();
     final stockValue = await _repo.stockValueAtBuyPrice();
     if (!mounted) return;
@@ -74,26 +76,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
     _load();
   }
 
-  Future<void> _deletePermanently(Product product) async {
+  Future<void> _forceDeleteProduct(Product product) async {
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await ConfirmDialog.show(
-      context,
-      title: l10n.deletePermanentlyTitle,
-      message: l10n.deletePermanentlyMessage(product.name),
-      confirmLabel: l10n.deletePermanentlyAction,
-      tone: ConfirmTone.destructive,
-      icon: Icons.delete_forever_outlined,
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => _ForceDeleteDialog(product: product),
     );
-    if (!confirmed) return;
-    try {
-      await _repo.deletePermanently(product.id);
-      _load();
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
-      );
-    }
+    if (confirmed != true) return;
+    await _repo.forceDeleteWithHistory(product.id);
+    if (!mounted) return;
+    _load();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.forceDeleteSuccessMessage(product.name))),
+    );
   }
 
   List<Product> get _filtered {
@@ -113,7 +108,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
       if (_stockFilter == StockFilter.low && status != ProductStatus.lowStock) {
         return false;
       }
-      if (_stockFilter == StockFilter.out && status != ProductStatus.outOfStock) {
+      if (_stockFilter == StockFilter.out &&
+          status != ProductStatus.outOfStock) {
         return false;
       }
       return true;
@@ -168,8 +164,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
               children: [
                 OutlinedButton.icon(
                   onPressed: _toggleArchivedView,
-                  icon: Icon(_showingArchived ? Icons.inventory_2_outlined : Icons.archive_outlined, size: 18),
-                  label: Text(_showingArchived ? l10n.viewActive : l10n.viewArchived),
+                  icon: Icon(
+                    _showingArchived
+                        ? Icons.inventory_2_outlined
+                        : Icons.archive_outlined,
+                    size: 18,
+                  ),
+                  label: Text(
+                    _showingArchived ? l10n.viewActive : l10n.viewArchived,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 FilledButton.icon(
@@ -180,34 +183,42 @@ class _ProductsScreenState extends State<ProductsScreen> {
               ],
             ),
           ),
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 2.2,
-            children: [
-              StatCard(
-                label: l10n.statTotalProducts,
-                value: '${_all.length}',
-                icon: Icons.inventory_2_outlined,
-                accentColor: const Color(0xFF0E7C7B),
-              ),
-              StatCard(
-                label: l10n.statTotalUnits,
-                value: formatQuantity(totalUnits, 'unit'),
-                icon: Icons.widgets_outlined,
-                accentColor: const Color(0xFFF2A93B),
-              ),
-              StatCard(
-                label: l10n.statStockValue,
-                value: formatMoney(_stockValue),
-                hint: l10n.atBuyPrice,
-                icon: Icons.account_balance_wallet_outlined,
-                accentColor: const Color(0xFF16A34A),
-              ),
-            ],
+          Builder(
+            builder: (context) {
+              final stats = [
+                StatCard(
+                  label: l10n.statTotalProducts,
+                  value: '${_all.length}',
+                  icon: Icons.inventory_2_outlined,
+                  accentColor: const Color(0xFF0E7C7B),
+                ),
+                StatCard(
+                  label: l10n.statTotalUnits,
+                  value: formatQuantity(totalUnits, 'unit'),
+                  icon: Icons.widgets_outlined,
+                  accentColor: const Color(0xFFF2A93B),
+                ),
+                StatCard(
+                  label: l10n.statStockValue,
+                  value: formatMoney(_stockValue),
+                  hint: l10n.atBuyPrice,
+                  icon: Icons.account_balance_wallet_outlined,
+                  accentColor: const Color(0xFF16A34A),
+                ),
+              ];
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  mainAxisExtent: 152,
+                ),
+                itemCount: stats.length,
+                itemBuilder: (context, i) => stats[i],
+              );
+            },
           ),
           const SizedBox(height: 24),
           Panel(
@@ -277,7 +288,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
               ],
             ),
             child: rows.isEmpty
-                ? EmptyState(icon: Icons.inventory_2_outlined, title: l10n.noProductsMatch)
+                ? EmptyState(
+                    icon: Icons.inventory_2_outlined,
+                    title: l10n.noProductsMatch,
+                  )
                 : LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(
@@ -355,12 +369,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         FutureBuilder<String?>(
-                                          future: resolveProductImagePath(p.imagePath),
+                                          future: resolveProductImagePath(
+                                            p.imagePath,
+                                          ),
                                           builder: (context, snapshot) {
                                             if (snapshot.data != null) {
                                               return CircleAvatar(
                                                 radius: 15,
-                                                backgroundImage: FileImage(File(snapshot.data!)),
+                                                backgroundImage: FileImage(
+                                                  File(snapshot.data!),
+                                                ),
                                               );
                                             }
                                             return CircleAvatar(
@@ -381,13 +399,21 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                           },
                                         ),
                                         const SizedBox(width: 10),
-                                        Text(
-                                          productDisplayName(p),
-                                          style: TextStyle(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                            fontWeight: FontWeight.w600,
+                                        Tooltip(
+                                          message: productDisplayName(p),
+                                          child: SizedBox(
+                                            width: 200,
+                                            child: Text(
+                                              productDisplayName(p),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -400,7 +426,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                     ),
                                   ),
                                   DataCell(
-                                    Text(
+                                    MoneyText(
                                       p.sellingPrice != null
                                           ? formatMoney(p.sellingPrice!)
                                           : '—',
@@ -412,7 +438,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                   ),
                                   DataCell(
                                     Text(
-                                      formatQuantity(p.stockQuantity, p.unitType),
+                                      formatQuantity(
+                                        p.stockQuantity,
+                                        p.unitType,
+                                      ),
                                       style: TextStyle(
                                         color: stockColor,
                                         fontWeight: FontWeight.w700,
@@ -437,17 +466,21 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                         children: [
                                           TextButton.icon(
                                             onPressed: () => _restoreProduct(p),
-                                            icon: const Icon(Icons.restore, size: 16),
+                                            icon: const Icon(
+                                              Icons.restore,
+                                              size: 16,
+                                            ),
                                             label: Text(l10n.restoreAction),
                                           ),
                                           IconButton(
-                                            onPressed: () => _deletePermanently(p),
+                                            onPressed: () =>
+                                                _forceDeleteProduct(p),
                                             icon: const Icon(
-                                              Icons.delete_forever_outlined,
+                                              Icons.dangerous_outlined,
                                               size: 18,
                                               color: Color(0xFFE4572E),
                                             ),
-                                            tooltip: l10n.deletePermanentlyAction,
+                                            tooltip: l10n.forceDeleteAction,
                                           ),
                                         ],
                                       ),
@@ -463,6 +496,101 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Requires the user to type the product's exact name before enabling the
+/// destructive action — this deletes real sales/purchase/stock history
+/// permanently, so a plain Yes/No isn't enough friction.
+class _ForceDeleteDialog extends StatefulWidget {
+  final Product product;
+  const _ForceDeleteDialog({required this.product});
+
+  @override
+  State<_ForceDeleteDialog> createState() => _ForceDeleteDialogState();
+}
+
+class _ForceDeleteDialogState extends State<_ForceDeleteDialog> {
+  final _controller = TextEditingController();
+  bool _matches = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    const color = Color(0xFFE4572E);
+    return AlertDialog(
+      contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.dangerous_outlined,
+              color: color,
+              size: 22,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            l10n.forceDeleteTitle,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+      content: SizedBox(
+        width: 360,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.forceDeleteWarning(widget.product.name),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _controller,
+              autofocus: true,
+              decoration: InputDecoration(
+                labelText: l10n.forceDeleteTypeToConfirm(widget.product.name),
+                border: const OutlineInputBorder(),
+              ),
+              onChanged: (value) =>
+                  setState(() => _matches = value == widget.product.name),
+            ),
+          ],
+        ),
+      ),
+      actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(backgroundColor: color),
+          onPressed: _matches ? () => Navigator.pop(context, true) : null,
+          child: Text(l10n.forceDeleteAction),
+        ),
+      ],
     );
   }
 }

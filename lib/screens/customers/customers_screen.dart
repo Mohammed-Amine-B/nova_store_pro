@@ -88,7 +88,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
   Future<void> _openDetail(Customer customer) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CustomerDetailScreen(db: widget.db, customerId: customer.id),
+        builder: (context) =>
+            CustomerDetailScreen(db: widget.db, customerId: customer.id),
       ),
     );
     _load();
@@ -99,7 +100,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
     final l10n = AppLocalizations.of(context)!;
     if (_loading) return const Center(child: CircularProgressIndicator());
     final rows = _filtered;
-    final totalOwed = _all.fold<double>(0, (sum, c) => sum + (c.balance > 0 ? c.balance : 0));
+    final totalOwed = _all.fold<double>(
+      0,
+      (sum, c) => sum + (c.balance > 0 ? c.balance : 0),
+    );
 
     return SingleChildScrollView(
       child: Column(
@@ -108,16 +112,23 @@ class _CustomersScreenState extends State<CustomersScreen> {
           PageHeader(
             title: l10n.customersTitle,
             subtitle: l10n.customersSubtitle,
-                        actions: Row(
+            actions: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 OutlinedButton.icon(
                   onPressed: _toggleArchivedView,
-                  icon: Icon(_showingArchived ? Icons.people_outline : Icons.archive_outlined, size: 18),
-                  label: Text(_showingArchived ? l10n.viewActive : l10n.viewArchived),
+                  icon: Icon(
+                    _showingArchived
+                        ? Icons.people_outline
+                        : Icons.archive_outlined,
+                    size: 18,
+                  ),
+                  label: Text(
+                    _showingArchived ? l10n.viewActive : l10n.viewArchived,
+                  ),
                 ),
                 const SizedBox(width: 12),
-                                OutlinedButton.icon(
+                OutlinedButton.icon(
                   onPressed: () async {
                     final customerId = await showDialog<int>(
                       context: context,
@@ -127,10 +138,16 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => Scaffold(
-                          appBar: AppBar(title: Text(l10n.newCustomerSaleTitle), leading: const BackButton()),
+                          appBar: AppBar(
+                            title: Text(l10n.newCustomerSaleTitle),
+                            leading: const BackButton(),
+                          ),
                           body: Padding(
                             padding: const EdgeInsets.all(24),
-                            child: CustomerSaleScreen(db: widget.db, customerId: customerId),
+                            child: CustomerSaleScreen(
+                              db: widget.db,
+                              customerId: customerId,
+                            ),
                           ),
                         ),
                       ),
@@ -149,27 +166,35 @@ class _CustomersScreenState extends State<CustomersScreen> {
               ],
             ),
           ),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 2.6,
-            children: [
-              StatCard(
-                label: l10n.statTotalCustomers,
-                value: '${_all.length}',
-                icon: Icons.people_outline,
-                accentColor: const Color(0xFF0E7C7B),
-              ),
-              StatCard(
-                label: l10n.statTotalOwed,
-                value: formatMoney(totalOwed),
-                icon: Icons.account_balance_wallet_outlined,
-                accentColor: const Color(0xFFE4572E),
-              ),
-            ],
+          Builder(
+            builder: (context) {
+              final stats = [
+                StatCard(
+                  label: l10n.statTotalCustomers,
+                  value: '${_all.length}',
+                  icon: Icons.people_outline,
+                  accentColor: const Color(0xFF0E7C7B),
+                ),
+                StatCard(
+                  label: l10n.statTotalOwed,
+                  value: formatMoney(totalOwed),
+                  icon: Icons.account_balance_wallet_outlined,
+                  accentColor: const Color(0xFFE4572E),
+                ),
+              ];
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  mainAxisExtent: 128,
+                ),
+                itemCount: stats.length,
+                itemBuilder: (context, i) => stats[i],
+              );
+            },
           ),
           const SizedBox(height: 24),
           Panel(
@@ -189,21 +214,32 @@ class _CustomersScreenState extends State<CustomersScreen> {
               ),
             ),
             child: rows.isEmpty
-                ? EmptyState(icon: Icons.people_outline, title: l10n.noCustomersMatch)
+                ? EmptyState(
+                    icon: Icons.people_outline,
+                    title: l10n.noCustomersMatch,
+                  )
                 : LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: ConstrainedBox(
-                          constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                          constraints: BoxConstraints(
+                            minWidth: constraints.maxWidth,
+                          ),
                           child: DataTable(
                             showCheckboxColumn: false,
                             headingRowColor: WidgetStateProperty.all(
-                              Theme.of(context).colorScheme.primary.withValues(alpha: 0.06),
+                              Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.06),
                             ),
-                            dataRowColor: WidgetStateProperty.resolveWith((states) {
+                            dataRowColor: WidgetStateProperty.resolveWith((
+                              states,
+                            ) {
                               if (states.contains(WidgetState.hovered)) {
-                                return Theme.of(context).colorScheme.primary.withValues(alpha: 0.04);
+                                return Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.04);
                               }
                               return null;
                             }),
@@ -214,9 +250,13 @@ class _CustomersScreenState extends State<CustomersScreen> {
                             columns: [
                               DataColumn(label: Text(l10n.colName)),
                               DataColumn(label: Text(l10n.colPhone)),
-                              DataColumn(label: Text(l10n.colBalance), numeric: true),
+                              DataColumn(
+                                label: Text(l10n.colBalance),
+                                numeric: true,
+                              ),
                               DataColumn(label: Text(l10n.colActions)),
-                              if (_showingArchived) DataColumn(label: Text(l10n.restoreAction)),
+                              if (_showingArchived)
+                                DataColumn(label: Text(l10n.restoreAction)),
                             ],
                             rows: rows.map((cwb) {
                               final c = cwb.customer;
@@ -233,9 +273,13 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                       children: [
                                         CircleAvatar(
                                           radius: 15,
-                                          backgroundColor: const Color(0xFF0E7C7B).withValues(alpha: 0.15),
+                                          backgroundColor: const Color(
+                                            0xFF0E7C7B,
+                                          ).withValues(alpha: 0.15),
                                           child: Text(
-                                            c.name.isNotEmpty ? c.name[0].toUpperCase() : '?',
+                                            c.name.isNotEmpty
+                                                ? c.name[0].toUpperCase()
+                                                : '?',
                                             style: const TextStyle(
                                               color: Color(0xFF0E7C7B),
                                               fontWeight: FontWeight.w700,
@@ -244,11 +288,21 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                           ),
                                         ),
                                         const SizedBox(width: 10),
-                                        Text(
-                                          c.name,
-                                          style: TextStyle(
-                                            color: Theme.of(context).colorScheme.primary,
-                                            fontWeight: FontWeight.w600,
+                                        Tooltip(
+                                          message: c.name,
+                                          child: SizedBox(
+                                            width: 200,
+                                            child: Text(
+                                              c.name,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -258,13 +312,19 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                   DataCell(
                                     Text(
                                       balanceDisplay.$1,
-                                      style: TextStyle(fontWeight: FontWeight.w700, color: balanceColor),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: balanceColor,
+                                      ),
                                     ),
                                   ),
                                   DataCell(
                                     TextButton.icon(
                                       onPressed: () => _openDetail(c),
-                                      icon: const Icon(Icons.visibility_outlined, size: 16),
+                                      icon: const Icon(
+                                        Icons.visibility_outlined,
+                                        size: 16,
+                                      ),
                                       label: Text(l10n.viewAction),
                                     ),
                                   ),
@@ -272,7 +332,10 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                     DataCell(
                                       TextButton.icon(
                                         onPressed: () => _restoreCustomer(c),
-                                        icon: const Icon(Icons.restore, size: 16),
+                                        icon: const Icon(
+                                          Icons.restore,
+                                          size: 16,
+                                        ),
                                         label: Text(l10n.restoreAction),
                                       ),
                                     ),

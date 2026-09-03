@@ -160,6 +160,79 @@ class ProductRepository {
     await _activityLog.log('product', 'deleted', entityName: product?.name, refId: id);
   }
 
+  /// Permanently deletes a product along with ALL related data (sale items,
+  /// purchase items, batches, stock movements, and any return line items
+  /// against those sale items), cleaning up any sale/purchase/return that
+  /// becomes empty as a result. Unlike [deletePermanently], this does NOT
+  /// check for history first — it removes everything regardless. Only call
+  /// this after strong user confirmation (the UI layer enforces this).
+  Future<void> forceDeleteWithHistory(int productId) async {
+    final product = await (db.select(db.products)..where((p) => p.id.equals(productId))).getSingleOrNull();
+
+    await db.transaction(() async {
+      final saleItems = await (db.select(db.saleItems)..where((i) => i.productId.equals(productId))).get();
+      final affectedSaleIds = <int>{};
+      final affectedReturnIds = <int>{};
+      for (final item in saleItems) {
+        affectedSaleIds.add(item.saleId);
+        await (db.delete(db.saleItemBatches)..where((b) => b.saleItemId.equals(item.id))).go();
+
+        final returnItems =
+            await (db.select(db.returnItems)..where((r) => r.saleItemId.equals(item.id))).get();
+        for (final r in returnItems) {
+          affectedReturnIds.add(r.returnId);
+        }
+        await (db.delete(db.returnItems)..where((r) => r.saleItemId.equals(item.id))).go();
+      }
+      await (db.delete(db.saleItems)..where((i) => i.productId.equals(productId))).go();
+
+      for (final returnId in affectedReturnIds) {
+        final remainingReturnItems =
+            await (db.select(db.returnItems)..where((r) => r.returnId.equals(returnId))).get();
+        if (remainingReturnItems.isEmpty) {
+          await (db.delete(db.returns)..where((r) => r.id.equals(returnId))).go();
+        }
+      }
+
+      for (final saleId in affectedSaleIds) {
+        final remaining = await (db.select(db.saleItems)..where((i) => i.saleId.equals(saleId))).get();
+        if (remaining.isEmpty) {
+          await (db.delete(db.returns)..where((r) => r.saleId.equals(saleId))).go();
+          await (db.delete(db.sales)..where((s) => s.id.equals(saleId))).go();
+        } else {
+          final total = remaining.fold<double>(0, (sum, i) => sum + i.quantity * i.unitPrice);
+          final profit = remaining.fold<double>(0, (sum, i) => sum + i.quantity * (i.unitPrice - i.unitCost));
+          await (db.update(db.sales)..where((s) => s.id.equals(saleId)))
+              .write(SalesCompanion(totalAmount: Value(total), totalProfit: Value(profit)));
+        }
+      }
+
+      final purchaseItems = await (db.select(db.purchaseItems)..where((i) => i.productId.equals(productId))).get();
+      final affectedPurchaseIds = <int>{};
+      for (final item in purchaseItems) {
+        affectedPurchaseIds.add(item.purchaseId);
+      }
+      await (db.delete(db.purchaseItems)..where((i) => i.productId.equals(productId))).go();
+      for (final purchaseId in affectedPurchaseIds) {
+        final remaining =
+            await (db.select(db.purchaseItems)..where((i) => i.purchaseId.equals(purchaseId))).get();
+        if (remaining.isEmpty) {
+          await (db.delete(db.purchases)..where((p) => p.id.equals(purchaseId))).go();
+        } else {
+          final total = remaining.fold<double>(0, (sum, i) => sum + i.quantity * i.buyPrice);
+          await (db.update(db.purchases)..where((p) => p.id.equals(purchaseId)))
+              .write(PurchasesCompanion(totalAmount: Value(total)));
+        }
+      }
+
+      await (db.delete(db.stockMovements)..where((m) => m.productId.equals(productId))).go();
+      await (db.delete(db.productBatches)..where((b) => b.productId.equals(productId))).go();
+      await (db.delete(db.products)..where((p) => p.id.equals(productId))).go();
+    });
+
+    await _activityLog.log('product', 'deleted', entityName: product?.name, refId: productId);
+  }
+
   /// Products are archived, never hard-deleted.
   Future<void> archive(int id) async {
     final product = await (db.select(db.products)..where((p) => p.id.equals(id))).getSingleOrNull();
@@ -285,5 +358,35 @@ class ProductRepository {
     await (db.update(db.products)..where((p) => p.id.equals(id)))
         .write(const ProductsCompanion(isArchived: Value(false)));
     await _activityLog.log('product', 'restored', entityName: product?.name, refId: id);
+  }
+
+  /// For a given product, groups its purchase history by supplier and returns
+  /// each supplier's average buy price, sorted cheapest first. Only meaningful
+  /// when a product has been bought from 2+ different suppliers.
+  Future<List<({String supplierName, double avgBuyPrice, int purchaseCount})>> getSupplierPriceComparison(int productId) async {
+    final items = await (db.select(db.purchaseItems)..where((i) => i.productId.equals(productId))).get();
+    if (items.isEmpty) return [];
+    final purchases = await db.select(db.purchases).get();
+    final purchaseSupplier = {for (final p in purchases) p.id: p.supplierId};
+    final suppliers = await db.select(db.suppliers).get();
+    final supplierName = {for (final s in suppliers) s.id: s.name};
+
+    final bySupplier = <int, List<double>>{};
+    for (final item in items) {
+      final supplierId = purchaseSupplier[item.purchaseId];
+      if (supplierId == null) continue;
+      bySupplier.putIfAbsent(supplierId, () => []).add(item.buyPrice);
+    }
+
+    final result = bySupplier.entries.map((e) {
+      final avg = e.value.reduce((a, b) => a + b) / e.value.length;
+      return (
+        supplierName: supplierName[e.key] ?? 'Unknown',
+        avgBuyPrice: avg,
+        purchaseCount: e.value.length,
+      );
+    }).toList();
+    result.sort((a, b) => a.avgBuyPrice.compareTo(b.avgBuyPrice));
+    return result;
   }
 }

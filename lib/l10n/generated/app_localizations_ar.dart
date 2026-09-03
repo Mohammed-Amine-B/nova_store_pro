@@ -45,6 +45,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get close => 'إغلاق';
 
   @override
+  String get exitConfirmTitle => 'الخروج من Nova Pro';
+
+  @override
+  String get exitConfirmMessage => 'هل أنت متأكد أنك تريد الخروج من Nova Pro؟';
+
+  @override
+  String get exitConfirmButton => 'خروج';
+
+  @override
   String get dashboardTitle => 'لوحة التحكم';
 
   @override
@@ -144,6 +153,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get colCurrentStock => 'المخزون الحالي';
+
+  @override
+  String get productDetailsAction => 'تفاصيل المنتج';
 
   @override
   String get colStatus => 'الحالة';
@@ -287,6 +299,80 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noMovementsRecorded => 'لا توجد حركات مسجلة.';
 
   @override
+  String get colProductId => 'رقم المنتج';
+
+  @override
+  String get sizeVariantLabel => 'الحجم / الصنف';
+
+  @override
+  String get profitMarginLabel => 'هامش الربح';
+
+  @override
+  String get stockStatusLabel => 'حالة المخزون';
+
+  @override
+  String get bestSupplierPanel => 'أفضل مورد';
+
+  @override
+  String avgPriceAcrossPurchases(int count) {
+    return 'متوسط السعر عبر $count عملية شراء';
+  }
+
+  @override
+  String alsoBoughtFromNote(String list) {
+    return 'تم الشراء أيضًا من: $list';
+  }
+
+  @override
+  String get viewAllAction => 'عرض الكل';
+
+  @override
+  String get perUnitNote => 'لكل وحدة';
+
+  @override
+  String get latestBatchAverageNote => 'متوسط آخر دفعة';
+
+  @override
+  String get colTotalValue => 'القيمة الإجمالية';
+
+  @override
+  String get printBarcodeAction => 'طباعة الباركود';
+
+  @override
+  String get barcodePrintComingSoon => 'طباعة الباركود قريباً.';
+
+  @override
+  String stockValueFormulaNote(String qty, String cost) {
+    return '$qty × $cost تكلفة';
+  }
+
+  @override
+  String aboveMinimumNote(String qty) {
+    return '$qty فوق الحد الأدنى';
+  }
+
+  @override
+  String belowMinimumNote(String qty) {
+    return '$qty تحت الحد الأدنى';
+  }
+
+  @override
+  String get atMinimumNote => 'عند الحد الأدنى';
+
+  @override
+  String percentOfSellingPriceNote(String percent) {
+    return '$percent% من سعر البيع';
+  }
+
+  @override
+  String get weeksSuffix => 'أسابيع';
+
+  @override
+  String stockWillLastNote(String weeks) {
+    return 'سيدوم المخزون حوالي $weeks بناءً على المبيعات الأخيرة';
+  }
+
+  @override
   String get categoriesTitle => 'التصنيفات';
 
   @override
@@ -335,6 +421,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get salesTodayPanel => 'مبيعات اليوم';
 
   @override
+  String get colTime => 'الوقت';
+
+  @override
   String get colProduct => 'المنتج';
 
   @override
@@ -354,6 +443,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get statSoldItems => 'الوحدات المباعة';
+
+  @override
+  String get statTransactions => 'العمليات';
 
   @override
   String get fifoHint => 'FIFO';
@@ -945,6 +1037,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reportsTitle => 'التقارير';
 
   @override
+  String get viewReportsAction => 'عرض التقارير';
+
+  @override
   String get reportsSubtitle => 'أداء المبيعات والتصدير';
 
   @override
@@ -1071,6 +1166,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String daysAgo(int count) {
+    return 'منذ $count يوم';
+  }
+
+  @override
   String get passwordLabel => 'كلمة المرور';
 
   @override
@@ -1143,6 +1243,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deletePermanentlyAction => 'حذف نهائي';
+
+  @override
+  String get forceDeleteAction => 'حذف قسري';
+
+  @override
+  String get forceDeleteTitle => 'حذف المنتج قسريًا؟';
+
+  @override
+  String forceDeleteWarning(String name) {
+    return 'سيؤدي هذا إلى حذف \"$name\" نهائيًا مع جميع مبيعاته ومشترياته وسجل مخزونه. لا يمكن التراجع عن هذا الإجراء.';
+  }
+
+  @override
+  String forceDeleteTypeToConfirm(String name) {
+    return 'اكتب \"$name\" للتأكيد';
+  }
+
+  @override
+  String forceDeleteSuccessMessage(String name) {
+    return 'تم حذف \"$name\" وكل سجله نهائيًا.';
+  }
 
   @override
   String get securityPanel => 'الأمان';
@@ -1398,9 +1519,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get recentActivityPanel => 'النشاط الأخير';
 
   @override
-  String get viewAllAction => 'عرض الكل';
-
-  @override
   String get noRecentActivity => 'لا يوجد نشاط بعد.';
 
   @override
@@ -1545,6 +1663,29 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noStagnantProducts => 'لا يوجد مخزون بطيء الحركة حاليًا.';
+
+  @override
+  String get oldDebtCustomersPanel => 'عملاء بديون قديمة';
+
+  @override
+  String get oldDebtCustomersDesc =>
+      'أرصدة لم تشهد أي دفعة أو عملية شراء منذ أكثر من 30 يومًا';
+
+  @override
+  String get noOldDebtCustomers => 'لا توجد ديون عملاء متأخرة حاليًا.';
+
+  @override
+  String get lastActivityLabel => 'آخر نشاط';
+
+  @override
+  String get supplierPriorityPanel => 'الموردون الأولى بالدفع';
+
+  @override
+  String get supplierPriorityDesc =>
+      'الموردون الذين يُدان لهم بأكبر المبالغ، مرتبين حسب المبلغ المستحق';
+
+  @override
+  String get noSupplierPriority => 'لا توجد مستحقات لأي مورد حاليًا.';
 
   @override
   String reorderNoticeMessage(int count) {

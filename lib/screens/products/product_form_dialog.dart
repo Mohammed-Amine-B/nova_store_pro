@@ -38,7 +38,9 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     text: plainNumber(widget.editing?.minStock ?? 5),
   );
   late final _sellingPriceController = TextEditingController(
-    text: widget.editing?.sellingPrice != null ? plainNumber(widget.editing!.sellingPrice!) : '',
+    text: widget.editing?.sellingPrice != null
+        ? plainNumber(widget.editing!.sellingPrice!)
+        : '',
   );
   late final _variantSizeController = TextEditingController(
     text: widget.editing?.variantSize ?? '',
@@ -165,150 +167,167 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
       ),
       content: SizedBox(
         width: 380,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Center(
-              child: InkWell(
-                onTap: _pickImage,
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Theme.of(context).dividerColor),
-                  ),
-                  child: FutureBuilder<String?>(
-                    future: resolveProductImagePath(_imagePath),
-                    builder: (context, snapshot) {
-                      if (snapshot.data != null) {
-                        return Image.file(File(snapshot.data!), fit: BoxFit.cover);
-                      }
-                      return Icon(
-                        Icons.image_outlined,
-                        size: 36,
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: _nameController,
-              focusNode: _nameFocus,
-              textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                labelText: l10n.productNameLabel,
-                border: const OutlineInputBorder(),
-              ),
-              onChanged: _onNameChanged,
-              onSubmitted: (_) => _codeFocus.requestFocus(),
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _codeController,
-                    focusNode: _codeFocus,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      labelText: l10n.productCodeLabel,
-                      border: const OutlineInputBorder(),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: InkWell(
+                  onTap: _pickImage,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Theme.of(context).dividerColor),
                     ),
-                    onChanged: (_) => _codeManuallyEdited = true,
-                    onSubmitted: (_) => _barcodeFocus.requestFocus(),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    controller: _barcodeController,
-                    focusNode: _barcodeFocus,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      labelText: l10n.barcodeOptionalLabel,
-                      border: const OutlineInputBorder(),
+                    child: FutureBuilder<String?>(
+                      future: resolveProductImagePath(_imagePath),
+                      builder: (context, snapshot) {
+                        if (snapshot.data != null) {
+                          return Image.file(
+                            File(snapshot.data!),
+                            fit: BoxFit.cover,
+                          );
+                        }
+                        return Icon(
+                          Icons.image_outlined,
+                          size: 36,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.5),
+                        );
+                      },
                     ),
-                    onSubmitted: (_) => _minStockFocus.requestFocus(),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            DropdownButtonFormField<int?>(
-              initialValue: _categoryId,
-              isExpanded: true,
-              decoration: InputDecoration(
-                labelText: l10n.categoryOptionalLabel,
-                border: const OutlineInputBorder(),
               ),
-              items: [
-                DropdownMenuItem(value: null, child: Text(l10n.noneOption)),
-                ...widget.categories.map(
-                  (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
-                ),
-              ],
-              onChanged: (v) => setState(() => _categoryId = v),
-            ),
-            const SizedBox(height: 14),
-                        DropdownButtonFormField<String>(
-              initialValue: _unitType,
-              isExpanded: true,
-              decoration: InputDecoration(
-                labelText: l10n.unitTypeLabel,
-                border: const OutlineInputBorder(),
-              ),
-              items: [
-                DropdownMenuItem(value: 'piece', child: Text(l10n.unitTypePiece)),
-                DropdownMenuItem(value: 'kg', child: Text(l10n.unitTypeKg)),
-                DropdownMenuItem(value: 'meter', child: Text(l10n.unitTypeMeter)),
-              ],
-              onChanged: (v) => setState(() => _unitType = v ?? 'piece'),
-            ),
-            if (widget.editing != null) ...[
               const SizedBox(height: 14),
               TextField(
-                controller: _sellingPriceController,
+                controller: _nameController,
+                focusNode: _nameFocus,
+                textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                  labelText: l10n.sellingPriceFieldLabel,
+                  labelText: l10n.productNameLabel,
                   border: const OutlineInputBorder(),
                 ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                onChanged: _onNameChanged,
+                onSubmitted: (_) => _codeFocus.requestFocus(),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _codeController,
+                      focusNode: _codeFocus,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        labelText: l10n.productCodeLabel,
+                        border: const OutlineInputBorder(),
+                      ),
+                      onChanged: (_) => _codeManuallyEdited = true,
+                      onSubmitted: (_) => _barcodeFocus.requestFocus(),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _barcodeController,
+                      focusNode: _barcodeFocus,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        labelText: l10n.barcodeOptionalLabel,
+                        border: const OutlineInputBorder(),
+                      ),
+                      onSubmitted: (_) => _minStockFocus.requestFocus(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              DropdownButtonFormField<int?>(
+                initialValue: _categoryId,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  labelText: l10n.categoryOptionalLabel,
+                  border: const OutlineInputBorder(),
+                ),
+                items: [
+                  DropdownMenuItem(value: null, child: Text(l10n.noneOption)),
+                  ...widget.categories.map(
+                    (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
+                  ),
+                ],
+                onChanged: (v) => setState(() => _categoryId = v),
+              ),
+              const SizedBox(height: 14),
+              DropdownButtonFormField<String>(
+                initialValue: _unitType,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  labelText: l10n.unitTypeLabel,
+                  border: const OutlineInputBorder(),
+                ),
+                items: [
+                  DropdownMenuItem(
+                    value: 'piece',
+                    child: Text(l10n.unitTypePiece),
+                  ),
+                  DropdownMenuItem(value: 'kg', child: Text(l10n.unitTypeKg)),
+                  DropdownMenuItem(
+                    value: 'meter',
+                    child: Text(l10n.unitTypeMeter),
+                  ),
+                ],
+                onChanged: (v) => setState(() => _unitType = v ?? 'piece'),
+              ),
+              if (widget.editing != null) ...[
+                const SizedBox(height: 14),
+                TextField(
+                  controller: _sellingPriceController,
+                  decoration: InputDecoration(
+                    labelText: l10n.sellingPriceFieldLabel,
+                    border: const OutlineInputBorder(),
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 14),
+              TextField(
+                controller: _minStockController,
+                focusNode: _minStockFocus,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  labelText: l10n.lowStockThresholdLabel,
+                  border: const OutlineInputBorder(),
+                ),
+                keyboardType: _unitType == 'piece'
+                    ? TextInputType.number
+                    : const TextInputType.numberWithOptions(decimal: true),
+                onSubmitted: (_) => _variantSizeFocus.requestFocus(),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _variantSizeController,
+                focusNode: _variantSizeFocus,
+                textInputAction: TextInputAction.done,
+                decoration: InputDecoration(
+                  labelText: l10n.variantSizeLabel,
+                  hintText: l10n.variantSizeHint,
+                  border: const OutlineInputBorder(),
+                ),
+                onSubmitted: (_) => _save(),
               ),
             ],
-            const SizedBox(height: 14),
-            TextField(
-              controller: _minStockController,
-              focusNode: _minStockFocus,
-              textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                labelText: l10n.lowStockThresholdLabel,
-                border: const OutlineInputBorder(),
-              ),
-              keyboardType: _unitType == 'piece'
-                  ? TextInputType.number
-                  : const TextInputType.numberWithOptions(decimal: true),
-              onSubmitted: (_) => _variantSizeFocus.requestFocus(),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: _variantSizeController,
-              focusNode: _variantSizeFocus,
-              textInputAction: TextInputAction.done,
-              decoration: InputDecoration(
-                labelText: l10n.variantSizeLabel,
-                hintText: l10n.variantSizeHint,
-                border: const OutlineInputBorder(),
-              ),
-              onSubmitted: (_) => _save(),
-            ),
-          ],
+          ),
         ),
       ),
       actionsPadding: const EdgeInsets.fromLTRB(24, 8, 24, 20),

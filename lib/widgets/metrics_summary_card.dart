@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'money_text.dart';
 
 class MetricItem {
   final String label;
@@ -40,15 +41,27 @@ class MetricsSummaryCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Text(items[i].value, style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: items[i].valueColor,
-                      )),
+                      Flexible(
+                        child: MoneyText(
+                          items[i].value,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: items[i].valueColor,
+                          ),
+                        ),
+                      ),
                       if (items[i].hint != null) ...[
                         const SizedBox(width: 6),
-                        Text(items[i].hint!, style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                        )),
+                        Flexible(
+                          child: Text(
+                            items[i].hint!,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ),
                       ],
                     ],
                   ),
