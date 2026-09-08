@@ -141,6 +141,54 @@ class AppLocalizationsFr extends AppLocalizations {
   String get filterOutOfStock => 'Rupture de stock';
 
   @override
+  String get filtersLabel => 'Filtres';
+
+  @override
+  String get clearFiltersAction => 'Effacer les filtres';
+
+  @override
+  String activeFiltersCount(int count) {
+    return '$count actifs';
+  }
+
+  @override
+  String get photoFilterLabel => 'Photo';
+
+  @override
+  String get photoFilterHas => 'Avec photo';
+
+  @override
+  String get photoFilterNone => 'Sans photo';
+
+  @override
+  String get productTypeFilterLabel => 'Type de produit';
+
+  @override
+  String get priceRangeLabel => 'Fourchette de prix de vente';
+
+  @override
+  String get minPriceLabel => 'Min';
+
+  @override
+  String get maxPriceLabel => 'Max';
+
+  @override
+  String get dateAddedLabel => 'Date d\'ajout';
+
+  @override
+  String get anyDateLabel => 'Toute date';
+
+  @override
+  String get stagnantStockLabel =>
+      'Afficher uniquement les produits sans vente depuis 30 jours';
+
+  @override
+  String get lastSupplierLabel => 'Dernier fournisseur';
+
+  @override
+  String get allSuppliers => 'Tous les fournisseurs';
+
+  @override
   String get colProductName => 'Nom du produit';
 
   @override
@@ -403,6 +451,58 @@ class AppLocalizationsFr extends AppLocalizations {
   String stockWillLastNote(String weeks) {
     return 'Le stock durera environ $weeks selon les ventes récentes';
   }
+
+  @override
+  String get navNotes => 'Notes';
+
+  @override
+  String get notesTitle => 'Notes';
+
+  @override
+  String get notesSubtitle => 'Rappels rapides non liés à un enregistrement';
+
+  @override
+  String notesCount(int count) {
+    return '$count notes';
+  }
+
+  @override
+  String get addNote => 'Ajouter une note';
+
+  @override
+  String get editNote => 'Modifier la note';
+
+  @override
+  String get allNotesPanel => 'Toutes les notes';
+
+  @override
+  String get noNotesYet => 'Aucune note pour l\'instant';
+
+  @override
+  String get noteTitleLabel => 'Titre';
+
+  @override
+  String get noteContentOptionalLabel => 'Contenu (optionnel)';
+
+  @override
+  String get deleteNoteTitle => 'Supprimer la note ?';
+
+  @override
+  String deleteNoteMessage(String title) {
+    return 'Supprimer \"$title\" ? Cette action est irréversible.';
+  }
+
+  @override
+  String get noteTypeLabel => 'Type';
+
+  @override
+  String get noteTypeProductToAdd => 'Produit à ajouter';
+
+  @override
+  String get noteTypeCustomerRequest => 'Demande client';
+
+  @override
+  String get noteTypeGeneral => 'Général';
 
   @override
   String get categoriesTitle => 'Catégories';
@@ -748,6 +848,46 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get debtNoteHint =>
       'ex. Solde d\'ouverture avant l\'utilisation de cette application';
+
+  @override
+  String get editPaymentTitle => 'Modifier le paiement';
+
+  @override
+  String get deletePaymentTitle => 'Supprimer le paiement';
+
+  @override
+  String get deletePaymentMessage =>
+      'Ce paiement sera retiré de l\'historique du client.';
+
+  @override
+  String get editDebtTitle => 'Modifier la dette';
+
+  @override
+  String get deleteDebtTitle => 'Supprimer l\'entrée de dette';
+
+  @override
+  String get deleteDebtMessage =>
+      'Cette entrée de dette sera retirée de l\'historique du client.';
+
+  @override
+  String balancePreviewAfterDelete(String amount) {
+    return 'La suppression changera le solde à : $amount';
+  }
+
+  @override
+  String get editSupplierPaymentTitle => 'Modifier le paiement';
+
+  @override
+  String get deleteSupplierPaymentTitle => 'Supprimer le paiement';
+
+  @override
+  String get deleteSupplierPaymentMessage =>
+      'Ce paiement sera retiré de l\'historique du fournisseur.';
+
+  @override
+  String amountOwedPreviewAfterDelete(String amount) {
+    return 'La suppression changera le montant dû à : $amount';
+  }
 
   @override
   String get supplierDetailFallbackTitle => 'Détail du fournisseur';
@@ -1588,6 +1728,20 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get sellModeByQuantity => 'Par quantité';
+
+  @override
+  String get sellModeByAmount => 'Par montant';
+
+  @override
+  String get amountToSpendLabel => 'Montant à dépenser';
+
+  @override
+  String computedQuantityPreview(String quantity, String unit) {
+    return '≈ $quantity $unit';
+  }
+
+  @override
   String get statCustomersOwe => 'Les clients vous doivent';
 
   @override
@@ -1784,4 +1938,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get useSuggestionAction => 'Utiliser';
+
+  @override
+  String suggestedBuyPriceHint(String price) {
+    return 'Suggéré : $price (basé sur des produits similaires)';
+  }
 }

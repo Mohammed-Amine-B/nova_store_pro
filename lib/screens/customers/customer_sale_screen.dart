@@ -11,6 +11,7 @@ import '../../widgets/enter_to_submit.dart';
 import '../../widgets/product_thumbnail.dart';
 import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
+import '../../utils/rounding.dart';
 
 class _CartLine {
   final int? saleItemId;
@@ -133,61 +134,139 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
   }
 
   Future<(double, double)?> _askQuantityAndPrice(Product product) async {
-    final l10n = AppLocalizations.of(context)!;
     final isPiece = product.unitType == 'piece';
     final quantityController = TextEditingController(text: '1');
     final priceController = TextEditingController(
       text: plainNumber(product.sellingPrice ?? 0),
     );
-    void confirm(BuildContext context) {
-      var quantity = double.tryParse(quantityController.text) ?? 0;
-      if (isPiece) quantity = quantity.roundToDouble();
-      final price = double.tryParse(priceController.text) ?? 0;
-      if (quantity <= 0 || price <= 0) return;
-      Navigator.pop(context, (quantity, price));
-    }
+    var sellByAmount = false;
 
     return showDialog<(double, double)>(
       context: context,
-      builder: (context) => EnterToSubmit(
-        onSubmit: () => confirm(context),
-        child: AlertDialog(
-          title: Text(productDisplayName(product)),
-          content: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: quantityController,
-                  decoration: InputDecoration(labelText: l10n.quantityLabel),
-                  keyboardType: isPiece
-                      ? TextInputType.number
-                      : const TextInputType.numberWithOptions(decimal: true),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final l10n = AppLocalizations.of(context)!;
+          final unitLabel = product.unitType == 'kg' ? 'kg' : 'm';
+          final price = double.tryParse(priceController.text) ?? 0;
+          final enteredAmount = double.tryParse(quantityController.text) ?? 0;
+          final showQuantityPreview =
+              sellByAmount && enteredAmount > 0 && price > 0;
+          final previewQuantity = showQuantityPreview
+              ? roundQuantity(enteredAmount / price)
+              : 0.0;
+
+          void confirm() {
+            var quantity = double.tryParse(quantityController.text) ?? 0;
+            final price = double.tryParse(priceController.text) ?? 0;
+            if (quantity <= 0 || price <= 0) return;
+            if (isPiece) {
+              quantity = quantity.roundToDouble();
+            } else if (sellByAmount) {
+              quantity = roundQuantity(quantity / price);
+            }
+            Navigator.pop(context, (quantity, price));
+          }
+
+          return EnterToSubmit(
+            onSubmit: confirm,
+            child: AlertDialog(
+              title: Text(productDisplayName(product)),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (!isPiece) ...[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: SegmentedButton<bool>(
+                          segments: [
+                            ButtonSegment(
+                              value: false,
+                              label: Text(l10n.sellModeByQuantity),
+                            ),
+                            ButtonSegment(
+                              value: true,
+                              label: Text(l10n.sellModeByAmount),
+                            ),
+                          ],
+                          selected: {sellByAmount},
+                          onSelectionChanged: (s) =>
+                              setDialogState(() => sellByAmount = s.first),
+                          style: SegmentedButton.styleFrom(
+                            selectedBackgroundColor: const Color(
+                              0xFF0E7C7B,
+                            ).withValues(alpha: 0.12),
+                            selectedForegroundColor: const Color(0xFF0E7C7B),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: quantityController,
+                            decoration: InputDecoration(
+                              labelText: sellByAmount
+                                  ? l10n.amountToSpendLabel
+                                  : l10n.quantityLabel,
+                            ),
+                            keyboardType: isPiece
+                                ? TextInputType.number
+                                : const TextInputType.numberWithOptions(
+                                    decimal: true,
+                                  ),
+                            onChanged: (_) => setDialogState(() {}),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: TextField(
+                            controller: priceController,
+                            decoration: InputDecoration(
+                              labelText: l10n.colUnitPrice,
+                            ),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            onChanged: (_) => setDialogState(() {}),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (showQuantityPreview) ...[
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          l10n.computedQuantityPreview(
+                            plainNumber(previewQuantity),
+                            unitLabel,
+                          ),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  controller: priceController,
-                  decoration: InputDecoration(labelText: l10n.colUnitPrice),
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.cancel),
                 ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.cancel),
+                FilledButton(onPressed: confirm, child: Text(l10n.addAction)),
+              ],
             ),
-            FilledButton(
-              onPressed: () => confirm(context),
-              child: Text(l10n.addAction),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

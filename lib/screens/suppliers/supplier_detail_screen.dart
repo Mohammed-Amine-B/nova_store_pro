@@ -245,6 +245,148 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
     if (saved == true) _load();
   }
 
+  Future<void> _editPayment(SupplierPayment payment) async {
+    final amountController = TextEditingController(
+      text: plainNumber(payment.amount),
+    );
+    final noteController = TextEditingController(text: payment.note ?? '');
+    var paymentDate = payment.paymentDate;
+    String? error;
+
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final l10n = AppLocalizations.of(context)!;
+          Future<void> save() async {
+            final amount = double.tryParse(amountController.text) ?? 0;
+            if (amount <= 0) {
+              setDialogState(() => error = l10n.enterValidAmount);
+              return;
+            }
+            await _repo.updatePayment(
+              id: payment.id,
+              amount: amount,
+              paymentDate: paymentDate,
+              note: noteController.text.isEmpty ? null : noteController.text,
+            );
+            if (context.mounted) Navigator.pop(context, true);
+          }
+
+          Future<void> delete() async {
+            final previewOwed = _owed + payment.amount;
+            final confirmed = await ConfirmDialog.show(
+              context,
+              title: l10n.deleteSupplierPaymentTitle,
+              message: l10n.deleteSupplierPaymentMessage,
+              confirmLabel: l10n.delete,
+              tone: ConfirmTone.destructive,
+              icon: Icons.delete_outline,
+              extra: Text(
+                l10n.amountOwedPreviewAfterDelete(formatMoney(previewOwed)),
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: previewOwed <= 0
+                      ? const Color(0xFF16A34A)
+                      : const Color(0xFFE4572E),
+                ),
+              ),
+            );
+            if (!confirmed) return;
+            await _repo.deletePayment(payment.id);
+            if (context.mounted) Navigator.pop(context, true);
+          }
+
+          return EnterToSubmit(
+            onSubmit: save,
+            child: AlertDialog(
+              title: Text(l10n.editSupplierPaymentTitle),
+              content: SizedBox(
+                width: 320,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (error != null) ...[
+                        Text(
+                          error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      TextField(
+                        controller: amountController,
+                        decoration: InputDecoration(
+                          labelText: l10n.amountLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: paymentDate,
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null) {
+                            setDialogState(() => paymentDate = picked);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: l10n.paymentDateLabel,
+                            border: const OutlineInputBorder(),
+                          ),
+                          child: Text(_formatDate(paymentDate)),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: noteController,
+                        decoration: InputDecoration(
+                          labelText: l10n.noteOptionalLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFFE4572E),
+                  ),
+                  onPressed: delete,
+                  child: Text(l10n.delete),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF0E7C7B),
+                  ),
+                  onPressed: save,
+                  child: Text(l10n.save),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+    if (saved == true) _load();
+  }
+
   Future<void> _deletePurchase(Purchase purchase) async {
     final l10n = AppLocalizations.of(context)!;
     final confirmed = await ConfirmDialog.show(
@@ -499,6 +641,7 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                                       minWidth: constraints.maxWidth,
                                     ),
                                     child: DataTable(
+                                      showCheckboxColumn: false,
                                       columns: [
                                         DataColumn(label: Text(l10n.colDate)),
                                         DataColumn(
@@ -509,6 +652,8 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                                       ],
                                       rows: _payments.map((p) {
                                         return DataRow(
+                                          onSelectChanged: (_) =>
+                                              _editPayment(p),
                                           cells: [
                                             DataCell(
                                               Text(_formatDate(p.paymentDate)),

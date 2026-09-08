@@ -140,6 +140,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filterOutOfStock => 'Out of Stock';
 
   @override
+  String get filtersLabel => 'Filters';
+
+  @override
+  String get clearFiltersAction => 'Clear Filters';
+
+  @override
+  String activeFiltersCount(int count) {
+    return '$count active';
+  }
+
+  @override
+  String get photoFilterLabel => 'Photo';
+
+  @override
+  String get photoFilterHas => 'Has Photo';
+
+  @override
+  String get photoFilterNone => 'No Photo';
+
+  @override
+  String get productTypeFilterLabel => 'Product Type';
+
+  @override
+  String get priceRangeLabel => 'Selling Price Range';
+
+  @override
+  String get minPriceLabel => 'Min';
+
+  @override
+  String get maxPriceLabel => 'Max';
+
+  @override
+  String get dateAddedLabel => 'Date Added';
+
+  @override
+  String get anyDateLabel => 'Any date';
+
+  @override
+  String get stagnantStockLabel =>
+      'Only show products with no sales in the last 30 days';
+
+  @override
+  String get lastSupplierLabel => 'Last Supplier';
+
+  @override
+  String get allSuppliers => 'All suppliers';
+
+  @override
   String get colProductName => 'Product Name';
 
   @override
@@ -399,6 +447,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String stockWillLastNote(String weeks) {
     return 'Stock will last about $weeks based on recent sales';
   }
+
+  @override
+  String get navNotes => 'Notes';
+
+  @override
+  String get notesTitle => 'Notes';
+
+  @override
+  String get notesSubtitle => 'Quick reminders not tied to any record';
+
+  @override
+  String notesCount(int count) {
+    return '$count notes';
+  }
+
+  @override
+  String get addNote => 'Add Note';
+
+  @override
+  String get editNote => 'Edit Note';
+
+  @override
+  String get allNotesPanel => 'All Notes';
+
+  @override
+  String get noNotesYet => 'No notes yet';
+
+  @override
+  String get noteTitleLabel => 'Title';
+
+  @override
+  String get noteContentOptionalLabel => 'Content (optional)';
+
+  @override
+  String get deleteNoteTitle => 'Delete note?';
+
+  @override
+  String deleteNoteMessage(String title) {
+    return 'Delete \"$title\"? This can\'t be undone.';
+  }
+
+  @override
+  String get noteTypeLabel => 'Type';
+
+  @override
+  String get noteTypeProductToAdd => 'Product to Add';
+
+  @override
+  String get noteTypeCustomerRequest => 'Customer Request';
+
+  @override
+  String get noteTypeGeneral => 'General';
 
   @override
   String get categoriesTitle => 'Categories';
@@ -739,6 +839,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get debtNoteHint => 'e.g. Opening balance before using this app';
+
+  @override
+  String get editPaymentTitle => 'Edit Payment';
+
+  @override
+  String get deletePaymentTitle => 'Delete payment';
+
+  @override
+  String get deletePaymentMessage =>
+      'This payment will be removed from the customer\'s history.';
+
+  @override
+  String get editDebtTitle => 'Edit Debt';
+
+  @override
+  String get deleteDebtTitle => 'Delete debt entry';
+
+  @override
+  String get deleteDebtMessage =>
+      'This debt entry will be removed from the customer\'s history.';
+
+  @override
+  String balancePreviewAfterDelete(String amount) {
+    return 'Deleting this will change the balance to: $amount';
+  }
+
+  @override
+  String get editSupplierPaymentTitle => 'Edit Payment';
+
+  @override
+  String get deleteSupplierPaymentTitle => 'Delete payment';
+
+  @override
+  String get deleteSupplierPaymentMessage =>
+      'This payment will be removed from the supplier\'s history.';
+
+  @override
+  String amountOwedPreviewAfterDelete(String amount) {
+    return 'Deleting this will change the amount owed to: $amount';
+  }
 
   @override
   String get supplierDetailFallbackTitle => 'Supplier Detail';
@@ -1568,6 +1708,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get sellModeByQuantity => 'By Quantity';
+
+  @override
+  String get sellModeByAmount => 'By Amount';
+
+  @override
+  String get amountToSpendLabel => 'Amount to Spend';
+
+  @override
+  String computedQuantityPreview(String quantity, String unit) {
+    return '≈ $quantity $unit';
+  }
+
+  @override
   String get statCustomersOwe => 'Customers Owe You';
 
   @override
@@ -1760,4 +1914,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get useSuggestionAction => 'Use';
+
+  @override
+  String suggestedBuyPriceHint(String price) {
+    return 'Suggested: $price (based on similar products)';
+  }
 }

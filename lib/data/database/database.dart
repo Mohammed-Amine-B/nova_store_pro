@@ -22,6 +22,7 @@ import 'tables/returns_table.dart';
 import 'tables/return_items_table.dart';
 import 'tables/supplier_payments_table.dart';
 import 'tables/activity_log_table.dart';
+import 'tables/notes_table.dart';
 
 part 'database.g.dart';
 
@@ -45,6 +46,7 @@ part 'database.g.dart';
     ReturnItems,
     SupplierPayments,
     ActivityLog,
+    Notes,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -57,47 +59,53 @@ class AppDatabase extends _$AppDatabase {
   // yet; the local dev SQLite database needs to be deleted once for this
   // change. All schema changes after this one still require a real migration.
   @override
-  int get schemaVersion => 16;
+  int get schemaVersion => 18;
 
   // Baseline: schema version 9 as of 2026-08-23. All future schema changes must
   // add a migration step in onUpgrade below — never tell a user to delete their
   // database again.
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (Migrator m) async {
-          await m.createAll();
-        },
-        onUpgrade: (Migrator m, int from, int to) async {
-          // Migration steps go here, one `if` block per version jump, added
-          // incrementally as the schema changes in the future.
-          if (from < 10) {
-            await m.addColumn(settings, settings.securityQuestion);
-            await m.addColumn(settings, settings.securityAnswerHash);
-            await m.addColumn(settings, settings.recoveryCodeHash);
-          }
-          if (from < 11) {
-            await m.addColumn(settings, settings.fontSize);
-          }
-          if (from < 13) {
-            await m.addColumn(products, products.variantSize);
-          }
-          // from < 14: Products.variantGroup was dropped — no migration step
-          // (see the one-time exception noted on schemaVersion above).
-          if (from < 15) {
-            await m.createTable(customerDebtAdjustments);
-          }
-          if (from < 16) {
-            await m.addColumn(settings, settings.backupDestination);
-            await m.addColumn(settings, settings.lastAutoBackupAt);
-          }
-        },
-        beforeOpen: (details) async {
-          // Optional: enable foreign keys or run startup checks here if needed.
-          // Left as a no-op for now — this app never enforced FK constraints at
-          // the SQLite level, so turning that on retroactively could reject
-          // writes against pre-existing data that predates strict enforcement.
-        },
-      );
+    onCreate: (Migrator m) async {
+      await m.createAll();
+    },
+    onUpgrade: (Migrator m, int from, int to) async {
+      // Migration steps go here, one `if` block per version jump, added
+      // incrementally as the schema changes in the future.
+      if (from < 10) {
+        await m.addColumn(settings, settings.securityQuestion);
+        await m.addColumn(settings, settings.securityAnswerHash);
+        await m.addColumn(settings, settings.recoveryCodeHash);
+      }
+      if (from < 11) {
+        await m.addColumn(settings, settings.fontSize);
+      }
+      if (from < 13) {
+        await m.addColumn(products, products.variantSize);
+      }
+      // from < 14: Products.variantGroup was dropped — no migration step
+      // (see the one-time exception noted on schemaVersion above).
+      if (from < 15) {
+        await m.createTable(customerDebtAdjustments);
+      }
+      if (from < 16) {
+        await m.addColumn(settings, settings.backupDestination);
+        await m.addColumn(settings, settings.lastAutoBackupAt);
+      }
+      if (from < 17) {
+        await m.createTable(notes); // already includes the `type` column, since that's part of the current table definition
+      }
+      if (from >= 17 && from < 18) {
+        await m.addColumn(notes, notes.type); // only needed for a DB that already had `notes` before `type` existed
+      }
+    },
+    beforeOpen: (details) async {
+      // Optional: enable foreign keys or run startup checks here if needed.
+      // Left as a no-op for now — this app never enforced FK constraints at
+      // the SQLite level, so turning that on retroactively could reject
+      // writes against pre-existing data that predates strict enforcement.
+    },
+  );
 }
 
 QueryExecutor _openConnection() {

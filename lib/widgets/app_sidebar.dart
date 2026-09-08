@@ -23,9 +23,9 @@ List<NavItem> navItemsFor(BuildContext context) {
     NavItem(Icons.insights_outlined, l10n.insightsTitle, 9),
     NavItem(Icons.history_edu_outlined, l10n.activityLogTitle, 10),
     NavItem(Icons.settings_outlined, l10n.navSettings, 11),
+    NavItem(Icons.sticky_note_2_outlined, l10n.navNotes, 12),
   ];
 }
-
 
 class AppSidebar extends StatelessWidget {
   final String shopName;
@@ -62,13 +62,19 @@ class AppSidebar extends StatelessWidget {
                     color: theme.colorScheme.primary,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.storefront, color: Colors.white, size: 20),
+                  child: const Icon(
+                    Icons.storefront,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     shopName,
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -97,14 +103,17 @@ class AppSidebar extends StatelessWidget {
       (l10n.navSectionOverview, const [0]),
       (l10n.navSectionInventory, const [1, 2, 4]),
       (l10n.navSectionSales, const [3, 5, 6, 7]),
-      (l10n.navSectionAdmin, const [8, 9, 10, 11]),
+      (l10n.navSectionAdmin, const [8, 9, 10, 11, 12]),
     ];
 
     final theme = Theme.of(context);
     final widgets = <Widget>[];
     for (var i = 0; i < sections.length; i++) {
       final (label, indices) = sections[i];
-      final sectionItems = indices.map((idx) => items[idx]).whereType<NavItem>().toList();
+      final sectionItems = indices
+          .map((idx) => items[idx])
+          .whereType<NavItem>()
+          .toList();
       if (sectionItems.isEmpty) continue;
       if (i > 0) widgets.add(const SizedBox(height: 16));
       widgets.add(

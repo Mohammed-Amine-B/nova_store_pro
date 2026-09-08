@@ -72,6 +72,28 @@
   "filterAll": "All",
   "filterLowStock": "Low Stock",
   "filterOutOfStock": "Out of Stock",
+  "filtersLabel": "Filters",
+  "clearFiltersAction": "Clear Filters",
+  "activeFiltersCount": "{count} active",
+  "@activeFiltersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "photoFilterLabel": "Photo",
+  "photoFilterHas": "Has Photo",
+  "photoFilterNone": "No Photo",
+  "productTypeFilterLabel": "Product Type",
+  "priceRangeLabel": "Selling Price Range",
+  "minPriceLabel": "Min",
+  "maxPriceLabel": "Max",
+  "dateAddedLabel": "Date Added",
+  "anyDateLabel": "Any date",
+  "stagnantStockLabel": "Only show products with no sales in the last 30 days",
+  "lastSupplierLabel": "Last Supplier",
+  "allSuppliers": "All suppliers",
   "colProductName": "Product Name",
   "colBarcode": "Barcode",
   "colCategory": "Category",
@@ -196,6 +218,36 @@
       "weeks": { "type": "String" }
     }
   },
+  "navNotes": "Notes",
+  "notesTitle": "Notes",
+  "notesSubtitle": "Quick reminders not tied to any record",
+  "notesCount": "{count} notes",
+  "@notesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addNote": "Add Note",
+  "editNote": "Edit Note",
+  "allNotesPanel": "All Notes",
+  "noNotesYet": "No notes yet",
+  "noteTitleLabel": "Title",
+  "noteContentOptionalLabel": "Content (optional)",
+  "deleteNoteTitle": "Delete note?",
+  "deleteNoteMessage": "Delete \"{title}\"? This can't be undone.",
+  "@deleteNoteMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "noteTypeLabel": "Type",
+  "noteTypeProductToAdd": "Product to Add",
+  "noteTypeCustomerRequest": "Customer Request",
+  "noteTypeGeneral": "General",
   "categoriesTitle": "Categories",
   "categoriesCount": "{count} categories",
   "@categoriesCount": {
@@ -372,6 +424,31 @@
   "debtAddedLabel": "Debt Added",
   "addDebtAction": "Add Debt",
   "debtNoteHint": "e.g. Opening balance before using this app",
+  "editPaymentTitle": "Edit Payment",
+  "deletePaymentTitle": "Delete payment",
+  "deletePaymentMessage": "This payment will be removed from the customer's history.",
+  "editDebtTitle": "Edit Debt",
+  "deleteDebtTitle": "Delete debt entry",
+  "deleteDebtMessage": "This debt entry will be removed from the customer's history.",
+  "balancePreviewAfterDelete": "Deleting this will change the balance to: {amount}",
+  "@balancePreviewAfterDelete": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "editSupplierPaymentTitle": "Edit Payment",
+  "deleteSupplierPaymentTitle": "Delete payment",
+  "deleteSupplierPaymentMessage": "This payment will be removed from the supplier's history.",
+  "amountOwedPreviewAfterDelete": "Deleting this will change the amount owed to: {amount}",
+  "@amountOwedPreviewAfterDelete": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "supplierDetailFallbackTitle": "Supplier Detail",
   "supplierNoLongerExists": "This supplier no longer exists.",
   "selectSupplierTitle": "Select Supplier",
@@ -1048,6 +1125,20 @@
       }
     }
   },
+  "sellModeByQuantity": "By Quantity",
+  "sellModeByAmount": "By Amount",
+  "amountToSpendLabel": "Amount to Spend",
+  "computedQuantityPreview": "≈ {quantity} {unit}",
+  "@computedQuantityPreview": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "statCustomersOwe": "Customers Owe You",
   "statOwedToSuppliers": "You Owe Suppliers",
   "recentActivityPanel": "Recent Activity",
@@ -1141,5 +1232,13 @@
       }
     }
   },
-  "useSuggestionAction": "Use"
+  "useSuggestionAction": "Use",
+  "suggestedBuyPriceHint": "Suggested: {price} (based on similar products)",
+  "@suggestedBuyPriceHint": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  }
 }

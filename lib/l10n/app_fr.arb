@@ -41,6 +41,28 @@
   "filterAll": "Tous",
   "filterLowStock": "Stock faible",
   "filterOutOfStock": "Rupture de stock",
+  "filtersLabel": "Filtres",
+  "clearFiltersAction": "Effacer les filtres",
+  "activeFiltersCount": "{count} actifs",
+  "@activeFiltersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "photoFilterLabel": "Photo",
+  "photoFilterHas": "Avec photo",
+  "photoFilterNone": "Sans photo",
+  "productTypeFilterLabel": "Type de produit",
+  "priceRangeLabel": "Fourchette de prix de vente",
+  "minPriceLabel": "Min",
+  "maxPriceLabel": "Max",
+  "dateAddedLabel": "Date d'ajout",
+  "anyDateLabel": "Toute date",
+  "stagnantStockLabel": "Afficher uniquement les produits sans vente depuis 30 jours",
+  "lastSupplierLabel": "Dernier fournisseur",
+  "allSuppliers": "Tous les fournisseurs",
   "colProductName": "Nom du produit",
   "colBarcode": "Code-barres",
   "colCategory": "Catégorie",
@@ -148,6 +170,36 @@
       "weeks": { "type": "String" }
     }
   },
+  "navNotes": "Notes",
+  "notesTitle": "Notes",
+  "notesSubtitle": "Rappels rapides non liés à un enregistrement",
+  "notesCount": "{count} notes",
+  "@notesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addNote": "Ajouter une note",
+  "editNote": "Modifier la note",
+  "allNotesPanel": "Toutes les notes",
+  "noNotesYet": "Aucune note pour l'instant",
+  "noteTitleLabel": "Titre",
+  "noteContentOptionalLabel": "Contenu (optionnel)",
+  "deleteNoteTitle": "Supprimer la note ?",
+  "deleteNoteMessage": "Supprimer \"{title}\" ? Cette action est irréversible.",
+  "@deleteNoteMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "noteTypeLabel": "Type",
+  "noteTypeProductToAdd": "Produit à ajouter",
+  "noteTypeCustomerRequest": "Demande client",
+  "noteTypeGeneral": "Général",
   "categoriesTitle": "Catégories",
   "categoriesCount": "{count} catégories",
   "addCategory": "Ajouter une catégorie",
@@ -254,6 +306,31 @@
   "debtAddedLabel": "Dette ajoutée",
   "addDebtAction": "Ajouter une dette",
   "debtNoteHint": "ex. Solde d'ouverture avant l'utilisation de cette application",
+  "editPaymentTitle": "Modifier le paiement",
+  "deletePaymentTitle": "Supprimer le paiement",
+  "deletePaymentMessage": "Ce paiement sera retiré de l'historique du client.",
+  "editDebtTitle": "Modifier la dette",
+  "deleteDebtTitle": "Supprimer l'entrée de dette",
+  "deleteDebtMessage": "Cette entrée de dette sera retirée de l'historique du client.",
+  "balancePreviewAfterDelete": "La suppression changera le solde à : {amount}",
+  "@balancePreviewAfterDelete": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "editSupplierPaymentTitle": "Modifier le paiement",
+  "deleteSupplierPaymentTitle": "Supprimer le paiement",
+  "deleteSupplierPaymentMessage": "Ce paiement sera retiré de l'historique du fournisseur.",
+  "amountOwedPreviewAfterDelete": "La suppression changera le montant dû à : {amount}",
+  "@amountOwedPreviewAfterDelete": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "supplierDetailFallbackTitle": "Détail du fournisseur",
   "supplierNoLongerExists": "Ce fournisseur n'existe plus.",
   "selectSupplierTitle": "Sélectionner un fournisseur",
@@ -495,6 +572,10 @@
   "priceModeTotal": "Prix total",
   "totalPricePaidLabel": "Prix total payé",
   "perUnitPreview": "≈ {price} par {unit}",
+  "sellModeByQuantity": "Par quantité",
+  "sellModeByAmount": "Par montant",
+  "amountToSpendLabel": "Montant à dépenser",
+  "computedQuantityPreview": "≈ {quantity} {unit}",
   "statCustomersOwe": "Les clients vous doivent",
   "statOwedToSuppliers": "Vous devez aux fournisseurs",
   "recentActivityPanel": "Activité récente",
@@ -554,5 +635,13 @@
   "noSupplierPriority": "Vous ne devez rien à aucun fournisseur pour l'instant.",
   "reorderNoticeMessage": "{count} produits à réapprovisionner bientôt",
   "suggestedPriceHint": "Suggéré : {price} (basé sur des produits similaires)",
-  "useSuggestionAction": "Utiliser"
+  "useSuggestionAction": "Utiliser",
+  "suggestedBuyPriceHint": "Suggéré : {price} (basé sur des produits similaires)",
+  "@suggestedBuyPriceHint": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  }
 }

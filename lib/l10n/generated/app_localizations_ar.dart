@@ -140,6 +140,54 @@ class AppLocalizationsAr extends AppLocalizations {
   String get filterOutOfStock => 'نفذ من المخزون';
 
   @override
+  String get filtersLabel => 'التصفية';
+
+  @override
+  String get clearFiltersAction => 'مسح التصفية';
+
+  @override
+  String activeFiltersCount(int count) {
+    return '$count نشطة';
+  }
+
+  @override
+  String get photoFilterLabel => 'الصورة';
+
+  @override
+  String get photoFilterHas => 'لديه صورة';
+
+  @override
+  String get photoFilterNone => 'بدون صورة';
+
+  @override
+  String get productTypeFilterLabel => 'نوع المنتج';
+
+  @override
+  String get priceRangeLabel => 'نطاق سعر البيع';
+
+  @override
+  String get minPriceLabel => 'الأدنى';
+
+  @override
+  String get maxPriceLabel => 'الأقصى';
+
+  @override
+  String get dateAddedLabel => 'تاريخ الإضافة';
+
+  @override
+  String get anyDateLabel => 'أي تاريخ';
+
+  @override
+  String get stagnantStockLabel =>
+      'عرض المنتجات التي لم تُباع خلال آخر 30 يومًا فقط';
+
+  @override
+  String get lastSupplierLabel => 'آخر مورّد';
+
+  @override
+  String get allSuppliers => 'جميع الموردين';
+
+  @override
   String get colProductName => 'اسم المنتج';
 
   @override
@@ -399,6 +447,58 @@ class AppLocalizationsAr extends AppLocalizations {
   String stockWillLastNote(String weeks) {
     return 'سيدوم المخزون حوالي $weeks بناءً على المبيعات الأخيرة';
   }
+
+  @override
+  String get navNotes => 'الملاحظات';
+
+  @override
+  String get notesTitle => 'الملاحظات';
+
+  @override
+  String get notesSubtitle => 'تذكيرات سريعة غير مرتبطة بأي سجل';
+
+  @override
+  String notesCount(int count) {
+    return '$count ملاحظة';
+  }
+
+  @override
+  String get addNote => 'إضافة ملاحظة';
+
+  @override
+  String get editNote => 'تعديل الملاحظة';
+
+  @override
+  String get allNotesPanel => 'جميع الملاحظات';
+
+  @override
+  String get noNotesYet => 'لا توجد ملاحظات بعد';
+
+  @override
+  String get noteTitleLabel => 'العنوان';
+
+  @override
+  String get noteContentOptionalLabel => 'المحتوى (اختياري)';
+
+  @override
+  String get deleteNoteTitle => 'حذف الملاحظة؟';
+
+  @override
+  String deleteNoteMessage(String title) {
+    return 'حذف \"$title\"؟ لا يمكن التراجع عن هذا.';
+  }
+
+  @override
+  String get noteTypeLabel => 'النوع';
+
+  @override
+  String get noteTypeProductToAdd => 'منتج يجب إضافته';
+
+  @override
+  String get noteTypeCustomerRequest => 'طلب زبون';
+
+  @override
+  String get noteTypeGeneral => 'عام';
 
   @override
   String get categoriesTitle => 'التصنيفات';
@@ -739,6 +839,44 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get debtNoteHint => 'مثال: رصيد افتتاحي قبل استخدام هذا التطبيق';
+
+  @override
+  String get editPaymentTitle => 'تعديل الدفعة';
+
+  @override
+  String get deletePaymentTitle => 'حذف الدفعة';
+
+  @override
+  String get deletePaymentMessage => 'سيتم حذف هذه الدفعة من سجل الزبون.';
+
+  @override
+  String get editDebtTitle => 'تعديل الدين';
+
+  @override
+  String get deleteDebtTitle => 'حذف قيد الدين';
+
+  @override
+  String get deleteDebtMessage => 'سيتم حذف قيد الدين هذا من سجل الزبون.';
+
+  @override
+  String balancePreviewAfterDelete(String amount) {
+    return 'سيؤدي الحذف إلى تغيير الرصيد إلى: $amount';
+  }
+
+  @override
+  String get editSupplierPaymentTitle => 'تعديل الدفعة';
+
+  @override
+  String get deleteSupplierPaymentTitle => 'حذف الدفعة';
+
+  @override
+  String get deleteSupplierPaymentMessage =>
+      'سيتم حذف هذه الدفعة من سجل المورد.';
+
+  @override
+  String amountOwedPreviewAfterDelete(String amount) {
+    return 'سيؤدي الحذف إلى تغيير المبلغ المستحق إلى: $amount';
+  }
 
   @override
   String get supplierDetailFallbackTitle => 'تفاصيل المورد';
@@ -1568,6 +1706,20 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get sellModeByQuantity => 'بالكمية';
+
+  @override
+  String get sellModeByAmount => 'بالمبلغ';
+
+  @override
+  String get amountToSpendLabel => 'المبلغ المراد إنفاقه';
+
+  @override
+  String computedQuantityPreview(String quantity, String unit) {
+    return '≈ $quantity $unit';
+  }
+
+  @override
   String get statCustomersOwe => 'الزبائن مدينون لك';
 
   @override
@@ -1757,4 +1909,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get useSuggestionAction => 'استخدام';
+
+  @override
+  String suggestedBuyPriceHint(String price) {
+    return 'مقترح: $price (بناءً على منتجات مشابهة)';
+  }
 }

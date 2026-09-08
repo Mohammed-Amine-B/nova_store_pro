@@ -346,6 +346,96 @@ abstract class AppLocalizations {
   /// **'Out of Stock'**
   String get filterOutOfStock;
 
+  /// No description provided for @filtersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get filtersLabel;
+
+  /// No description provided for @clearFiltersAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Filters'**
+  String get clearFiltersAction;
+
+  /// No description provided for @activeFiltersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active'**
+  String activeFiltersCount(int count);
+
+  /// No description provided for @photoFilterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get photoFilterLabel;
+
+  /// No description provided for @photoFilterHas.
+  ///
+  /// In en, this message translates to:
+  /// **'Has Photo'**
+  String get photoFilterHas;
+
+  /// No description provided for @photoFilterNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No Photo'**
+  String get photoFilterNone;
+
+  /// No description provided for @productTypeFilterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Product Type'**
+  String get productTypeFilterLabel;
+
+  /// No description provided for @priceRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selling Price Range'**
+  String get priceRangeLabel;
+
+  /// No description provided for @minPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Min'**
+  String get minPriceLabel;
+
+  /// No description provided for @maxPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Max'**
+  String get maxPriceLabel;
+
+  /// No description provided for @dateAddedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Added'**
+  String get dateAddedLabel;
+
+  /// No description provided for @anyDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Any date'**
+  String get anyDateLabel;
+
+  /// No description provided for @stagnantStockLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Only show products with no sales in the last 30 days'**
+  String get stagnantStockLabel;
+
+  /// No description provided for @lastSupplierLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Supplier'**
+  String get lastSupplierLabel;
+
+  /// No description provided for @allSuppliers.
+  ///
+  /// In en, this message translates to:
+  /// **'All suppliers'**
+  String get allSuppliers;
+
   /// No description provided for @colProductName.
   ///
   /// In en, this message translates to:
@@ -831,6 +921,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stock will last about {weeks} based on recent sales'**
   String stockWillLastNote(String weeks);
+
+  /// No description provided for @navNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get navNotes;
+
+  /// No description provided for @notesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notesTitle;
+
+  /// No description provided for @notesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick reminders not tied to any record'**
+  String get notesSubtitle;
+
+  /// No description provided for @notesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} notes'**
+  String notesCount(int count);
+
+  /// No description provided for @addNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Note'**
+  String get addNote;
+
+  /// No description provided for @editNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Note'**
+  String get editNote;
+
+  /// No description provided for @allNotesPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'All Notes'**
+  String get allNotesPanel;
+
+  /// No description provided for @noNotesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No notes yet'**
+  String get noNotesYet;
+
+  /// No description provided for @noteTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get noteTitleLabel;
+
+  /// No description provided for @noteContentOptionalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Content (optional)'**
+  String get noteContentOptionalLabel;
+
+  /// No description provided for @deleteNoteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete note?'**
+  String get deleteNoteTitle;
+
+  /// No description provided for @deleteNoteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{title}\"? This can\'t be undone.'**
+  String deleteNoteMessage(String title);
+
+  /// No description provided for @noteTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get noteTypeLabel;
+
+  /// No description provided for @noteTypeProductToAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Product to Add'**
+  String get noteTypeProductToAdd;
+
+  /// No description provided for @noteTypeCustomerRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Request'**
+  String get noteTypeCustomerRequest;
+
+  /// No description provided for @noteTypeGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get noteTypeGeneral;
 
   /// No description provided for @categoriesTitle.
   ///
@@ -1467,6 +1653,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'e.g. Opening balance before using this app'**
   String get debtNoteHint;
+
+  /// No description provided for @editPaymentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Payment'**
+  String get editPaymentTitle;
+
+  /// No description provided for @deletePaymentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete payment'**
+  String get deletePaymentTitle;
+
+  /// No description provided for @deletePaymentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This payment will be removed from the customer\'s history.'**
+  String get deletePaymentMessage;
+
+  /// No description provided for @editDebtTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Debt'**
+  String get editDebtTitle;
+
+  /// No description provided for @deleteDebtTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete debt entry'**
+  String get deleteDebtTitle;
+
+  /// No description provided for @deleteDebtMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This debt entry will be removed from the customer\'s history.'**
+  String get deleteDebtMessage;
+
+  /// No description provided for @balancePreviewAfterDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting this will change the balance to: {amount}'**
+  String balancePreviewAfterDelete(String amount);
+
+  /// No description provided for @editSupplierPaymentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Payment'**
+  String get editSupplierPaymentTitle;
+
+  /// No description provided for @deleteSupplierPaymentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete payment'**
+  String get deleteSupplierPaymentTitle;
+
+  /// No description provided for @deleteSupplierPaymentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This payment will be removed from the supplier\'s history.'**
+  String get deleteSupplierPaymentMessage;
+
+  /// No description provided for @amountOwedPreviewAfterDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting this will change the amount owed to: {amount}'**
+  String amountOwedPreviewAfterDelete(String amount);
 
   /// No description provided for @supplierDetailFallbackTitle.
   ///
@@ -2872,6 +3124,30 @@ abstract class AppLocalizations {
   /// **'≈ {price} per {unit}'**
   String perUnitPreview(String price, String unit);
 
+  /// No description provided for @sellModeByQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'By Quantity'**
+  String get sellModeByQuantity;
+
+  /// No description provided for @sellModeByAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'By Amount'**
+  String get sellModeByAmount;
+
+  /// No description provided for @amountToSpendLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount to Spend'**
+  String get amountToSpendLabel;
+
+  /// No description provided for @computedQuantityPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {quantity} {unit}'**
+  String computedQuantityPreview(String quantity, String unit);
+
   /// No description provided for @statCustomersOwe.
   ///
   /// In en, this message translates to:
@@ -3225,6 +3501,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use'**
   String get useSuggestionAction;
+
+  /// No description provided for @suggestedBuyPriceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested: {price} (based on similar products)'**
+  String suggestedBuyPriceHint(String price);
 }
 
 class _AppLocalizationsDelegate

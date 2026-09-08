@@ -196,7 +196,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<void> _openAddStock() async {
     final added = await showDialog<bool>(
       context: context,
-      builder: (context) => _AddStockDialog(repo: _repo, product: _product!),
+      builder: (context) => _AddStockDialog(
+        repo: _repo,
+        product: _product!,
+        hasBatches: _batches.isNotEmpty,
+      ),
     );
     if (added == true) _load();
   }
@@ -1528,7 +1532,12 @@ class _StockBar extends StatelessWidget {
 class _AddStockDialog extends StatefulWidget {
   final ProductRepository repo;
   final Product product;
-  const _AddStockDialog({required this.repo, required this.product});
+  final bool hasBatches;
+  const _AddStockDialog({
+    required this.repo,
+    required this.product,
+    required this.hasBatches,
+  });
 
   @override
   State<_AddStockDialog> createState() => _AddStockDialogState();
@@ -1618,19 +1627,21 @@ class _AddStockDialogState extends State<_AddStockDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CheckboxListTile(
-                  value: _isOpeningStock,
-                  onChanged: (v) =>
-                      setState(() => _isOpeningStock = v ?? false),
-                  controlAffinity: ListTileControlAffinity.leading,
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  title: Text(
-                    l10n.openingStockToggleLabel,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                if (!widget.hasBatches) ...[
+                  CheckboxListTile(
+                    value: _isOpeningStock,
+                    onChanged: (v) =>
+                        setState(() => _isOpeningStock = v ?? false),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    title: Text(
+                      l10n.openingStockToggleLabel,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
+                  const SizedBox(height: 8),
+                ],
                 Row(
                   children: [
                     Expanded(
@@ -1665,6 +1676,46 @@ class _AddStockDialogState extends State<_AddStockDialog> {
                     ),
                   ],
                 ),
+                if (_isOpeningStock &&
+                    widget.product.categoryId != null &&
+                    (double.tryParse(_sellingPriceController.text) ?? 0) > 0)
+                  FutureBuilder<double?>(
+                    future: widget.repo.suggestBuyPrice(
+                      widget.product.categoryId!,
+                      double.tryParse(_sellingPriceController.text) ?? 0,
+                    ),
+                    builder: (context, snapshot) {
+                      final suggestion = snapshot.data;
+                      if (suggestion == null) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l10n.suggestedBuyPriceHint(
+                                  formatMoney(suggestion),
+                                ),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => setState(
+                                () => _buyPriceController.text = plainNumber(
+                                  suggestion,
+                                ),
+                              ),
+                              child: Text(l10n.useSuggestionAction),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 const SizedBox(height: 14),
                 TextField(
                   controller: _sellingPriceController,
@@ -1675,6 +1726,7 @@ class _AddStockDialogState extends State<_AddStockDialog> {
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
+                  onChanged: (_) => setState(() {}),
                 ),
                 if (widget.product.categoryId != null &&
                     (double.tryParse(_buyPriceController.text) ?? 0) > 0)

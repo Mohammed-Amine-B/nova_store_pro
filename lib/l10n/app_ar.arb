@@ -41,6 +41,28 @@
   "filterAll": "الكل",
   "filterLowStock": "مخزون منخفض",
   "filterOutOfStock": "نفذ من المخزون",
+  "filtersLabel": "التصفية",
+  "clearFiltersAction": "مسح التصفية",
+  "activeFiltersCount": "{count} نشطة",
+  "@activeFiltersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "photoFilterLabel": "الصورة",
+  "photoFilterHas": "لديه صورة",
+  "photoFilterNone": "بدون صورة",
+  "productTypeFilterLabel": "نوع المنتج",
+  "priceRangeLabel": "نطاق سعر البيع",
+  "minPriceLabel": "الأدنى",
+  "maxPriceLabel": "الأقصى",
+  "dateAddedLabel": "تاريخ الإضافة",
+  "anyDateLabel": "أي تاريخ",
+  "stagnantStockLabel": "عرض المنتجات التي لم تُباع خلال آخر 30 يومًا فقط",
+  "lastSupplierLabel": "آخر مورّد",
+  "allSuppliers": "جميع الموردين",
   "colProductName": "اسم المنتج",
   "colBarcode": "الباركود",
   "colCategory": "التصنيف",
@@ -148,6 +170,36 @@
       "weeks": { "type": "String" }
     }
   },
+  "navNotes": "الملاحظات",
+  "notesTitle": "الملاحظات",
+  "notesSubtitle": "تذكيرات سريعة غير مرتبطة بأي سجل",
+  "notesCount": "{count} ملاحظة",
+  "@notesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addNote": "إضافة ملاحظة",
+  "editNote": "تعديل الملاحظة",
+  "allNotesPanel": "جميع الملاحظات",
+  "noNotesYet": "لا توجد ملاحظات بعد",
+  "noteTitleLabel": "العنوان",
+  "noteContentOptionalLabel": "المحتوى (اختياري)",
+  "deleteNoteTitle": "حذف الملاحظة؟",
+  "deleteNoteMessage": "حذف \"{title}\"؟ لا يمكن التراجع عن هذا.",
+  "@deleteNoteMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "noteTypeLabel": "النوع",
+  "noteTypeProductToAdd": "منتج يجب إضافته",
+  "noteTypeCustomerRequest": "طلب زبون",
+  "noteTypeGeneral": "عام",
   "categoriesTitle": "التصنيفات",
   "categoriesCount": "{count} تصنيف",
   "addCategory": "إضافة تصنيف",
@@ -254,6 +306,31 @@
   "debtAddedLabel": "دين مضاف",
   "addDebtAction": "إضافة دين",
   "debtNoteHint": "مثال: رصيد افتتاحي قبل استخدام هذا التطبيق",
+  "editPaymentTitle": "تعديل الدفعة",
+  "deletePaymentTitle": "حذف الدفعة",
+  "deletePaymentMessage": "سيتم حذف هذه الدفعة من سجل الزبون.",
+  "editDebtTitle": "تعديل الدين",
+  "deleteDebtTitle": "حذف قيد الدين",
+  "deleteDebtMessage": "سيتم حذف قيد الدين هذا من سجل الزبون.",
+  "balancePreviewAfterDelete": "سيؤدي الحذف إلى تغيير الرصيد إلى: {amount}",
+  "@balancePreviewAfterDelete": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "editSupplierPaymentTitle": "تعديل الدفعة",
+  "deleteSupplierPaymentTitle": "حذف الدفعة",
+  "deleteSupplierPaymentMessage": "سيتم حذف هذه الدفعة من سجل المورد.",
+  "amountOwedPreviewAfterDelete": "سيؤدي الحذف إلى تغيير المبلغ المستحق إلى: {amount}",
+  "@amountOwedPreviewAfterDelete": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "supplierDetailFallbackTitle": "تفاصيل المورد",
   "supplierNoLongerExists": "هذا المورد لم يعد موجودًا.",
   "selectSupplierTitle": "اختيار المورد",
@@ -495,6 +572,10 @@
   "priceModeTotal": "السعر الإجمالي",
   "totalPricePaidLabel": "السعر الإجمالي المدفوع",
   "perUnitPreview": "≈ {price} لكل {unit}",
+  "sellModeByQuantity": "بالكمية",
+  "sellModeByAmount": "بالمبلغ",
+  "amountToSpendLabel": "المبلغ المراد إنفاقه",
+  "computedQuantityPreview": "≈ {quantity} {unit}",
   "statCustomersOwe": "الزبائن مدينون لك",
   "statOwedToSuppliers": "أنت مدين للموردين",
   "recentActivityPanel": "النشاط الأخير",
@@ -554,5 +635,13 @@
   "noSupplierPriority": "لا توجد مستحقات لأي مورد حاليًا.",
   "reorderNoticeMessage": "{count} منتج يحتاج إعادة طلب قريبًا",
   "suggestedPriceHint": "مقترح: {price} (بناءً على منتجات مشابهة)",
-  "useSuggestionAction": "استخدام"
+  "useSuggestionAction": "استخدام",
+  "suggestedBuyPriceHint": "مقترح: {price} (بناءً على منتجات مشابهة)",
+  "@suggestedBuyPriceHint": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  }
 }

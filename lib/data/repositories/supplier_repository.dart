@@ -9,11 +9,15 @@ class SupplierRepository {
   late final ActivityLogRepository _activityLog = ActivityLogRepository(db);
 
   Future<List<Supplier>> getAllActive() async {
-    return (db.select(db.suppliers)..where((s) => s.isArchived.equals(false))).get();
+    return (db.select(
+      db.suppliers,
+    )..where((s) => s.isArchived.equals(false))).get();
   }
 
   Future<List<Supplier>> getArchived() async {
-    return (db.select(db.suppliers)..where((s) => s.isArchived.equals(true))).get();
+    return (db.select(
+      db.suppliers,
+    )..where((s) => s.isArchived.equals(true))).get();
   }
 
   Future<int> add({
@@ -22,12 +26,16 @@ class SupplierRepository {
     String? phone,
     String? note,
   }) async {
-    final id = await db.into(db.suppliers).insert(SuppliersCompanion.insert(
-          name: name.trim(),
-          location: Value(location?.trim()),
-          phone: Value(phone?.trim()),
-          note: Value(note?.trim()),
-        ));
+    final id = await db
+        .into(db.suppliers)
+        .insert(
+          SuppliersCompanion.insert(
+            name: name.trim(),
+            location: Value(location?.trim()),
+            phone: Value(phone?.trim()),
+            note: Value(note?.trim()),
+          ),
+        );
     await _activityLog.log('supplier', 'created', entityName: name.trim());
     return id;
   }
@@ -52,28 +60,47 @@ class SupplierRepository {
 
   /// Suppliers are archived, never hard-deleted.
   Future<void> archive(int id) async {
-    final supplier = await (db.select(db.suppliers)..where((s) => s.id.equals(id))).getSingleOrNull();
-    await (db.update(db.suppliers)..where((s) => s.id.equals(id)))
-        .write(const SuppliersCompanion(isArchived: Value(true)));
-    await _activityLog.log('supplier', 'archived', entityName: supplier?.name, refId: id);
+    final supplier = await (db.select(
+      db.suppliers,
+    )..where((s) => s.id.equals(id))).getSingleOrNull();
+    await (db.update(db.suppliers)..where((s) => s.id.equals(id))).write(
+      const SuppliersCompanion(isArchived: Value(true)),
+    );
+    await _activityLog.log(
+      'supplier',
+      'archived',
+      entityName: supplier?.name,
+      refId: id,
+    );
   }
 
   Future<void> unarchive(int id) async {
-    final supplier = await (db.select(db.suppliers)..where((s) => s.id.equals(id))).getSingleOrNull();
-    await (db.update(db.suppliers)..where((s) => s.id.equals(id)))
-        .write(const SuppliersCompanion(isArchived: Value(false)));
-    await _activityLog.log('supplier', 'restored', entityName: supplier?.name, refId: id);
+    final supplier = await (db.select(
+      db.suppliers,
+    )..where((s) => s.id.equals(id))).getSingleOrNull();
+    await (db.update(db.suppliers)..where((s) => s.id.equals(id))).write(
+      const SuppliersCompanion(isArchived: Value(false)),
+    );
+    await _activityLog.log(
+      'supplier',
+      'restored',
+      entityName: supplier?.name,
+      refId: id,
+    );
   }
 
   Future<Supplier?> getById(int id) async {
-    return (db.select(db.suppliers)..where((s) => s.id.equals(id))).getSingleOrNull();
+    return (db.select(
+      db.suppliers,
+    )..where((s) => s.id.equals(id))).getSingleOrNull();
   }
 
   Future<double> totalPurchasedFrom(int supplierId) async {
-    final rows = await (db.selectOnly(db.purchases)
-          ..addColumns([db.purchases.totalAmount])
-          ..where(db.purchases.supplierId.equals(supplierId)))
-        .get();
+    final rows =
+        await (db.selectOnly(db.purchases)
+              ..addColumns([db.purchases.totalAmount])
+              ..where(db.purchases.supplierId.equals(supplierId)))
+            .get();
     var total = 0.0;
     for (final row in rows) {
       total += row.read(db.purchases.totalAmount) ?? 0;
@@ -89,8 +116,13 @@ class SupplierRepository {
   }
 
   Future<double> getRemainingOwed(int supplierId) async {
-    final purchases = await (db.select(db.purchases)..where((p) => p.supplierId.equals(supplierId))).get();
-    final owed = purchases.fold<double>(0, (sum, p) => sum + (p.totalAmount - p.amountPaid));
+    final purchases = await (db.select(
+      db.purchases,
+    )..where((p) => p.supplierId.equals(supplierId))).get();
+    final owed = purchases.fold<double>(
+      0,
+      (sum, p) => sum + (p.totalAmount - p.amountPaid),
+    );
     final payments = await getPaymentsForSupplier(supplierId);
     final paid = payments.fold<double>(0, (sum, p) => sum + p.amount);
     return roundMoney(owed - paid);
@@ -113,13 +145,51 @@ class SupplierRepository {
     required DateTime paymentDate,
     String? note,
   }) async {
-    await db.into(db.supplierPayments).insert(SupplierPaymentsCompanion.insert(
-          supplierId: supplierId,
-          amount: roundMoney(amount),
-          paymentDate: paymentDate,
-          note: Value(note),
-        ));
-    final supplier = await (db.select(db.suppliers)..where((s) => s.id.equals(supplierId))).getSingleOrNull();
-    await _activityLog.log('payment', 'created', amount: roundMoney(amount), entityName: supplier?.name, refId: supplierId);
+    await db
+        .into(db.supplierPayments)
+        .insert(
+          SupplierPaymentsCompanion.insert(
+            supplierId: supplierId,
+            amount: roundMoney(amount),
+            paymentDate: paymentDate,
+            note: Value(note),
+          ),
+        );
+    final supplier = await (db.select(
+      db.suppliers,
+    )..where((s) => s.id.equals(supplierId))).getSingleOrNull();
+    await _activityLog.log(
+      'payment',
+      'created',
+      amount: roundMoney(amount),
+      entityName: supplier?.name,
+      refId: supplierId,
+    );
+  }
+
+  Future<void> updatePayment({
+    required int id,
+    required double amount,
+    required DateTime paymentDate,
+    String? note,
+  }) async {
+    await (db.update(db.supplierPayments)..where((p) => p.id.equals(id))).write(
+      SupplierPaymentsCompanion(
+        amount: Value(roundMoney(amount)),
+        paymentDate: Value(paymentDate),
+        note: Value(note?.trim()),
+      ),
+    );
+    await _activityLog.log(
+      'payment',
+      'updated',
+      amount: roundMoney(amount),
+      refId: id,
+    );
+  }
+
+  Future<void> deletePayment(int id) async {
+    await (db.delete(db.supplierPayments)..where((p) => p.id.equals(id))).go();
+    await _activityLog.log('payment', 'deleted', refId: id);
   }
 }

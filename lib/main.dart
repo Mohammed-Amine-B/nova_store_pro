@@ -22,8 +22,10 @@ import 'screens/returns/returns_screen.dart';
 import 'screens/reports/reports_screen.dart';
 import 'screens/insights/insights_screen.dart';
 import 'screens/activity_log/activity_log_screen.dart';
+import 'screens/notes/notes_screen.dart';
 
-const _singleInstancePort = 48291; // arbitrary fixed local port, unlikely to collide with anything else
+const _singleInstancePort =
+    48291; // arbitrary fixed local port, unlikely to collide with anything else
 // ignore: unused_element
 ServerSocket? _singleInstanceServer;
 
@@ -44,7 +46,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final acquired = await _acquireSingleInstanceLock();
   if (!acquired) {
-    exit(0); // another instance is already running — quit immediately, don't open a second window
+    exit(
+      0,
+    ); // another instance is already running — quit immediately, don't open a second window
   }
   await windowManager.ensureInitialized();
   await windowManager.setPreventClose(true);
@@ -186,7 +190,9 @@ class _NovaStoreAppState extends State<NovaStoreApp> with WindowListener {
                   db: widget.db,
                   onNewSale: () => _appScaffoldKey.currentState?.openNewSale(),
                   onViewReports: () =>
-                      _appScaffoldKey.currentState?.switchToTab(8), // ReportsScreen's index in `pages` below
+                      _appScaffoldKey.currentState?.switchToTab(
+                        8,
+                      ), // ReportsScreen's index in `pages` below
                 ),
                 ProductsScreen(db: widget.db),
                 SuppliersScreen(db: widget.db),
@@ -209,6 +215,7 @@ class _NovaStoreAppState extends State<NovaStoreApp> with WindowListener {
                   fontSize: _fontSize,
                   onFontSizeChanged: _onFontSizeChanged,
                 ),
+                NotesScreen(db: widget.db),
               ],
             )
           : LoginScreen(

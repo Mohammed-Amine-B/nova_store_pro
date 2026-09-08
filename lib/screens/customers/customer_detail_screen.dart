@@ -337,6 +337,299 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
     if (saved == true) _load();
   }
 
+  Future<void> _editPayment(DebtPayment payment) async {
+    final amountController = TextEditingController(
+      text: plainNumber(payment.amount),
+    );
+    final noteController = TextEditingController(text: payment.note ?? '');
+    var paymentDate = payment.paymentDate;
+    String? error;
+
+    final result = await showDialog<_HistoryEditResult>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final l10n = AppLocalizations.of(context)!;
+          Future<void> save() async {
+            final amount = double.tryParse(amountController.text) ?? 0;
+            if (amount <= 0) {
+              setDialogState(() => error = l10n.enterValidAmount);
+              return;
+            }
+            await _repo.updatePayment(
+              id: payment.id,
+              amount: amount,
+              paymentDate: paymentDate,
+              note: noteController.text.isEmpty ? null : noteController.text,
+            );
+            if (context.mounted) {
+              Navigator.pop(context, _HistoryEditResult.saved);
+            }
+          }
+
+          Future<void> delete() async {
+            final previewBalance = _balance + payment.amount;
+            final confirmed = await ConfirmDialog.show(
+              context,
+              title: l10n.deletePaymentTitle,
+              message: l10n.deletePaymentMessage,
+              confirmLabel: l10n.delete,
+              tone: ConfirmTone.destructive,
+              icon: Icons.delete_outline,
+              extra: Text(
+                l10n.balancePreviewAfterDelete(formatMoney(previewBalance)),
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: previewBalance <= 0
+                      ? const Color(0xFF16A34A)
+                      : const Color(0xFFE4572E),
+                ),
+              ),
+            );
+            if (!confirmed) return;
+            await _repo.deletePayment(payment.id);
+            if (context.mounted) {
+              Navigator.pop(context, _HistoryEditResult.deleted);
+            }
+          }
+
+          return EnterToSubmit(
+            onSubmit: save,
+            child: AlertDialog(
+              title: Text(l10n.editPaymentTitle),
+              content: SizedBox(
+                width: 320,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (error != null) ...[
+                        Text(
+                          error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      TextField(
+                        controller: amountController,
+                        decoration: InputDecoration(
+                          labelText: l10n.amountLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: paymentDate,
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null) {
+                            setDialogState(() => paymentDate = picked);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: l10n.paymentDateLabel,
+                            border: const OutlineInputBorder(),
+                          ),
+                          child: Text(_formatDate(paymentDate)),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: noteController,
+                        decoration: InputDecoration(
+                          labelText: l10n.noteOptionalLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFFE4572E),
+                  ),
+                  onPressed: delete,
+                  child: Text(l10n.delete),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF0E7C7B),
+                  ),
+                  onPressed: save,
+                  child: Text(l10n.save),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+    if (result != null) _load();
+  }
+
+  Future<void> _editDebtAdjustment(CustomerDebtAdjustment adjustment) async {
+    final amountController = TextEditingController(
+      text: plainNumber(adjustment.amount),
+    );
+    final noteController = TextEditingController(text: adjustment.note ?? '');
+    var debtDate = adjustment.date;
+    String? error;
+
+    final result = await showDialog<_HistoryEditResult>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final l10n = AppLocalizations.of(context)!;
+          Future<void> save() async {
+            final amount = double.tryParse(amountController.text) ?? 0;
+            if (amount <= 0) {
+              setDialogState(() => error = l10n.enterValidAmount);
+              return;
+            }
+            await _repo.updateDebtAdjustment(
+              id: adjustment.id,
+              amount: amount,
+              date: debtDate,
+              note: noteController.text.isEmpty ? null : noteController.text,
+            );
+            if (context.mounted) {
+              Navigator.pop(context, _HistoryEditResult.saved);
+            }
+          }
+
+          Future<void> delete() async {
+            final previewBalance = _balance - adjustment.amount;
+            final confirmed = await ConfirmDialog.show(
+              context,
+              title: l10n.deleteDebtTitle,
+              message: l10n.deleteDebtMessage,
+              confirmLabel: l10n.delete,
+              tone: ConfirmTone.destructive,
+              icon: Icons.delete_outline,
+              extra: Text(
+                l10n.balancePreviewAfterDelete(formatMoney(previewBalance)),
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: previewBalance <= 0
+                      ? const Color(0xFF16A34A)
+                      : const Color(0xFFE4572E),
+                ),
+              ),
+            );
+            if (!confirmed) return;
+            await _repo.deleteDebtAdjustment(adjustment.id);
+            if (context.mounted) {
+              Navigator.pop(context, _HistoryEditResult.deleted);
+            }
+          }
+
+          return EnterToSubmit(
+            onSubmit: save,
+            child: AlertDialog(
+              title: Text(l10n.editDebtTitle),
+              content: SizedBox(
+                width: 320,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (error != null) ...[
+                        Text(
+                          error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      TextField(
+                        controller: amountController,
+                        decoration: InputDecoration(
+                          labelText: l10n.amountLabel,
+                          border: const OutlineInputBorder(),
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: debtDate,
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null) {
+                            setDialogState(() => debtDate = picked);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: l10n.paymentDateLabel,
+                            border: const OutlineInputBorder(),
+                          ),
+                          child: Text(_formatDate(debtDate)),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: noteController,
+                        decoration: InputDecoration(
+                          labelText: l10n.noteOptionalLabel,
+                          hintText: l10n.debtNoteHint,
+                          border: const OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFFE4572E),
+                  ),
+                  onPressed: delete,
+                  child: Text(l10n.delete),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.cancel),
+                ),
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF0E7C7B),
+                  ),
+                  onPressed: save,
+                  child: Text(l10n.save),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+    if (result != null) _load();
+  }
+
   Future<void> _viewInvoice(Sale sale) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -464,72 +757,96 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
   }
 
   Widget _buildPaymentHistoryRow(AppLocalizations l10n, DebtPayment p) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(width: 92, child: Text(_formatDate(p.paymentDate))),
-          _TypeBadge(label: l10n.catPayment, color: const Color(0xFF16A34A)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              p.note ?? '—',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.7),
+    return InkWell(
+      onTap: () => _editPayment(p),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(width: 92, child: Text(_formatDate(p.paymentDate))),
+            _TypeBadge(label: l10n.catPayment, color: const Color(0xFF16A34A)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                p.note ?? '—',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
               ),
             ),
-          ),
-          MoneyText(
-            '+${formatMoney(p.amount)}',
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF16A34A),
+            MoneyText(
+              '+${formatMoney(p.amount)}',
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF16A34A),
+              ),
             ),
-          ),
-          const SizedBox(width: 48),
-        ],
+            SizedBox(
+              width: 48,
+              child: Icon(
+                Icons.edit_outlined,
+                size: 18,
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.4),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildDebtHistoryRow(AppLocalizations l10n, CustomerDebtAdjustment a) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(width: 92, child: Text(_formatDate(a.date))),
-          _TypeBadge(
-            label: l10n.debtAddedLabel,
-            color: const Color(0xFFE4572E),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              a.note ?? '—',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.7),
+    return InkWell(
+      onTap: () => _editDebtAdjustment(a),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(width: 92, child: Text(_formatDate(a.date))),
+            _TypeBadge(
+              label: l10n.debtAddedLabel,
+              color: const Color(0xFFE4572E),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                a.note ?? '—',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
               ),
             ),
-          ),
-          MoneyText(
-            '+${formatMoney(a.amount)}',
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-              color: Color(0xFFE4572E),
+            MoneyText(
+              '+${formatMoney(a.amount)}',
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Color(0xFFE4572E),
+              ),
             ),
-          ),
-          const SizedBox(width: 48),
-        ],
+            SizedBox(
+              width: 48,
+              child: Icon(
+                Icons.edit_outlined,
+                size: 18,
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.4),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -749,6 +1066,8 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 }
 
 enum _HistoryType { sale, payment, debt }
+
+enum _HistoryEditResult { saved, deleted }
 
 /// One row in the merged Sales/Payments/Debt-Adjustments history timeline.
 class _HistoryEntry {

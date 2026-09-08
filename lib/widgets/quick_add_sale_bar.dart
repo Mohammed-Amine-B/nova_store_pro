@@ -4,6 +4,7 @@ import '../data/database/database.dart';
 import '../data/repositories/sales_repository.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../utils/formatting.dart';
+import '../utils/rounding.dart';
 import 'enter_to_submit.dart';
 import 'product_thumbnail.dart';
 import 'money_text.dart';
@@ -189,6 +190,7 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
     final priceController = TextEditingController(
       text: plainNumber(p.sellingPrice ?? 0),
     );
+    var sellByAmount = false;
     String? error;
 
     final confirmed = await showDialog<bool>(
@@ -196,13 +198,26 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           final l10n = AppLocalizations.of(context)!;
+          final unitLabel = p.unitType == 'kg' ? 'kg' : 'm';
+          final price = double.tryParse(priceController.text) ?? 0;
+          final enteredAmount = double.tryParse(quantityController.text) ?? 0;
+          final showQuantityPreview =
+              sellByAmount && enteredAmount > 0 && price > 0;
+          final previewQuantity = showQuantityPreview
+              ? roundQuantity(enteredAmount / price)
+              : 0.0;
+
           Future<void> confirm() async {
             var quantity = double.tryParse(quantityController.text) ?? 0;
-            if (isPiece) quantity = quantity.roundToDouble();
             final price = double.tryParse(priceController.text) ?? 0;
             if (quantity <= 0 || price <= 0) {
               setDialogState(() => error = l10n.enterValidQuantityPrice);
               return;
+            }
+            if (isPiece) {
+              quantity = quantity.roundToDouble();
+            } else if (sellByAmount) {
+              quantity = roundQuantity(quantity / price);
             }
             try {
               await _repo.createSale(
@@ -290,13 +305,42 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
                         ),
                         const SizedBox(height: 8),
                       ],
+                      if (!isPiece) ...[
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: SegmentedButton<bool>(
+                            segments: [
+                              ButtonSegment(
+                                value: false,
+                                label: Text(l10n.sellModeByQuantity),
+                              ),
+                              ButtonSegment(
+                                value: true,
+                                label: Text(l10n.sellModeByAmount),
+                              ),
+                            ],
+                            selected: {sellByAmount},
+                            onSelectionChanged: (s) =>
+                                setDialogState(() => sellByAmount = s.first),
+                            style: SegmentedButton.styleFrom(
+                              selectedBackgroundColor: const Color(
+                                0xFF0E7C7B,
+                              ).withValues(alpha: 0.12),
+                              selectedForegroundColor: const Color(0xFF0E7C7B),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
                       Row(
                         children: [
                           Expanded(
                             child: TextField(
                               controller: quantityController,
                               decoration: InputDecoration(
-                                labelText: l10n.quantityLabel,
+                                labelText: sellByAmount
+                                    ? l10n.amountToSpendLabel
+                                    : l10n.quantityLabel,
                                 border: const OutlineInputBorder(),
                               ),
                               keyboardType: isPiece
@@ -304,6 +348,7 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
                                   : const TextInputType.numberWithOptions(
                                       decimal: true,
                                     ),
+                              onChanged: (_) => setDialogState(() {}),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -318,10 +363,29 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
                                   const TextInputType.numberWithOptions(
                                     decimal: true,
                                   ),
+                              onChanged: (_) => setDialogState(() {}),
                             ),
                           ),
                         ],
                       ),
+                      if (showQuantityPreview) ...[
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            l10n.computedQuantityPreview(
+                              plainNumber(previewQuantity),
+                              unitLabel,
+                            ),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),

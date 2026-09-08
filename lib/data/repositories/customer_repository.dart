@@ -15,19 +15,27 @@ class CustomerRepository {
   late final ActivityLogRepository _activityLog = ActivityLogRepository(db);
 
   Future<List<Customer>> getAllActive() async {
-    return (db.select(db.customers)..where((c) => c.isArchived.equals(false))).get();
+    return (db.select(
+      db.customers,
+    )..where((c) => c.isArchived.equals(false))).get();
   }
 
   Future<List<Customer>> getArchived() async {
-    return (db.select(db.customers)..where((c) => c.isArchived.equals(true))).get();
+    return (db.select(
+      db.customers,
+    )..where((c) => c.isArchived.equals(true))).get();
   }
 
   Future<int> add({required String name, String? phone, String? note}) async {
-    final id = await db.into(db.customers).insert(CustomersCompanion.insert(
-          name: name.trim(),
-          phone: Value(phone?.trim()),
-          note: Value(note?.trim()),
-        ));
+    final id = await db
+        .into(db.customers)
+        .insert(
+          CustomersCompanion.insert(
+            name: name.trim(),
+            phone: Value(phone?.trim()),
+            note: Value(note?.trim()),
+          ),
+        );
     await _activityLog.log('customer', 'created', entityName: name.trim());
     return id;
   }
@@ -50,21 +58,39 @@ class CustomerRepository {
 
   /// Customers are archived, never hard-deleted.
   Future<void> archive(int id) async {
-    final customer = await (db.select(db.customers)..where((c) => c.id.equals(id))).getSingleOrNull();
-    await (db.update(db.customers)..where((c) => c.id.equals(id)))
-        .write(const CustomersCompanion(isArchived: Value(true)));
-    await _activityLog.log('customer', 'archived', entityName: customer?.name, refId: id);
+    final customer = await (db.select(
+      db.customers,
+    )..where((c) => c.id.equals(id))).getSingleOrNull();
+    await (db.update(db.customers)..where((c) => c.id.equals(id))).write(
+      const CustomersCompanion(isArchived: Value(true)),
+    );
+    await _activityLog.log(
+      'customer',
+      'archived',
+      entityName: customer?.name,
+      refId: id,
+    );
   }
 
   Future<void> unarchive(int id) async {
-    final customer = await (db.select(db.customers)..where((c) => c.id.equals(id))).getSingleOrNull();
-    await (db.update(db.customers)..where((c) => c.id.equals(id)))
-        .write(const CustomersCompanion(isArchived: Value(false)));
-    await _activityLog.log('customer', 'restored', entityName: customer?.name, refId: id);
+    final customer = await (db.select(
+      db.customers,
+    )..where((c) => c.id.equals(id))).getSingleOrNull();
+    await (db.update(db.customers)..where((c) => c.id.equals(id))).write(
+      const CustomersCompanion(isArchived: Value(false)),
+    );
+    await _activityLog.log(
+      'customer',
+      'restored',
+      entityName: customer?.name,
+      refId: id,
+    );
   }
 
   Future<Customer?> getById(int id) async {
-    return (db.select(db.customers)..where((c) => c.id.equals(id))).getSingleOrNull();
+    return (db.select(
+      db.customers,
+    )..where((c) => c.id.equals(id))).getSingleOrNull();
   }
 
   /// Newest first.
@@ -85,7 +111,10 @@ class CustomerRepository {
 
   Future<double> getRemainingBalance(int customerId) async {
     final sales = await getSalesForCustomer(customerId);
-    final owedFromSales = sales.fold<double>(0, (sum, s) => sum + (s.totalAmount - s.amountPaid));
+    final owedFromSales = sales.fold<double>(
+      0,
+      (sum, s) => sum + (s.totalAmount - s.amountPaid),
+    );
     final adjustments = await getDebtAdjustments(customerId);
     final manualDebt = adjustments.fold<double>(0, (sum, a) => sum + a.amount);
     final payments = await getPaymentsForCustomer(customerId);
@@ -101,18 +130,32 @@ class CustomerRepository {
     required DateTime date,
     String? note,
   }) async {
-    await db.into(db.customerDebtAdjustments).insert(CustomerDebtAdjustmentsCompanion.insert(
-          customerId: customerId,
-          amount: roundMoney(amount),
-          date: date,
-          note: Value(note?.trim()),
-        ));
-    final customer = await (db.select(db.customers)..where((c) => c.id.equals(customerId))).getSingleOrNull();
-    await _activityLog.log('debt_adjustment', 'created', amount: roundMoney(amount), entityName: customer?.name, refId: customerId);
+    await db
+        .into(db.customerDebtAdjustments)
+        .insert(
+          CustomerDebtAdjustmentsCompanion.insert(
+            customerId: customerId,
+            amount: roundMoney(amount),
+            date: date,
+            note: Value(note?.trim()),
+          ),
+        );
+    final customer = await (db.select(
+      db.customers,
+    )..where((c) => c.id.equals(customerId))).getSingleOrNull();
+    await _activityLog.log(
+      'debt_adjustment',
+      'created',
+      amount: roundMoney(amount),
+      entityName: customer?.name,
+      refId: customerId,
+    );
   }
 
   /// Newest first.
-  Future<List<CustomerDebtAdjustment>> getDebtAdjustments(int customerId) async {
+  Future<List<CustomerDebtAdjustment>> getDebtAdjustments(
+    int customerId,
+  ) async {
     return (db.select(db.customerDebtAdjustments)
           ..where((a) => a.customerId.equals(customerId))
           ..orderBy([(a) => OrderingTerm.desc(a.createdAt)]))
@@ -125,15 +168,83 @@ class CustomerRepository {
     required DateTime paymentDate,
     String? note,
   }) async {
-    final id = await db.into(db.debtPayments).insert(DebtPaymentsCompanion.insert(
-          customerId: customerId,
-          amount: roundMoney(amount),
-          paymentDate: paymentDate,
-          note: Value(note?.trim()),
-        ));
-    final customer = await (db.select(db.customers)..where((c) => c.id.equals(customerId))).getSingleOrNull();
-    await _activityLog.log('payment', 'created', amount: roundMoney(amount), entityName: customer?.name, refId: customerId);
+    final id = await db
+        .into(db.debtPayments)
+        .insert(
+          DebtPaymentsCompanion.insert(
+            customerId: customerId,
+            amount: roundMoney(amount),
+            paymentDate: paymentDate,
+            note: Value(note?.trim()),
+          ),
+        );
+    final customer = await (db.select(
+      db.customers,
+    )..where((c) => c.id.equals(customerId))).getSingleOrNull();
+    await _activityLog.log(
+      'payment',
+      'created',
+      amount: roundMoney(amount),
+      entityName: customer?.name,
+      refId: customerId,
+    );
     return id;
+  }
+
+  Future<void> updatePayment({
+    required int id,
+    required double amount,
+    required DateTime paymentDate,
+    String? note,
+  }) async {
+    await (db.update(db.debtPayments)..where((p) => p.id.equals(id))).write(
+      DebtPaymentsCompanion(
+        amount: Value(roundMoney(amount)),
+        paymentDate: Value(paymentDate),
+        note: Value(note?.trim()),
+      ),
+    );
+    await _activityLog.log(
+      'payment',
+      'updated',
+      amount: roundMoney(amount),
+      refId: id,
+    );
+  }
+
+  Future<void> deletePayment(int id) async {
+    await (db.delete(db.debtPayments)..where((p) => p.id.equals(id))).go();
+    await _activityLog.log('payment', 'deleted', refId: id);
+  }
+
+  Future<void> updateDebtAdjustment({
+    required int id,
+    required double amount,
+    required DateTime date,
+    String? note,
+  }) async {
+    await (db.update(
+      db.customerDebtAdjustments,
+    )..where((a) => a.id.equals(id))).write(
+      CustomerDebtAdjustmentsCompanion(
+        amount: Value(roundMoney(amount)),
+        date: Value(date),
+        note: Value(note?.trim()),
+      ),
+    );
+    await _activityLog.log(
+      'debt_adjustment',
+      'updated',
+      amount: roundMoney(amount),
+      refId: id,
+    );
+  }
+
+  Future<void> deleteDebtAdjustment(int id) async {
+    await (db.delete(
+      db.customerDebtAdjustments,
+    )..where((a) => a.id.equals(id))).go();
+    await _activityLog.log('debt_adjustment', 'deleted', refId: id);
   }
 
   /// Active customers with their computed remaining balance, sorted by balance descending.
@@ -151,7 +262,10 @@ class CustomerRepository {
   /// Sum of every positive active-customer balance — how much customers owe the shop overall.
   Future<double> getTotalOutstandingBalance() async {
     final all = await getAllWithBalances();
-    final total = all.fold<double>(0, (sum, c) => sum + (c.balance > 0 ? c.balance : 0));
+    final total = all.fold<double>(
+      0,
+      (sum, c) => sum + (c.balance > 0 ? c.balance : 0),
+    );
     return roundMoney(total);
   }
 }
