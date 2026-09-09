@@ -187,6 +187,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                     Icons.edit_outlined,
                                     size: 20,
                                   ),
+                                  tooltip: l10n.edit,
                                   onPressed: () =>
                                       _showAddDialog(editing: item.category),
                                 ),
@@ -195,6 +196,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                     Icons.delete_outline,
                                     size: 20,
                                   ),
+                                  tooltip: l10n.delete,
                                   onPressed: () =>
                                       _confirmDelete(item.category),
                                 ),

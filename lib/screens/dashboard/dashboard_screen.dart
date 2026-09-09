@@ -456,6 +456,7 @@ class _QuickActionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           onTap: onTap,
+          mouseCursor: enabled ? SystemMouseCursors.click : null,
           borderRadius: BorderRadius.circular(12),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),

@@ -149,6 +149,7 @@ class AppSidebar extends StatelessWidget {
         borderRadius: BorderRadius.circular(13),
         child: InkWell(
           borderRadius: BorderRadius.circular(13),
+          mouseCursor: SystemMouseCursors.click,
           onTap: () => onSelect(item.index),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),

@@ -14,6 +14,7 @@ import '../../widgets/panel.dart';
 import '../../widgets/stat_card.dart';
 import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
+import '../../widgets/horizontal_scroll_table.dart';
 
 enum ReportRange { today, week, month, custom }
 
@@ -348,8 +349,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   )
                 : LayoutBuilder(
                     builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
+                      return HorizontalScrollTable(
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
                             minWidth: constraints.maxWidth,

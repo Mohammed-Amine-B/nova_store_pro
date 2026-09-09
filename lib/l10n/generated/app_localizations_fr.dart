@@ -147,6 +147,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get clearFiltersAction => 'Effacer les filtres';
 
   @override
+  String get clearDateFilterTooltip => 'Effacer le filtre de date';
+
+  @override
   String activeFiltersCount(int count) {
     return '$count actifs';
   }
@@ -503,6 +506,46 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noteTypeGeneral => 'Général';
+
+  @override
+  String get quickNoteAction => 'Note rapide';
+
+  @override
+  String get addNewProductAction => 'Ajouter un nouveau produit';
+
+  @override
+  String get linkExistingProductAction => 'Lier à un produit existant';
+
+  @override
+  String get noProductsFound => 'Aucun produit trouvé.';
+
+  @override
+  String get priceOptionalNoteLabel => 'Prix (optionnel)';
+
+  @override
+  String get quantityOptionalNoteLabel => 'Quantité (optionnelle)';
+
+  @override
+  String get noteReferenceOnlyHint =>
+      'Optionnel — pour votre référence uniquement, non comptabilisé dans les rapports';
+
+  @override
+  String notedQuantityAndPrice(String quantity, String price) {
+    return 'Noté : $quantity × $price';
+  }
+
+  @override
+  String notedQuantityOnly(String quantity) {
+    return 'Noté : $quantity';
+  }
+
+  @override
+  String notedPriceOnly(String price) {
+    return 'Noté : $price';
+  }
+
+  @override
+  String get goToDaySalesTooltip => 'Aller aux ventes de ce jour';
 
   @override
   String get categoriesTitle => 'Catégories';
@@ -1943,4 +1986,94 @@ class AppLocalizationsFr extends AppLocalizations {
   String suggestedBuyPriceHint(String price) {
     return 'Suggéré : $price (basé sur des produits similaires)';
   }
+
+  @override
+  String backupFailedMessage(String error) {
+    return 'Échec de la sauvegarde : $error';
+  }
+
+  @override
+  String get chooseBackupFolderDialogTitle =>
+      'Choisir un dossier de sauvegarde';
+
+  @override
+  String get backupCreatedTitle => 'Sauvegarde créée';
+
+  @override
+  String get backupSavedToLabel => 'Votre sauvegarde a été enregistrée dans :';
+
+  @override
+  String get copyPathAction => 'Copier le chemin';
+
+  @override
+  String get showInFolderAction => 'Afficher dans le dossier';
+
+  @override
+  String get doneAction => 'Terminé';
+
+  @override
+  String get exportProductsCategoriesTitle => 'Exporter produits et catégories';
+
+  @override
+  String get exportFormatDialogDesc =>
+      'Excel inclut des feuilles séparées pour les catégories et les produits. CSV est un fichier unique avec le nom de la catégorie comme colonne sur chaque ligne de produit.';
+
+  @override
+  String get exportFormatCsvOption => 'CSV (.csv)';
+
+  @override
+  String get exportFormatExcelOption => 'Excel (.xlsx)';
+
+  @override
+  String exportFailedMessage(String error) {
+    return 'Échec de l\'exportation : $error';
+  }
+
+  @override
+  String get exportCreatedTitle => 'Exportation créée';
+
+  @override
+  String get exportSavedToLabel => 'Votre exportation a été enregistrée dans :';
+
+  @override
+  String get backupPanelTitle => 'Sauvegarde';
+
+  @override
+  String get backupPanelDesc =>
+      'Enregistrez une copie de votre base de données et des photos de produits par sécurité.';
+
+  @override
+  String get backupPanelHint =>
+      'Crée un fichier .zip daté que vous pouvez enregistrer sur une clé USB ou un dossier cloud.';
+
+  @override
+  String get backupNowAction => 'Sauvegarder maintenant';
+
+  @override
+  String get autoBackupPanelTitle => 'Sauvegardes quotidiennes automatiques';
+
+  @override
+  String get autoBackupPanelDesc =>
+      'Protégez vos données en cas de panne du disque de cet ordinateur.';
+
+  @override
+  String get backupDestinationNotSet => 'Non défini';
+
+  @override
+  String get chooseFolderAction => 'Choisir un dossier';
+
+  @override
+  String get autoBackupHint =>
+      'Les sauvegardes automatiques s\'exécutent quotidiennement vers ce dossier au démarrage de l\'application, si celui-ci est défini.';
+
+  @override
+  String get exportPanelDesc =>
+      'Enregistrez votre catalogue au format Excel ou CSV pour un usage externe.';
+
+  @override
+  String get exportPanelHint =>
+      'Exporte uniquement les catégories et produits actifs — choisissez Excel (2 feuilles) ou un seul fichier CSV.';
+
+  @override
+  String get exportAction => 'Exporter';
 }

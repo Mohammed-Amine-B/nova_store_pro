@@ -11,6 +11,7 @@ import '../../widgets/enter_to_submit.dart';
 import '../../widgets/product_thumbnail.dart';
 import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
+import '../../widgets/horizontal_scroll_table.dart';
 
 class _CartLine {
   final int? purchaseItemId;
@@ -522,8 +523,7 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
                 )
               : LayoutBuilder(
                   builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
+                    return HorizontalScrollTable(
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
                           minWidth: constraints.maxWidth,
@@ -585,6 +585,7 @@ class _NewPurchaseScreenState extends State<NewPurchaseScreen> {
                                       size: 18,
                                       color: theme.colorScheme.error,
                                     ),
+                                    tooltip: l10n.removeAction,
                                     onPressed: () => _removeLine(line),
                                   ),
                                 ),

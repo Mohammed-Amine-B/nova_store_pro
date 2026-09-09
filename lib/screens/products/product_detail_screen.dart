@@ -20,6 +20,7 @@ import '../../widgets/enter_to_submit.dart';
 import '../../utils/formatting.dart';
 import '../../utils/product_images.dart';
 import 'product_form_dialog.dart';
+import '../../widgets/horizontal_scroll_table.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final AppDatabase db;
@@ -1115,8 +1116,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           else
             LayoutBuilder(
               builder: (context, constraints) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
+                return HorizontalScrollTable(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(minWidth: constraints.maxWidth),
                     child: DataTable(

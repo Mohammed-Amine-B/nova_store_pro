@@ -74,6 +74,7 @@ class _QuickAddSaleBarState extends State<QuickAddSaleBar> {
                       ? Theme.of(context).colorScheme.error
                       : const Color(0xFF16A34A);
                   return InkWell(
+                    mouseCursor: SystemMouseCursors.click,
                     onTap: () => _pick(p),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

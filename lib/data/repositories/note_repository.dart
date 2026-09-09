@@ -9,6 +9,8 @@ class NoteRepository {
     required String title,
     String? content,
     String type = 'general',
+    double? price,
+    double? quantity,
   }) async {
     return db
         .into(db.notes)
@@ -17,6 +19,8 @@ class NoteRepository {
             title: title.trim(),
             content: Value(content?.trim()),
             type: Value(type),
+            price: Value(price),
+            quantity: Value(quantity),
           ),
         );
   }
@@ -26,12 +30,16 @@ class NoteRepository {
     required String title,
     String? content,
     String type = 'general',
+    double? price,
+    double? quantity,
   }) async {
     await (db.update(db.notes)..where((n) => n.id.equals(id))).write(
       NotesCompanion(
         title: Value(title.trim()),
         content: Value(content?.trim()),
         type: Value(type),
+        price: Value(price),
+        quantity: Value(quantity),
       ),
     );
   }

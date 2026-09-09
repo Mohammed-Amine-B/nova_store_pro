@@ -12,6 +12,7 @@ import 'customer_form_dialog.dart';
 import 'customer_detail_screen.dart';
 import 'select_customer_dialog.dart';
 import 'customer_sale_screen.dart';
+import '../../widgets/horizontal_scroll_table.dart';
 
 class CustomersScreen extends StatefulWidget {
   final AppDatabase db;
@@ -66,6 +67,47 @@ class _CustomersScreenState extends State<CustomersScreen> {
   Future<void> _restoreCustomer(Customer customer) async {
     await _repo.unarchive(customer.id);
     _load();
+  }
+
+  List<DataCell> _withRowContextMenu(List<DataCell> cells, Customer customer) {
+    return cells
+        .map(
+          (cell) => DataCell(
+            GestureDetector(
+              onSecondaryTapUp: (details) =>
+                  _showCustomerContextMenu(details.globalPosition, customer),
+              child: cell.child,
+            ),
+          ),
+        )
+        .toList();
+  }
+
+  Future<void> _showCustomerContextMenu(
+    Offset position,
+    Customer customer,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final selected = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromRect(
+        position & const Size(1, 1),
+        Offset.zero & overlay.size,
+      ),
+      items: [
+        PopupMenuItem(value: 'view', child: Text(l10n.viewAction)),
+        if (_showingArchived)
+          PopupMenuItem(value: 'restore', child: Text(l10n.restoreAction)),
+      ],
+    );
+    if (!mounted) return;
+    switch (selected) {
+      case 'view':
+        _openDetail(customer);
+      case 'restore':
+        _restoreCustomer(customer);
+    }
   }
 
   List<CustomerWithBalance> get _filtered {
@@ -220,8 +262,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   )
                 : LayoutBuilder(
                     builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
+                      return HorizontalScrollTable(
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
                             minWidth: constraints.maxWidth,
@@ -266,7 +307,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                   : const Color(0xFF16A34A);
                               return DataRow(
                                 onSelectChanged: (_) => _openDetail(c),
-                                cells: [
+                                mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
+                                cells: _withRowContextMenu([
                                   DataCell(
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -339,7 +381,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                         label: Text(l10n.restoreAction),
                                       ),
                                     ),
-                                ],
+                                ], c),
                               );
                             }).toList(),
                           ),

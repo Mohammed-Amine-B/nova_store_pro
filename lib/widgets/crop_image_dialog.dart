@@ -100,6 +100,7 @@ class _CropImageDialogState extends State<CropImageDialog> {
         title: Text(l10n.cropPhotoTitle),
         leading: IconButton(
           icon: const Icon(Icons.close),
+          tooltip: l10n.close,
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),

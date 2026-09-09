@@ -54,6 +54,7 @@ dependencies:
   archive: ^4.0.9
   window_manager: ^0.5.2
   url_launcher: ^6.3.2
+  excel: ^4.0.6
 
 dev_dependencies:
   flutter_test:
@@ -124,3 +125,11 @@ flutter_launcher_icons:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# The `excel` package (used for Export Products & Categories) only supports
+# archive ^3.x, while this project pins archive ^4.0.9 (used by backup.dart's
+# ZipFileEncoder). Both packages only use the stable, long-unchanged
+# ZipFileEncoder/zip API, so it's safe to pin archive down to the version
+# `excel` expects for everyone, rather than leaving the two in conflict.
+dependency_overrides:
+  archive: ^3.6.1

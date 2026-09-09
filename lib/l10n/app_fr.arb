@@ -43,6 +43,7 @@
   "filterOutOfStock": "Rupture de stock",
   "filtersLabel": "Filtres",
   "clearFiltersAction": "Effacer les filtres",
+  "clearDateFilterTooltip": "Effacer le filtre de date",
   "activeFiltersCount": "{count} actifs",
   "@activeFiltersCount": {
     "placeholders": {
@@ -200,6 +201,17 @@
   "noteTypeProductToAdd": "Produit à ajouter",
   "noteTypeCustomerRequest": "Demande client",
   "noteTypeGeneral": "Général",
+  "quickNoteAction": "Note rapide",
+  "addNewProductAction": "Ajouter un nouveau produit",
+  "linkExistingProductAction": "Lier à un produit existant",
+  "noProductsFound": "Aucun produit trouvé.",
+  "priceOptionalNoteLabel": "Prix (optionnel)",
+  "quantityOptionalNoteLabel": "Quantité (optionnelle)",
+  "noteReferenceOnlyHint": "Optionnel — pour votre référence uniquement, non comptabilisé dans les rapports",
+  "notedQuantityAndPrice": "Noté : {quantity} × {price}",
+  "notedQuantityOnly": "Noté : {quantity}",
+  "notedPriceOnly": "Noté : {price}",
+  "goToDaySalesTooltip": "Aller aux ventes de ce jour",
   "categoriesTitle": "Catégories",
   "categoriesCount": "{count} catégories",
   "addCategory": "Ajouter une catégorie",
@@ -643,5 +655,45 @@
         "type": "String"
       }
     }
-  }
+  },
+  "backupFailedMessage": "Échec de la sauvegarde : {error}",
+  "@backupFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseBackupFolderDialogTitle": "Choisir un dossier de sauvegarde",
+  "backupCreatedTitle": "Sauvegarde créée",
+  "backupSavedToLabel": "Votre sauvegarde a été enregistrée dans :",
+  "copyPathAction": "Copier le chemin",
+  "showInFolderAction": "Afficher dans le dossier",
+  "doneAction": "Terminé",
+  "exportProductsCategoriesTitle": "Exporter produits et catégories",
+  "exportFormatDialogDesc": "Excel inclut des feuilles séparées pour les catégories et les produits. CSV est un fichier unique avec le nom de la catégorie comme colonne sur chaque ligne de produit.",
+  "exportFormatCsvOption": "CSV (.csv)",
+  "exportFormatExcelOption": "Excel (.xlsx)",
+  "exportFailedMessage": "Échec de l'exportation : {error}",
+  "@exportFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "exportCreatedTitle": "Exportation créée",
+  "exportSavedToLabel": "Votre exportation a été enregistrée dans :",
+  "backupPanelTitle": "Sauvegarde",
+  "backupPanelDesc": "Enregistrez une copie de votre base de données et des photos de produits par sécurité.",
+  "backupPanelHint": "Crée un fichier .zip daté que vous pouvez enregistrer sur une clé USB ou un dossier cloud.",
+  "backupNowAction": "Sauvegarder maintenant",
+  "autoBackupPanelTitle": "Sauvegardes quotidiennes automatiques",
+  "autoBackupPanelDesc": "Protégez vos données en cas de panne du disque de cet ordinateur.",
+  "backupDestinationNotSet": "Non défini",
+  "chooseFolderAction": "Choisir un dossier",
+  "autoBackupHint": "Les sauvegardes automatiques s'exécutent quotidiennement vers ce dossier au démarrage de l'application, si celui-ci est défini.",
+  "exportPanelDesc": "Enregistrez votre catalogue au format Excel ou CSV pour un usage externe.",
+  "exportPanelHint": "Exporte uniquement les catégories et produits actifs — choisissez Excel (2 feuilles) ou un seul fichier CSV.",
+  "exportAction": "Exporter"
 }

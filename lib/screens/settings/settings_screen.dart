@@ -6,6 +6,7 @@ import '../../data/database/database.dart';
 import '../../data/repositories/settings_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../utils/backup.dart';
+import '../../utils/export_products_categories.dart';
 import '../../widgets/enter_to_submit.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
@@ -50,6 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _saved = false;
   bool _hasPassword = false;
   bool _backingUp = false;
+  bool _exportingProducts = false;
   String? _backupDestination;
 
   @override
@@ -422,6 +424,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _backupNow() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _backingUp = true);
     try {
       final zipPath = await createBackup();
@@ -431,15 +434,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _backingUp = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Backup failed: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.backupFailedMessage(e.toString()))),
+      );
     }
   }
 
   Future<void> _chooseBackupDestination() async {
+    final l10n = AppLocalizations.of(context)!;
     final path = await FilePicker.getDirectoryPath(
-      dialogTitle: 'Choose a backup folder',
+      dialogTitle: l10n.chooseBackupFolderDialogTitle,
     );
     if (path == null) return;
     await _repo.updateBackupDestination(path);
@@ -461,12 +465,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _showBackupResultDialog(String zipPath) async {
+    final l10n = AppLocalizations.of(context)!;
     await showDialog(
       context: context,
       builder: (context) => EnterToSubmit(
         onSubmit: () => Navigator.pop(context),
         child: AlertDialog(
-          title: const Text('Backup Created'),
+          title: Text(l10n.backupCreatedTitle),
           content: SizedBox(
             width: 380,
             child: SingleChildScrollView(
@@ -474,7 +479,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Your backup was saved to:'),
+                  Text(l10n.backupSavedToLabel),
                   const SizedBox(height: 8),
                   SelectableText(
                     zipPath,
@@ -491,17 +496,120 @@ class _SettingsScreenState extends State<SettingsScreen> {
             TextButton.icon(
               onPressed: () => Clipboard.setData(ClipboardData(text: zipPath)),
               icon: const Icon(Icons.copy, size: 16),
-              label: const Text('Copy Path'),
+              label: Text(l10n.copyPathAction),
             ),
             if (Platform.isLinux || Platform.isWindows)
               TextButton.icon(
                 onPressed: () => _openContainingFolder(zipPath),
                 icon: const Icon(Icons.folder_open, size: 16),
-                label: const Text('Show in Folder'),
+                label: Text(l10n.showInFolderAction),
               ),
             FilledButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Done'),
+              child: Text(l10n.doneAction),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<ExportFormat?> _pickExportFormat() async {
+    final l10n = AppLocalizations.of(context)!;
+    return showDialog<ExportFormat>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.exportProductsCategoriesTitle),
+        content: Text(l10n.exportFormatDialogDesc),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: const Color(0xFF0E7C7B),
+              side: const BorderSide(color: Color(0xFF0E7C7B)),
+            ),
+            onPressed: () => Navigator.pop(context, ExportFormat.csv),
+            icon: const Icon(Icons.description_outlined, size: 18),
+            label: Text(l10n.exportFormatCsvOption),
+          ),
+          FilledButton.icon(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFF0E7C7B),
+            ),
+            onPressed: () => Navigator.pop(context, ExportFormat.excel),
+            icon: const Icon(Icons.grid_on_outlined, size: 18),
+            label: Text(l10n.exportFormatExcelOption),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _exportProductsCategories() async {
+    final l10n = AppLocalizations.of(context)!;
+    final format = await _pickExportFormat();
+    if (format == null) return;
+    setState(() => _exportingProducts = true);
+    try {
+      final path = await exportProductsAndCategories(widget.db, format);
+      if (!mounted) return;
+      setState(() => _exportingProducts = false);
+      await _showExportResultDialog(path);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _exportingProducts = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.exportFailedMessage(e.toString()))),
+      );
+    }
+  }
+
+  Future<void> _showExportResultDialog(String path) async {
+    final l10n = AppLocalizations.of(context)!;
+    await showDialog(
+      context: context,
+      builder: (context) => EnterToSubmit(
+        onSubmit: () => Navigator.pop(context),
+        child: AlertDialog(
+          title: Text(l10n.exportCreatedTitle),
+          content: SizedBox(
+            width: 380,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.exportSavedToLabel),
+                  const SizedBox(height: 8),
+                  SelectableText(
+                    path,
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton.icon(
+              onPressed: () => Clipboard.setData(ClipboardData(text: path)),
+              icon: const Icon(Icons.copy, size: 16),
+              label: Text(l10n.copyPathAction),
+            ),
+            if (Platform.isLinux || Platform.isWindows)
+              TextButton.icon(
+                onPressed: () => _openContainingFolder(path),
+                icon: const Icon(Icons.folder_open, size: 16),
+                label: Text(l10n.showInFolderAction),
+              ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.doneAction),
             ),
           ],
         ),
@@ -664,20 +772,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 20),
           Panel(
-            title: 'Backup',
-            description:
-                'Save a copy of your database and product photos for safekeeping.',
+            title: l10n.backupPanelTitle,
+            description: l10n.backupPanelDesc,
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
                   const Icon(Icons.backup_outlined, color: Color(0xFF0E7C7B)),
                   const SizedBox(width: 12),
-                  const Expanded(
-                    child: Text(
-                      'Creates a dated .zip you can save to a USB drive or cloud folder.',
-                    ),
-                  ),
+                  Expanded(child: Text(l10n.backupPanelHint)),
                   FilledButton.icon(
                     onPressed: _backingUp ? null : _backupNow,
                     style: FilledButton.styleFrom(
@@ -693,7 +796,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           )
                         : const Icon(Icons.backup_outlined, size: 18),
-                    label: const Text('Backup Now'),
+                    label: Text(l10n.backupNowAction),
                   ),
                 ],
               ),
@@ -701,9 +804,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 20),
           Panel(
-            title: 'Automatic Daily Backups',
-            description:
-                'Protect your data if this computer\'s drive ever fails.',
+            title: l10n.autoBackupPanelTitle,
+            description: l10n.autoBackupPanelDesc,
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -720,7 +822,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: Text(
                           _backupDestination == null ||
                                   _backupDestination!.isEmpty
-                              ? 'Not set'
+                              ? l10n.backupDestinationNotSet
                               : _backupDestination!,
                           style:
                               _backupDestination == null ||
@@ -742,18 +844,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           side: const BorderSide(color: Color(0xFF0E7C7B)),
                         ),
                         icon: const Icon(Icons.folder_open, size: 18),
-                        label: const Text('Choose Folder'),
+                        label: Text(l10n.chooseFolderAction),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Automatic backups run daily to this folder when the app starts, if it\'s set.',
+                    l10n.autoBackupHint,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(
                         context,
                       ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Panel(
+            title: l10n.exportProductsCategoriesTitle,
+            description: l10n.exportPanelDesc,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.table_chart_outlined,
+                    color: Color(0xFF0E7C7B),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(l10n.exportPanelHint)),
+                  FilledButton.icon(
+                    onPressed: _exportingProducts
+                        ? null
+                        : _exportProductsCategories,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF0E7C7B),
+                    ),
+                    icon: _exportingProducts
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.file_download_outlined, size: 18),
+                    label: Text(l10n.exportAction),
                   ),
                 ],
               ),

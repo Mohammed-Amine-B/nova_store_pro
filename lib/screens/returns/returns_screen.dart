@@ -5,6 +5,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/panel.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/horizontal_scroll_table.dart';
 
 class ReturnsScreen extends StatefulWidget {
   final AppDatabase db;
@@ -44,8 +45,7 @@ class _ReturnsScreenState extends State<ReturnsScreen> {
                 }
                 return LayoutBuilder(
                   builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
+                    return HorizontalScrollTable(
                       child: ConstrainedBox(
                         constraints: BoxConstraints(minWidth: constraints.maxWidth),
                         child: DataTable(

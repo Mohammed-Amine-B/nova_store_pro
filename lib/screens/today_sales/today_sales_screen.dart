@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../../data/database/database.dart';
+import '../../data/repositories/note_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/sales_day_view.dart';
 import '../../widgets/quick_add_sale_bar.dart';
+import '../notes/note_form_dialog.dart';
 
 class TodaySalesScreen extends StatefulWidget {
   final AppDatabase db;
@@ -21,12 +23,21 @@ class _TodaySalesScreenState extends State<TodaySalesScreen> {
   final _viewKey = GlobalKey<SalesDayViewState>();
   late final FocusNode _searchFocusNode = widget.searchFocusNode ?? FocusNode();
   late final DateTime _today = DateTime.now();
+  late final NoteRepository _noteRepo = NoteRepository(widget.db);
   int _salesCount = 0;
 
   @override
   void dispose() {
     if (widget.searchFocusNode == null) _searchFocusNode.dispose();
     super.dispose();
+  }
+
+  Future<void> _openQuickNote() async {
+    await showDialog<bool>(
+      context: context,
+      builder: (context) =>
+          NoteFormDialog(repo: _noteRepo, initialType: 'product_to_add'),
+    );
   }
 
   @override
@@ -56,6 +67,16 @@ class _TodaySalesScreenState extends State<TodaySalesScreen> {
               actions: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  OutlinedButton.icon(
+                    onPressed: _openQuickNote,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF0E7C7B),
+                      side: const BorderSide(color: Color(0xFF0E7C7B)),
+                    ),
+                    icon: const Icon(Icons.note_add_outlined, size: 18),
+                    label: Text(l10n.quickNoteAction),
+                  ),
+                  const SizedBox(width: 12),
                   OutlinedButton.icon(
                     onPressed: () => _viewKey.currentState?.printSummary(),
                     icon: const Icon(Icons.print_outlined, size: 18),

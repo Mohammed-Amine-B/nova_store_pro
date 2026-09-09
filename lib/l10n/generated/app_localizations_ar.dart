@@ -146,6 +146,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get clearFiltersAction => 'مسح التصفية';
 
   @override
+  String get clearDateFilterTooltip => 'مسح تصفية التاريخ';
+
+  @override
   String activeFiltersCount(int count) {
     return '$count نشطة';
   }
@@ -499,6 +502,46 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noteTypeGeneral => 'عام';
+
+  @override
+  String get quickNoteAction => 'ملاحظة سريعة';
+
+  @override
+  String get addNewProductAction => 'إضافة منتج جديد';
+
+  @override
+  String get linkExistingProductAction => 'ربط بمنتج موجود';
+
+  @override
+  String get noProductsFound => 'لم يتم العثور على منتجات.';
+
+  @override
+  String get priceOptionalNoteLabel => 'السعر (اختياري)';
+
+  @override
+  String get quantityOptionalNoteLabel => 'الكمية (اختياري)';
+
+  @override
+  String get noteReferenceOnlyHint =>
+      'اختياري — للمرجعية الشخصية فقط، لا يُحتسب في التقارير';
+
+  @override
+  String notedQuantityAndPrice(String quantity, String price) {
+    return 'ملاحظة: $quantity × $price';
+  }
+
+  @override
+  String notedQuantityOnly(String quantity) {
+    return 'ملاحظة: $quantity';
+  }
+
+  @override
+  String notedPriceOnly(String price) {
+    return 'ملاحظة: $price';
+  }
+
+  @override
+  String get goToDaySalesTooltip => 'الانتقال إلى مبيعات ذلك اليوم';
 
   @override
   String get categoriesTitle => 'التصنيفات';
@@ -1914,4 +1957,92 @@ class AppLocalizationsAr extends AppLocalizations {
   String suggestedBuyPriceHint(String price) {
     return 'مقترح: $price (بناءً على منتجات مشابهة)';
   }
+
+  @override
+  String backupFailedMessage(String error) {
+    return 'فشل النسخ الاحتياطي: $error';
+  }
+
+  @override
+  String get chooseBackupFolderDialogTitle => 'اختر مجلد النسخ الاحتياطي';
+
+  @override
+  String get backupCreatedTitle => 'تم إنشاء النسخة الاحتياطية';
+
+  @override
+  String get backupSavedToLabel => 'تم حفظ نسختك الاحتياطية في:';
+
+  @override
+  String get copyPathAction => 'نسخ المسار';
+
+  @override
+  String get showInFolderAction => 'إظهار في المجلد';
+
+  @override
+  String get doneAction => 'تم';
+
+  @override
+  String get exportProductsCategoriesTitle => 'تصدير المنتجات والتصنيفات';
+
+  @override
+  String get exportFormatDialogDesc =>
+      'يتضمن Excel ورقتين منفصلتين للتصنيفات والمنتجات. أما CSV فهو ملف واحد يحتوي على اسم التصنيف كعمود في كل صف منتج.';
+
+  @override
+  String get exportFormatCsvOption => 'CSV (.csv)';
+
+  @override
+  String get exportFormatExcelOption => 'Excel (.xlsx)';
+
+  @override
+  String exportFailedMessage(String error) {
+    return 'فشل التصدير: $error';
+  }
+
+  @override
+  String get exportCreatedTitle => 'تم إنشاء التصدير';
+
+  @override
+  String get exportSavedToLabel => 'تم حفظ ملف التصدير في:';
+
+  @override
+  String get backupPanelTitle => 'النسخ الاحتياطي';
+
+  @override
+  String get backupPanelDesc =>
+      'احفظ نسخة من قاعدة بياناتك وصور المنتجات للحفاظ عليها.';
+
+  @override
+  String get backupPanelHint =>
+      'ينشئ ملف .zip مؤرخًا يمكنك حفظه على محرك USB أو مجلد سحابي.';
+
+  @override
+  String get backupNowAction => 'نسخ احتياطي الآن';
+
+  @override
+  String get autoBackupPanelTitle => 'النسخ الاحتياطي التلقائي اليومي';
+
+  @override
+  String get autoBackupPanelDesc => 'احمِ بياناتك في حال تعطل قرص هذا الجهاز.';
+
+  @override
+  String get backupDestinationNotSet => 'غير محدد';
+
+  @override
+  String get chooseFolderAction => 'اختيار مجلد';
+
+  @override
+  String get autoBackupHint =>
+      'يعمل النسخ الاحتياطي التلقائي يوميًا إلى هذا المجلد عند بدء تشغيل التطبيق، إن تم تحديده.';
+
+  @override
+  String get exportPanelDesc =>
+      'احفظ كتالوجك كملف Excel أو CSV للاستخدام الخارجي.';
+
+  @override
+  String get exportPanelHint =>
+      'يصدّر التصنيفات والمنتجات النشطة فقط — اختر Excel (ورقتين) أو ملف CSV واحد.';
+
+  @override
+  String get exportAction => 'تصدير';
 }

@@ -13,6 +13,7 @@ import 'sales_day_detail_screen.dart';
 import '../reports/invoice_view_screen.dart';
 import '../suppliers/purchase_receipt_screen.dart';
 import '../../widgets/return_dialog.dart';
+import '../../widgets/horizontal_scroll_table.dart';
 
 enum ArchiveView { todaySales, customerSales, supplierPurchases }
 
@@ -106,8 +107,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                       ? EmptyState(icon: Icons.archive_outlined, title: l10n.noArchivedDaysYet)
                       : LayoutBuilder(
                           builder: (context, constraints) {
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
+                            return HorizontalScrollTable(
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                 child: DataTable(
@@ -122,6 +122,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                                   rows: days.map((d) {
                                     return DataRow(
                                       onSelectChanged: (_) => _openDay(d.date),
+                                      mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
                                       cells: [
                                         DataCell(Text(_formatDate(d.date))),
                                         DataCell(MoneyText(formatMoney(d.revenue))),
@@ -158,8 +159,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                       ? EmptyState(icon: Icons.receipt_long_outlined, title: l10n.noCustomerSalesYet)
                       : LayoutBuilder(
                           builder: (context, constraints) {
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
+                            return HorizontalScrollTable(
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                 child: DataTable(
@@ -185,6 +185,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                                     };
                                     return DataRow(
                                       onSelectChanged: (_) => _openInvoice(s.id),
+                                      mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
                                       cells: [
                                         DataCell(Text(_formatDate(s.date))),
                                         DataCell(Tooltip(
@@ -252,8 +253,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                       ? EmptyState(icon: Icons.local_shipping_outlined, title: l10n.noSupplierPurchasesYet)
                       : LayoutBuilder(
                           builder: (context, constraints) {
-                            return SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
+                            return HorizontalScrollTable(
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                 child: DataTable(
@@ -271,6 +271,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
                                     final remaining = p.totalAmount - p.amountPaid;
                                     return DataRow(
                                       onSelectChanged: (_) => _openReceipt(p.id),
+                                      mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
                                       cells: [
                                         DataCell(Text(_formatDate(p.purchaseDate))),
                                         DataCell(Tooltip(

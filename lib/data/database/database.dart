@@ -59,7 +59,7 @@ class AppDatabase extends _$AppDatabase {
   // yet; the local dev SQLite database needs to be deleted once for this
   // change. All schema changes after this one still require a real migration.
   @override
-  int get schemaVersion => 18;
+  int get schemaVersion => 19;
 
   // Baseline: schema version 9 as of 2026-08-23. All future schema changes must
   // add a migration step in onUpgrade below — never tell a user to delete their
@@ -93,10 +93,19 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(settings, settings.lastAutoBackupAt);
       }
       if (from < 17) {
-        await m.createTable(notes); // already includes the `type` column, since that's part of the current table definition
+        await m.createTable(
+          notes,
+        ); // already includes the `type` column, since that's part of the current table definition
       }
       if (from >= 17 && from < 18) {
-        await m.addColumn(notes, notes.type); // only needed for a DB that already had `notes` before `type` existed
+        await m.addColumn(
+          notes,
+          notes.type,
+        ); // only needed for a DB that already had `notes` before `type` existed
+      }
+      if (from >= 17 && from < 19) {
+        await m.addColumn(notes, notes.price);
+        await m.addColumn(notes, notes.quantity);
       }
     },
     beforeOpen: (details) async {

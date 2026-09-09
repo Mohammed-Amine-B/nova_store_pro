@@ -747,6 +747,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                   size: 18,
                   color: theme.colorScheme.error,
                 ),
+                tooltip: l10n.delete,
                 onPressed: () => _deleteSale(s),
               ),
             ],
@@ -758,6 +759,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
   Widget _buildPaymentHistoryRow(AppLocalizations l10n, DebtPayment p) {
     return InkWell(
+      mouseCursor: SystemMouseCursors.click,
       onTap: () => _editPayment(p),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -804,6 +806,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
 
   Widget _buildDebtHistoryRow(AppLocalizations l10n, CustomerDebtAdjustment a) {
     return InkWell(
+      mouseCursor: SystemMouseCursors.click,
       onTap: () => _editDebtAdjustment(a),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),

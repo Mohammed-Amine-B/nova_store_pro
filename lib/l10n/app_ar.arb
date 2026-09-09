@@ -43,6 +43,7 @@
   "filterOutOfStock": "نفذ من المخزون",
   "filtersLabel": "التصفية",
   "clearFiltersAction": "مسح التصفية",
+  "clearDateFilterTooltip": "مسح تصفية التاريخ",
   "activeFiltersCount": "{count} نشطة",
   "@activeFiltersCount": {
     "placeholders": {
@@ -200,6 +201,17 @@
   "noteTypeProductToAdd": "منتج يجب إضافته",
   "noteTypeCustomerRequest": "طلب زبون",
   "noteTypeGeneral": "عام",
+  "quickNoteAction": "ملاحظة سريعة",
+  "addNewProductAction": "إضافة منتج جديد",
+  "linkExistingProductAction": "ربط بمنتج موجود",
+  "noProductsFound": "لم يتم العثور على منتجات.",
+  "priceOptionalNoteLabel": "السعر (اختياري)",
+  "quantityOptionalNoteLabel": "الكمية (اختياري)",
+  "noteReferenceOnlyHint": "اختياري — للمرجعية الشخصية فقط، لا يُحتسب في التقارير",
+  "notedQuantityAndPrice": "ملاحظة: {quantity} × {price}",
+  "notedQuantityOnly": "ملاحظة: {quantity}",
+  "notedPriceOnly": "ملاحظة: {price}",
+  "goToDaySalesTooltip": "الانتقال إلى مبيعات ذلك اليوم",
   "categoriesTitle": "التصنيفات",
   "categoriesCount": "{count} تصنيف",
   "addCategory": "إضافة تصنيف",
@@ -643,5 +655,45 @@
         "type": "String"
       }
     }
-  }
+  },
+  "backupFailedMessage": "فشل النسخ الاحتياطي: {error}",
+  "@backupFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseBackupFolderDialogTitle": "اختر مجلد النسخ الاحتياطي",
+  "backupCreatedTitle": "تم إنشاء النسخة الاحتياطية",
+  "backupSavedToLabel": "تم حفظ نسختك الاحتياطية في:",
+  "copyPathAction": "نسخ المسار",
+  "showInFolderAction": "إظهار في المجلد",
+  "doneAction": "تم",
+  "exportProductsCategoriesTitle": "تصدير المنتجات والتصنيفات",
+  "exportFormatDialogDesc": "يتضمن Excel ورقتين منفصلتين للتصنيفات والمنتجات. أما CSV فهو ملف واحد يحتوي على اسم التصنيف كعمود في كل صف منتج.",
+  "exportFormatCsvOption": "CSV (.csv)",
+  "exportFormatExcelOption": "Excel (.xlsx)",
+  "exportFailedMessage": "فشل التصدير: {error}",
+  "@exportFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "exportCreatedTitle": "تم إنشاء التصدير",
+  "exportSavedToLabel": "تم حفظ ملف التصدير في:",
+  "backupPanelTitle": "النسخ الاحتياطي",
+  "backupPanelDesc": "احفظ نسخة من قاعدة بياناتك وصور المنتجات للحفاظ عليها.",
+  "backupPanelHint": "ينشئ ملف .zip مؤرخًا يمكنك حفظه على محرك USB أو مجلد سحابي.",
+  "backupNowAction": "نسخ احتياطي الآن",
+  "autoBackupPanelTitle": "النسخ الاحتياطي التلقائي اليومي",
+  "autoBackupPanelDesc": "احمِ بياناتك في حال تعطل قرص هذا الجهاز.",
+  "backupDestinationNotSet": "غير محدد",
+  "chooseFolderAction": "اختيار مجلد",
+  "autoBackupHint": "يعمل النسخ الاحتياطي التلقائي يوميًا إلى هذا المجلد عند بدء تشغيل التطبيق، إن تم تحديده.",
+  "exportPanelDesc": "احفظ كتالوجك كملف Excel أو CSV للاستخدام الخارجي.",
+  "exportPanelHint": "يصدّر التصنيفات والمنتجات النشطة فقط — اختر Excel (ورقتين) أو ملف CSV واحد.",
+  "exportAction": "تصدير"
 }

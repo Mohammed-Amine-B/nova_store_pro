@@ -358,6 +358,12 @@ abstract class AppLocalizations {
   /// **'Clear Filters'**
   String get clearFiltersAction;
 
+  /// No description provided for @clearDateFilterTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear date filter'**
+  String get clearDateFilterTooltip;
+
   /// No description provided for @activeFiltersCount.
   ///
   /// In en, this message translates to:
@@ -1017,6 +1023,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'General'**
   String get noteTypeGeneral;
+
+  /// No description provided for @quickNoteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Note'**
+  String get quickNoteAction;
+
+  /// No description provided for @addNewProductAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Product'**
+  String get addNewProductAction;
+
+  /// No description provided for @linkExistingProductAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Existing Product'**
+  String get linkExistingProductAction;
+
+  /// No description provided for @noProductsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No products found.'**
+  String get noProductsFound;
+
+  /// No description provided for @priceOptionalNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price (optional)'**
+  String get priceOptionalNoteLabel;
+
+  /// No description provided for @quantityOptionalNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity (optional)'**
+  String get quantityOptionalNoteLabel;
+
+  /// No description provided for @noteReferenceOnlyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional — for your reference only, not counted in reports'**
+  String get noteReferenceOnlyHint;
+
+  /// No description provided for @notedQuantityAndPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Noted: {quantity} × {price}'**
+  String notedQuantityAndPrice(String quantity, String price);
+
+  /// No description provided for @notedQuantityOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Noted: {quantity}'**
+  String notedQuantityOnly(String quantity);
+
+  /// No description provided for @notedPriceOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Noted: {price}'**
+  String notedPriceOnly(String price);
+
+  /// No description provided for @goToDaySalesTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to that day\'s sales'**
+  String get goToDaySalesTooltip;
 
   /// No description provided for @categoriesTitle.
   ///
@@ -3507,6 +3579,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Suggested: {price} (based on similar products)'**
   String suggestedBuyPriceHint(String price);
+
+  /// No description provided for @backupFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup failed: {error}'**
+  String backupFailedMessage(String error);
+
+  /// No description provided for @chooseBackupFolderDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a backup folder'**
+  String get chooseBackupFolderDialogTitle;
+
+  /// No description provided for @backupCreatedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Created'**
+  String get backupCreatedTitle;
+
+  /// No description provided for @backupSavedToLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your backup was saved to:'**
+  String get backupSavedToLabel;
+
+  /// No description provided for @copyPathAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Path'**
+  String get copyPathAction;
+
+  /// No description provided for @showInFolderAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in Folder'**
+  String get showInFolderAction;
+
+  /// No description provided for @doneAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get doneAction;
+
+  /// No description provided for @exportProductsCategoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Products & Categories'**
+  String get exportProductsCategoriesTitle;
+
+  /// No description provided for @exportFormatDialogDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Excel includes separate Categories and Products sheets. CSV is a single file with the category name as a column on each product.'**
+  String get exportFormatDialogDesc;
+
+  /// No description provided for @exportFormatCsvOption.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV (.csv)'**
+  String get exportFormatCsvOption;
+
+  /// No description provided for @exportFormatExcelOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Excel (.xlsx)'**
+  String get exportFormatExcelOption;
+
+  /// No description provided for @exportFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String exportFailedMessage(String error);
+
+  /// No description provided for @exportCreatedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Created'**
+  String get exportCreatedTitle;
+
+  /// No description provided for @exportSavedToLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your export was saved to:'**
+  String get exportSavedToLabel;
+
+  /// No description provided for @backupPanelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get backupPanelTitle;
+
+  /// No description provided for @backupPanelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a copy of your database and product photos for safekeeping.'**
+  String get backupPanelDesc;
+
+  /// No description provided for @backupPanelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Creates a dated .zip you can save to a USB drive or cloud folder.'**
+  String get backupPanelHint;
+
+  /// No description provided for @backupNowAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Now'**
+  String get backupNowAction;
+
+  /// No description provided for @autoBackupPanelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic Daily Backups'**
+  String get autoBackupPanelTitle;
+
+  /// No description provided for @autoBackupPanelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Protect your data if this computer\'s drive ever fails.'**
+  String get autoBackupPanelDesc;
+
+  /// No description provided for @backupDestinationNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get backupDestinationNotSet;
+
+  /// No description provided for @chooseFolderAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Folder'**
+  String get chooseFolderAction;
+
+  /// No description provided for @autoBackupHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backups run daily to this folder when the app starts, if it\'s set.'**
+  String get autoBackupHint;
+
+  /// No description provided for @exportPanelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save your catalogue as an Excel or CSV file for external use.'**
+  String get exportPanelDesc;
+
+  /// No description provided for @exportPanelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Exports active categories and products only — choose Excel (2 sheets) or a single CSV file.'**
+  String get exportPanelHint;
+
+  /// No description provided for @exportAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get exportAction;
 }
 
 class _AppLocalizationsDelegate

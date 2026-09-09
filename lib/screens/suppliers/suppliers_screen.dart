@@ -14,6 +14,7 @@ import 'supplier_form_dialog.dart';
 import 'supplier_detail_screen.dart';
 import 'new_purchase_screen.dart';
 import 'select_supplier_dialog.dart';
+import '../../widgets/horizontal_scroll_table.dart';
 
 class SuppliersScreen extends StatefulWidget {
   final AppDatabase db;
@@ -70,6 +71,47 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
   Future<void> _restoreSupplier(Supplier supplier) async {
     await _repo.unarchive(supplier.id);
     _load();
+  }
+
+  List<DataCell> _withRowContextMenu(List<DataCell> cells, Supplier supplier) {
+    return cells
+        .map(
+          (cell) => DataCell(
+            GestureDetector(
+              onSecondaryTapUp: (details) =>
+                  _showSupplierContextMenu(details.globalPosition, supplier),
+              child: cell.child,
+            ),
+          ),
+        )
+        .toList();
+  }
+
+  Future<void> _showSupplierContextMenu(
+    Offset position,
+    Supplier supplier,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final selected = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromRect(
+        position & const Size(1, 1),
+        Offset.zero & overlay.size,
+      ),
+      items: [
+        PopupMenuItem(value: 'open', child: Text(l10n.openAction)),
+        if (_showingArchived)
+          PopupMenuItem(value: 'restore', child: Text(l10n.restoreAction)),
+      ],
+    );
+    if (!mounted) return;
+    switch (selected) {
+      case 'open':
+        _openDetail(supplier);
+      case 'restore':
+        _restoreSupplier(supplier);
+    }
   }
 
   List<Supplier> get _filtered {
@@ -222,8 +264,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                   )
                 : LayoutBuilder(
                     builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
+                      return HorizontalScrollTable(
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
                             minWidth: constraints.maxWidth,
@@ -268,7 +309,8 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                             rows: rows.map((s) {
                               return DataRow(
                                 onSelectChanged: (_) => _openDetail(s),
-                                cells: [
+                                mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
+                                cells: _withRowContextMenu([
                                   DataCell(
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -354,7 +396,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                         label: Text(l10n.restoreAction),
                                       ),
                                     ),
-                                ],
+                                ], s),
                               );
                             }).toList(),
                           ),

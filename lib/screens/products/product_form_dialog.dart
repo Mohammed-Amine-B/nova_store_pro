@@ -32,11 +32,16 @@ class ProductFormDialog extends StatefulWidget {
   final List<Category> categories;
   final Product? editing;
 
+  /// Pre-fills the Name field when adding a new product (ignored when
+  /// [editing] is set). Doesn't put the dialog into edit mode.
+  final String? initialName;
+
   const ProductFormDialog({
     super.key,
     required this.repo,
     required this.categories,
     this.editing,
+    this.initialName,
   });
 
   @override
@@ -45,7 +50,7 @@ class ProductFormDialog extends StatefulWidget {
 
 class _ProductFormDialogState extends State<ProductFormDialog> {
   late final _nameController = TextEditingController(
-    text: widget.editing?.name ?? '',
+    text: widget.editing?.name ?? widget.initialName ?? '',
   );
   late final _codeController = TextEditingController(
     text: widget.editing?.code ?? '',
@@ -89,6 +94,10 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
     _codeManuallyEdited = widget.editing != null;
     _unitType = widget.editing?.unitType ?? 'piece';
     _imagePath = widget.editing?.imagePath;
+    if (widget.editing == null &&
+        (widget.initialName ?? '').trim().isNotEmpty) {
+      _onNameChanged(widget.initialName!);
+    }
   }
 
   Future<void> _pickImage() async {

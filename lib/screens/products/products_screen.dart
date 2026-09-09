@@ -21,6 +21,7 @@ import '../../widgets/category_chip.dart';
 import '../../utils/formatting.dart';
 import '../../utils/product_images.dart';
 import '../../utils/text_scale.dart';
+import '../../widgets/horizontal_scroll_table.dart';
 
 enum StockFilter { all, inStock, low, out }
 
@@ -117,6 +118,51 @@ class _ProductsScreenState extends State<ProductsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.forceDeleteSuccessMessage(product.name))),
     );
+  }
+
+  List<DataCell> _withRowContextMenu(List<DataCell> cells, Product product) {
+    return cells
+        .map(
+          (cell) => DataCell(
+            GestureDetector(
+              onSecondaryTapUp: (details) =>
+                  _showProductContextMenu(details.globalPosition, product),
+              child: cell.child,
+            ),
+          ),
+        )
+        .toList();
+  }
+
+  Future<void> _showProductContextMenu(Offset position, Product product) async {
+    final l10n = AppLocalizations.of(context)!;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final selected = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromRect(
+        position & const Size(1, 1),
+        Offset.zero & overlay.size,
+      ),
+      items: [
+        PopupMenuItem(value: 'open', child: Text(l10n.openAction)),
+        if (_showingArchived) ...[
+          PopupMenuItem(value: 'restore', child: Text(l10n.restoreAction)),
+          PopupMenuItem(
+            value: 'forceDelete',
+            child: Text(l10n.forceDeleteAction),
+          ),
+        ],
+      ],
+    );
+    if (!mounted) return;
+    switch (selected) {
+      case 'open':
+        _openDetail(product);
+      case 'restore':
+        _restoreProduct(product);
+      case 'forceDelete':
+        _forceDeleteProduct(product);
+    }
   }
 
   List<Product> get _filtered {
@@ -459,6 +505,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   suffixIcon: _dateAddedRange != null
                       ? IconButton(
                           icon: const Icon(Icons.clear, size: 16),
+                          tooltip: l10n.clearDateFilterTooltip,
                           onPressed: () =>
                               setState(() => _dateAddedRange = null),
                         )
@@ -674,8 +721,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       )
                     : LayoutBuilder(
                         builder: (context, constraints) {
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
+                          return HorizontalScrollTable(
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
                                 minWidth: constraints.maxWidth,
@@ -742,7 +788,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
                                   return DataRow(
                                     onSelectChanged: (_) => _openDetail(p),
-                                    cells: [
+                                    mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
+                                    cells: _withRowContextMenu([
                                       DataCell(
                                         Row(
                                           mainAxisSize: MainAxisSize.min,
@@ -871,7 +918,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                             ],
                                           ),
                                         ),
-                                    ],
+                                    ], p),
                                   );
                                 }).toList(),
                               ),

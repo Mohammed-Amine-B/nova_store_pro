@@ -8095,6 +8095,26 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     requiredDuringInsert: false,
     defaultValue: const Constant('general'),
   );
+  static const VerificationMeta _priceMeta = const VerificationMeta('price');
+  @override
+  late final GeneratedColumn<double> price = GeneratedColumn<double>(
+    'price',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<double> quantity = GeneratedColumn<double>(
+    'quantity',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -8114,6 +8134,8 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     content,
     isDone,
     type,
+    price,
+    quantity,
     createdAt,
   ];
   @override
@@ -8157,6 +8179,18 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
         type.isAcceptableOrUnknown(data['type']!, _typeMeta),
       );
     }
+    if (data.containsKey('price')) {
+      context.handle(
+        _priceMeta,
+        price.isAcceptableOrUnknown(data['price']!, _priceMeta),
+      );
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -8192,6 +8226,14 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
         DriftSqlType.string,
         data['${effectivePrefix}type'],
       )!,
+      price: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}price'],
+      ),
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}quantity'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -8211,6 +8253,8 @@ class Note extends DataClass implements Insertable<Note> {
   final String? content;
   final bool isDone;
   final String type;
+  final double? price;
+  final double? quantity;
   final DateTime createdAt;
   const Note({
     required this.id,
@@ -8218,6 +8262,8 @@ class Note extends DataClass implements Insertable<Note> {
     this.content,
     required this.isDone,
     required this.type,
+    this.price,
+    this.quantity,
     required this.createdAt,
   });
   @override
@@ -8230,6 +8276,12 @@ class Note extends DataClass implements Insertable<Note> {
     }
     map['is_done'] = Variable<bool>(isDone);
     map['type'] = Variable<String>(type);
+    if (!nullToAbsent || price != null) {
+      map['price'] = Variable<double>(price);
+    }
+    if (!nullToAbsent || quantity != null) {
+      map['quantity'] = Variable<double>(quantity);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -8243,6 +8295,12 @@ class Note extends DataClass implements Insertable<Note> {
           : Value(content),
       isDone: Value(isDone),
       type: Value(type),
+      price: price == null && nullToAbsent
+          ? const Value.absent()
+          : Value(price),
+      quantity: quantity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(quantity),
       createdAt: Value(createdAt),
     );
   }
@@ -8258,6 +8316,8 @@ class Note extends DataClass implements Insertable<Note> {
       content: serializer.fromJson<String?>(json['content']),
       isDone: serializer.fromJson<bool>(json['isDone']),
       type: serializer.fromJson<String>(json['type']),
+      price: serializer.fromJson<double?>(json['price']),
+      quantity: serializer.fromJson<double?>(json['quantity']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -8270,6 +8330,8 @@ class Note extends DataClass implements Insertable<Note> {
       'content': serializer.toJson<String?>(content),
       'isDone': serializer.toJson<bool>(isDone),
       'type': serializer.toJson<String>(type),
+      'price': serializer.toJson<double?>(price),
+      'quantity': serializer.toJson<double?>(quantity),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -8280,6 +8342,8 @@ class Note extends DataClass implements Insertable<Note> {
     Value<String?> content = const Value.absent(),
     bool? isDone,
     String? type,
+    Value<double?> price = const Value.absent(),
+    Value<double?> quantity = const Value.absent(),
     DateTime? createdAt,
   }) => Note(
     id: id ?? this.id,
@@ -8287,6 +8351,8 @@ class Note extends DataClass implements Insertable<Note> {
     content: content.present ? content.value : this.content,
     isDone: isDone ?? this.isDone,
     type: type ?? this.type,
+    price: price.present ? price.value : this.price,
+    quantity: quantity.present ? quantity.value : this.quantity,
     createdAt: createdAt ?? this.createdAt,
   );
   Note copyWithCompanion(NotesCompanion data) {
@@ -8296,6 +8362,8 @@ class Note extends DataClass implements Insertable<Note> {
       content: data.content.present ? data.content.value : this.content,
       isDone: data.isDone.present ? data.isDone.value : this.isDone,
       type: data.type.present ? data.type.value : this.type,
+      price: data.price.present ? data.price.value : this.price,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -8308,13 +8376,16 @@ class Note extends DataClass implements Insertable<Note> {
           ..write('content: $content, ')
           ..write('isDone: $isDone, ')
           ..write('type: $type, ')
+          ..write('price: $price, ')
+          ..write('quantity: $quantity, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, title, content, isDone, type, createdAt);
+  int get hashCode =>
+      Object.hash(id, title, content, isDone, type, price, quantity, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -8324,6 +8395,8 @@ class Note extends DataClass implements Insertable<Note> {
           other.content == this.content &&
           other.isDone == this.isDone &&
           other.type == this.type &&
+          other.price == this.price &&
+          other.quantity == this.quantity &&
           other.createdAt == this.createdAt);
 }
 
@@ -8333,6 +8406,8 @@ class NotesCompanion extends UpdateCompanion<Note> {
   final Value<String?> content;
   final Value<bool> isDone;
   final Value<String> type;
+  final Value<double?> price;
+  final Value<double?> quantity;
   final Value<DateTime> createdAt;
   const NotesCompanion({
     this.id = const Value.absent(),
@@ -8340,6 +8415,8 @@ class NotesCompanion extends UpdateCompanion<Note> {
     this.content = const Value.absent(),
     this.isDone = const Value.absent(),
     this.type = const Value.absent(),
+    this.price = const Value.absent(),
+    this.quantity = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   NotesCompanion.insert({
@@ -8348,6 +8425,8 @@ class NotesCompanion extends UpdateCompanion<Note> {
     this.content = const Value.absent(),
     this.isDone = const Value.absent(),
     this.type = const Value.absent(),
+    this.price = const Value.absent(),
+    this.quantity = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : title = Value(title);
   static Insertable<Note> custom({
@@ -8356,6 +8435,8 @@ class NotesCompanion extends UpdateCompanion<Note> {
     Expression<String>? content,
     Expression<bool>? isDone,
     Expression<String>? type,
+    Expression<double>? price,
+    Expression<double>? quantity,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -8364,6 +8445,8 @@ class NotesCompanion extends UpdateCompanion<Note> {
       if (content != null) 'content': content,
       if (isDone != null) 'is_done': isDone,
       if (type != null) 'type': type,
+      if (price != null) 'price': price,
+      if (quantity != null) 'quantity': quantity,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -8374,6 +8457,8 @@ class NotesCompanion extends UpdateCompanion<Note> {
     Value<String?>? content,
     Value<bool>? isDone,
     Value<String>? type,
+    Value<double?>? price,
+    Value<double?>? quantity,
     Value<DateTime>? createdAt,
   }) {
     return NotesCompanion(
@@ -8382,6 +8467,8 @@ class NotesCompanion extends UpdateCompanion<Note> {
       content: content ?? this.content,
       isDone: isDone ?? this.isDone,
       type: type ?? this.type,
+      price: price ?? this.price,
+      quantity: quantity ?? this.quantity,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -8404,6 +8491,12 @@ class NotesCompanion extends UpdateCompanion<Note> {
     if (type.present) {
       map['type'] = Variable<String>(type.value);
     }
+    if (price.present) {
+      map['price'] = Variable<double>(price.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<double>(quantity.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -8418,6 +8511,8 @@ class NotesCompanion extends UpdateCompanion<Note> {
           ..write('content: $content, ')
           ..write('isDone: $isDone, ')
           ..write('type: $type, ')
+          ..write('price: $price, ')
+          ..write('quantity: $quantity, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -16583,6 +16678,8 @@ typedef $$NotesTableCreateCompanionBuilder =
       Value<String?> content,
       Value<bool> isDone,
       Value<String> type,
+      Value<double?> price,
+      Value<double?> quantity,
       Value<DateTime> createdAt,
     });
 typedef $$NotesTableUpdateCompanionBuilder =
@@ -16592,6 +16689,8 @@ typedef $$NotesTableUpdateCompanionBuilder =
       Value<String?> content,
       Value<bool> isDone,
       Value<String> type,
+      Value<double?> price,
+      Value<double?> quantity,
       Value<DateTime> createdAt,
     });
 
@@ -16625,6 +16724,16 @@ class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
 
   ColumnFilters<String> get type => $composableBuilder(
     column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get price => $composableBuilder(
+    column: $table.price,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get quantity => $composableBuilder(
+    column: $table.quantity,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -16668,6 +16777,16 @@ class $$NotesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get price => $composableBuilder(
+    column: $table.price,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -16697,6 +16816,12 @@ class $$NotesTableAnnotationComposer
 
   GeneratedColumn<String> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<double> get price =>
+      $composableBuilder(column: $table.price, builder: (column) => column);
+
+  GeneratedColumn<double> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -16735,6 +16860,8 @@ class $$NotesTableTableManager
                 Value<String?> content = const Value.absent(),
                 Value<bool> isDone = const Value.absent(),
                 Value<String> type = const Value.absent(),
+                Value<double?> price = const Value.absent(),
+                Value<double?> quantity = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => NotesCompanion(
                 id: id,
@@ -16742,6 +16869,8 @@ class $$NotesTableTableManager
                 content: content,
                 isDone: isDone,
                 type: type,
+                price: price,
+                quantity: quantity,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -16751,6 +16880,8 @@ class $$NotesTableTableManager
                 Value<String?> content = const Value.absent(),
                 Value<bool> isDone = const Value.absent(),
                 Value<String> type = const Value.absent(),
+                Value<double?> price = const Value.absent(),
+                Value<double?> quantity = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => NotesCompanion.insert(
                 id: id,
@@ -16758,6 +16889,8 @@ class $$NotesTableTableManager
                 content: content,
                 isDone: isDone,
                 type: type,
+                price: price,
+                quantity: quantity,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0

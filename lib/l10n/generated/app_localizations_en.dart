@@ -146,6 +146,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearFiltersAction => 'Clear Filters';
 
   @override
+  String get clearDateFilterTooltip => 'Clear date filter';
+
+  @override
   String activeFiltersCount(int count) {
     return '$count active';
   }
@@ -499,6 +502,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noteTypeGeneral => 'General';
+
+  @override
+  String get quickNoteAction => 'Quick Note';
+
+  @override
+  String get addNewProductAction => 'Add New Product';
+
+  @override
+  String get linkExistingProductAction => 'Link Existing Product';
+
+  @override
+  String get noProductsFound => 'No products found.';
+
+  @override
+  String get priceOptionalNoteLabel => 'Price (optional)';
+
+  @override
+  String get quantityOptionalNoteLabel => 'Quantity (optional)';
+
+  @override
+  String get noteReferenceOnlyHint =>
+      'Optional — for your reference only, not counted in reports';
+
+  @override
+  String notedQuantityAndPrice(String quantity, String price) {
+    return 'Noted: $quantity × $price';
+  }
+
+  @override
+  String notedQuantityOnly(String quantity) {
+    return 'Noted: $quantity';
+  }
+
+  @override
+  String notedPriceOnly(String price) {
+    return 'Noted: $price';
+  }
+
+  @override
+  String get goToDaySalesTooltip => 'Go to that day\'s sales';
 
   @override
   String get categoriesTitle => 'Categories';
@@ -1919,4 +1962,93 @@ class AppLocalizationsEn extends AppLocalizations {
   String suggestedBuyPriceHint(String price) {
     return 'Suggested: $price (based on similar products)';
   }
+
+  @override
+  String backupFailedMessage(String error) {
+    return 'Backup failed: $error';
+  }
+
+  @override
+  String get chooseBackupFolderDialogTitle => 'Choose a backup folder';
+
+  @override
+  String get backupCreatedTitle => 'Backup Created';
+
+  @override
+  String get backupSavedToLabel => 'Your backup was saved to:';
+
+  @override
+  String get copyPathAction => 'Copy Path';
+
+  @override
+  String get showInFolderAction => 'Show in Folder';
+
+  @override
+  String get doneAction => 'Done';
+
+  @override
+  String get exportProductsCategoriesTitle => 'Export Products & Categories';
+
+  @override
+  String get exportFormatDialogDesc =>
+      'Excel includes separate Categories and Products sheets. CSV is a single file with the category name as a column on each product.';
+
+  @override
+  String get exportFormatCsvOption => 'CSV (.csv)';
+
+  @override
+  String get exportFormatExcelOption => 'Excel (.xlsx)';
+
+  @override
+  String exportFailedMessage(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String get exportCreatedTitle => 'Export Created';
+
+  @override
+  String get exportSavedToLabel => 'Your export was saved to:';
+
+  @override
+  String get backupPanelTitle => 'Backup';
+
+  @override
+  String get backupPanelDesc =>
+      'Save a copy of your database and product photos for safekeeping.';
+
+  @override
+  String get backupPanelHint =>
+      'Creates a dated .zip you can save to a USB drive or cloud folder.';
+
+  @override
+  String get backupNowAction => 'Backup Now';
+
+  @override
+  String get autoBackupPanelTitle => 'Automatic Daily Backups';
+
+  @override
+  String get autoBackupPanelDesc =>
+      'Protect your data if this computer\'s drive ever fails.';
+
+  @override
+  String get backupDestinationNotSet => 'Not set';
+
+  @override
+  String get chooseFolderAction => 'Choose Folder';
+
+  @override
+  String get autoBackupHint =>
+      'Automatic backups run daily to this folder when the app starts, if it\'s set.';
+
+  @override
+  String get exportPanelDesc =>
+      'Save your catalogue as an Excel or CSV file for external use.';
+
+  @override
+  String get exportPanelHint =>
+      'Exports active categories and products only — choose Excel (2 sheets) or a single CSV file.';
+
+  @override
+  String get exportAction => 'Export';
 }

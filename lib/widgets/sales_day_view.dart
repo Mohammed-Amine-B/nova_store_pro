@@ -19,6 +19,7 @@ import 'product_thumbnail.dart';
 import '../utils/formatting.dart';
 import '../utils/text_scale.dart';
 import 'return_dialog.dart';
+import 'horizontal_scroll_table.dart';
 
 class SalesDayView extends StatefulWidget {
   final AppDatabase db;
@@ -557,8 +558,7 @@ class SalesDayViewState extends State<SalesDayView> {
                     children: [
                       LayoutBuilder(
                         builder: (context, constraints) {
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
+                          return HorizontalScrollTable(
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
                                 minWidth: constraints.maxWidth,
@@ -709,6 +709,7 @@ class SalesDayViewState extends State<SalesDayView> {
                                                 Icons.edit_outlined,
                                                 size: 18,
                                               ),
+                                              tooltip: l10n.edit,
                                               onPressed: () => _editItem(item),
                                             ),
                                             IconButton(
@@ -717,7 +718,7 @@ class SalesDayViewState extends State<SalesDayView> {
                                                     .assignment_return_outlined,
                                                 size: 18,
                                               ),
-                                              tooltip: 'Return',
+                                              tooltip: l10n.returnTooltip,
                                               onPressed: () async {
                                                 await showReturnDialog(
                                                   context,
@@ -735,6 +736,7 @@ class SalesDayViewState extends State<SalesDayView> {
                                                     ? theme.colorScheme.error
                                                     : null,
                                               ),
+                                              tooltip: l10n.delete,
                                               onPressed: () =>
                                                   _deleteSale(sale),
                                             ),

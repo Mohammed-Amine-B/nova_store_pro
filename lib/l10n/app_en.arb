@@ -74,6 +74,7 @@
   "filterOutOfStock": "Out of Stock",
   "filtersLabel": "Filters",
   "clearFiltersAction": "Clear Filters",
+  "clearDateFilterTooltip": "Clear date filter",
   "activeFiltersCount": "{count} active",
   "@activeFiltersCount": {
     "placeholders": {
@@ -248,6 +249,41 @@
   "noteTypeProductToAdd": "Product to Add",
   "noteTypeCustomerRequest": "Customer Request",
   "noteTypeGeneral": "General",
+  "quickNoteAction": "Quick Note",
+  "addNewProductAction": "Add New Product",
+  "linkExistingProductAction": "Link Existing Product",
+  "noProductsFound": "No products found.",
+  "priceOptionalNoteLabel": "Price (optional)",
+  "quantityOptionalNoteLabel": "Quantity (optional)",
+  "noteReferenceOnlyHint": "Optional — for your reference only, not counted in reports",
+  "notedQuantityAndPrice": "Noted: {quantity} × {price}",
+  "@notedQuantityAndPrice": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "notedQuantityOnly": "Noted: {quantity}",
+  "@notedQuantityOnly": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "notedPriceOnly": "Noted: {price}",
+  "@notedPriceOnly": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "goToDaySalesTooltip": "Go to that day's sales",
   "categoriesTitle": "Categories",
   "categoriesCount": "{count} categories",
   "@categoriesCount": {
@@ -1240,5 +1276,45 @@
         "type": "String"
       }
     }
-  }
+  },
+  "backupFailedMessage": "Backup failed: {error}",
+  "@backupFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseBackupFolderDialogTitle": "Choose a backup folder",
+  "backupCreatedTitle": "Backup Created",
+  "backupSavedToLabel": "Your backup was saved to:",
+  "copyPathAction": "Copy Path",
+  "showInFolderAction": "Show in Folder",
+  "doneAction": "Done",
+  "exportProductsCategoriesTitle": "Export Products & Categories",
+  "exportFormatDialogDesc": "Excel includes separate Categories and Products sheets. CSV is a single file with the category name as a column on each product.",
+  "exportFormatCsvOption": "CSV (.csv)",
+  "exportFormatExcelOption": "Excel (.xlsx)",
+  "exportFailedMessage": "Export failed: {error}",
+  "@exportFailedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "exportCreatedTitle": "Export Created",
+  "exportSavedToLabel": "Your export was saved to:",
+  "backupPanelTitle": "Backup",
+  "backupPanelDesc": "Save a copy of your database and product photos for safekeeping.",
+  "backupPanelHint": "Creates a dated .zip you can save to a USB drive or cloud folder.",
+  "backupNowAction": "Backup Now",
+  "autoBackupPanelTitle": "Automatic Daily Backups",
+  "autoBackupPanelDesc": "Protect your data if this computer's drive ever fails.",
+  "backupDestinationNotSet": "Not set",
+  "chooseFolderAction": "Choose Folder",
+  "autoBackupHint": "Automatic backups run daily to this folder when the app starts, if it's set.",
+  "exportPanelDesc": "Save your catalogue as an Excel or CSV file for external use.",
+  "exportPanelHint": "Exports active categories and products only — choose Excel (2 sheets) or a single CSV file.",
+  "exportAction": "Export"
 }

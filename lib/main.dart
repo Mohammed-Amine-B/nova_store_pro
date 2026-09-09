@@ -215,7 +215,13 @@ class _NovaStoreAppState extends State<NovaStoreApp> with WindowListener {
                   fontSize: _fontSize,
                   onFontSizeChanged: _onFontSizeChanged,
                 ),
-                NotesScreen(db: widget.db),
+                NotesScreen(
+                  db: widget.db,
+                  onGoToTodaySales: () =>
+                      _appScaffoldKey.currentState?.switchToTab(
+                        5,
+                      ), // TodaySalesScreen's index in `pages` above
+                ),
               ],
             )
           : LoginScreen(

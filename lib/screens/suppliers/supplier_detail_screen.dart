@@ -12,6 +12,7 @@ import '../../utils/formatting.dart';
 import 'supplier_form_dialog.dart';
 import 'new_purchase_screen.dart';
 import 'purchase_receipt_screen.dart';
+import '../../widgets/horizontal_scroll_table.dart';
 
 class SupplierDetailScreen extends StatefulWidget {
   final AppDatabase db;
@@ -497,8 +498,7 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                             )
                           : LayoutBuilder(
                               builder: (context, constraints) {
-                                return SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
+                                return HorizontalScrollTable(
                                   child: ConstrainedBox(
                                     constraints: BoxConstraints(
                                       minWidth: constraints.maxWidth,
@@ -533,6 +533,7 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                                         return DataRow(
                                           onSelectChanged: (_) =>
                                               _editPurchase(p),
+                                          mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
                                           cells: [
                                             DataCell(
                                               Text(_formatDate(p.purchaseDate)),
@@ -608,6 +609,7 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                                                           .colorScheme
                                                           .error,
                                                     ),
+                                                    tooltip: l10n.delete,
                                                     onPressed: () =>
                                                         _deletePurchase(p),
                                                   ),
@@ -634,8 +636,7 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                             )
                           : LayoutBuilder(
                               builder: (context, constraints) {
-                                return SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
+                                return HorizontalScrollTable(
                                   child: ConstrainedBox(
                                     constraints: BoxConstraints(
                                       minWidth: constraints.maxWidth,
@@ -654,6 +655,7 @@ class _SupplierDetailScreenState extends State<SupplierDetailScreen> {
                                         return DataRow(
                                           onSelectChanged: (_) =>
                                               _editPayment(p),
+                                          mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
                                           cells: [
                                             DataCell(
                                               Text(_formatDate(p.paymentDate)),

@@ -12,6 +12,7 @@ import '../../widgets/product_thumbnail.dart';
 import '../../widgets/money_text.dart';
 import '../../utils/formatting.dart';
 import '../../utils/rounding.dart';
+import '../../widgets/horizontal_scroll_table.dart';
 
 class _CartLine {
   final int? saleItemId;
@@ -525,6 +526,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                       final lowStock = p.stockQuantity <= p.minStock;
                       return InkWell(
                         onTap: () => _addLine(p),
+                        mouseCursor: SystemMouseCursors.click,
                         borderRadius: BorderRadius.circular(10),
                         child: Container(
                           padding: const EdgeInsets.all(12),
@@ -617,8 +619,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                 )
               : LayoutBuilder(
                   builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
+                    return HorizontalScrollTable(
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
                           minWidth: constraints.maxWidth,
@@ -684,6 +685,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                                           Icons.edit_outlined,
                                           size: 18,
                                         ),
+                                        tooltip: l10n.edit,
                                         onPressed: () => _editLine(line),
                                       ),
                                       if (widget.isEditMode)
@@ -702,6 +704,7 @@ class _CustomerSaleScreenState extends State<CustomerSaleScreen> {
                                             size: 18,
                                             color: theme.colorScheme.error,
                                           ),
+                                          tooltip: l10n.removeAction,
                                           onPressed: () => _removeLine(line),
                                         ),
                                     ],

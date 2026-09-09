@@ -10,6 +10,7 @@ import '../../widgets/panel.dart';
 import '../../widgets/stat_card.dart';
 import '../customers/customer_detail_screen.dart';
 import '../suppliers/supplier_detail_screen.dart';
+import '../../widgets/horizontal_scroll_table.dart';
 
 class InsightsScreen extends StatefulWidget {
   final AppDatabase db;
@@ -75,6 +76,76 @@ class _InsightsScreenState extends State<InsightsScreen> {
       ),
     );
     _load();
+  }
+
+  static const int _previewLimit = 5;
+
+  Widget _viewAllLink(int count, VoidCallback onTap) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton(
+          onPressed: onTap,
+          style: TextButton.styleFrom(
+            foregroundColor: const Color(0xFF0E7C7B),
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text('${l10n.viewAllAction} ($count)'),
+        ),
+      ),
+    );
+  }
+
+  void _showViewAllDialog({required String title, required Widget child}) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        final size = MediaQuery.of(dialogContext).size;
+        return Dialog(
+          insetPadding: EdgeInsets.symmetric(
+            horizontal: size.width * 0.06,
+            vertical: size.height * 0.06,
+          ),
+          child: SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 8, 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: Theme.of(dialogContext).textTheme.titleLarge,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        tooltip: AppLocalizations.of(dialogContext)!.close,
+                        onPressed: () => Navigator.of(dialogContext).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: child,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -178,92 +249,21 @@ class _InsightsScreenState extends State<InsightsScreen> {
                     icon: Icons.inventory_2_outlined,
                     title: l10n.noReorderSuggestions,
                   )
-                : LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minWidth: constraints.maxWidth,
-                          ),
-                          child: DataTable(
-                            columns: [
-                              DataColumn(label: Text(l10n.colProduct)),
-                              DataColumn(
-                                label: Text(l10n.colCurrentStock),
-                                numeric: true,
-                              ),
-                              DataColumn(
-                                label: Text(l10n.colDaysLeft),
-                                numeric: true,
-                              ),
-                              DataColumn(
-                                label: Text(l10n.colSuggestedQty),
-                                numeric: true,
-                              ),
-                              DataColumn(label: Text(l10n.colSupplier)),
-                            ],
-                            rows: _reorderSuggestions.map((s) {
-                              return DataRow(
-                                cells: [
-                                  DataCell(Tooltip(
-                                    message: s.productName,
-                                    child: SizedBox(
-                                      width: 200,
-                                      child: Text(
-                                        s.productName,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  )),
-                                  DataCell(
-                                    Text(
-                                      formatQuantity(
-                                        s.currentStock,
-                                        s.unitType,
-                                      ),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Text(
-                                      s.daysOfStockLeft.toStringAsFixed(1),
-                                      style: TextStyle(
-                                        color: s.daysOfStockLeft < 7
-                                            ? const Color(0xFFE4572E)
-                                            : null,
-                                        fontWeight: s.daysOfStockLeft < 7
-                                            ? FontWeight.w700
-                                            : null,
-                                      ),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Text(
-                                      formatQuantity(
-                                        s.suggestedReorderQty,
-                                        s.unitType,
-                                      ),
-                                    ),
-                                  ),
-                                  DataCell(Tooltip(
-                                    message: s.suggestedSupplierName ?? '—',
-                                    child: SizedBox(
-                                      width: 160,
-                                      child: Text(
-                                        s.suggestedSupplierName ?? '—',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  )),
-                                ],
-                              );
-                            }).toList(),
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildReorderTable(
+                        _reorderSuggestions.take(_previewLimit).toList(),
+                      ),
+                      if (_reorderSuggestions.length > _previewLimit)
+                        _viewAllLink(
+                          _reorderSuggestions.length,
+                          () => _showViewAllDialog(
+                            title: l10n.reorderSuggestionsPanel,
+                            child: _buildReorderTable(_reorderSuggestions),
                           ),
                         ),
-                      );
-                    },
+                    ],
                   ),
           ),
           const SizedBox(height: 20),
@@ -276,18 +276,24 @@ class _InsightsScreenState extends State<InsightsScreen> {
                     title: l10n.noStagnantProducts,
                   )
                 : Column(
-                    children: _stagnantProducts.map((p) {
-                      return ListTile(
-                        leading: const Icon(Icons.inventory_2_outlined),
-                        title: Text(productDisplayName(p)),
-                        trailing: Text(
-                          formatQuantity(p.stockQuantity, p.unitType),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildStagnantProductsList(
+                        _stagnantProducts.take(_previewLimit).toList(),
+                        theme,
+                      ),
+                      if (_stagnantProducts.length > _previewLimit)
+                        _viewAllLink(
+                          _stagnantProducts.length,
+                          () => _showViewAllDialog(
+                            title: l10n.stagnantProductsPanel,
+                            child: _buildStagnantProductsList(
+                              _stagnantProducts,
+                              theme,
+                            ),
                           ),
                         ),
-                      );
-                    }).toList(),
+                    ],
                   ),
           ),
           const SizedBox(height: 20),
@@ -299,66 +305,21 @@ class _InsightsScreenState extends State<InsightsScreen> {
                     icon: Icons.person_off_outlined,
                     title: l10n.noOldDebtCustomers,
                   )
-                : LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minWidth: constraints.maxWidth,
-                          ),
-                          child: DataTable(
-                            columns: [
-                              DataColumn(label: Text(l10n.colName)),
-                              DataColumn(
-                                label: Text(l10n.colBalance),
-                                numeric: true,
-                              ),
-                              DataColumn(label: Text(l10n.lastActivityLabel)),
-                            ],
-                            rows: _oldDebtCustomers.map((entry) {
-                              return DataRow(
-                                onSelectChanged: (_) =>
-                                    _openCustomer(entry.customer.id),
-                                cells: [
-                                  DataCell(
-                                    Tooltip(
-                                      message: entry.customer.name,
-                                      child: SizedBox(
-                                        width: 200,
-                                        child: Text(
-                                          entry.customer.name,
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    MoneyText(
-                                      formatMoney(entry.balance),
-                                      style: const TextStyle(
-                                        color: Color(0xFFE4572E),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Text(
-                                      l10n.daysAgo(
-                                        DateTime.now()
-                                            .difference(entry.lastActivity)
-                                            .inDays,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }).toList(),
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildOldDebtTable(
+                        _oldDebtCustomers.take(_previewLimit).toList(),
+                      ),
+                      if (_oldDebtCustomers.length > _previewLimit)
+                        _viewAllLink(
+                          _oldDebtCustomers.length,
+                          () => _showViewAllDialog(
+                            title: l10n.oldDebtCustomersPanel,
+                            child: _buildOldDebtTable(_oldDebtCustomers),
                           ),
                         ),
-                      );
-                    },
+                    ],
                   ),
           ),
           const SizedBox(height: 20),
@@ -370,61 +331,230 @@ class _InsightsScreenState extends State<InsightsScreen> {
                     icon: Icons.local_shipping_outlined,
                     title: l10n.noSupplierPriority,
                   )
-                : LayoutBuilder(
-                    builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minWidth: constraints.maxWidth,
-                          ),
-                          child: DataTable(
-                            showCheckboxColumn: false,
-                            columns: [
-                              DataColumn(label: Text(l10n.colSupplier)),
-                              DataColumn(
-                                label: Text(l10n.colOwed),
-                                numeric: true,
-                              ),
-                            ],
-                            rows: _supplierPriority.map((entry) {
-                              return DataRow(
-                                onSelectChanged: (_) =>
-                                    _openSupplier(entry.supplier.id),
-                                cells: [
-                                  DataCell(
-                                    Tooltip(
-                                      message: entry.supplier.name,
-                                      child: SizedBox(
-                                        width: 200,
-                                        child: Text(
-                                          entry.supplier.name,
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  DataCell(
-                                    MoneyText(
-                                      formatMoney(entry.owed),
-                                      style: const TextStyle(
-                                        color: Color(0xFFE4572E),
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }).toList(),
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSupplierPriorityTable(
+                        _supplierPriority.take(_previewLimit).toList(),
+                      ),
+                      if (_supplierPriority.length > _previewLimit)
+                        _viewAllLink(
+                          _supplierPriority.length,
+                          () => _showViewAllDialog(
+                            title: l10n.supplierPriorityPanel,
+                            child: _buildSupplierPriorityTable(
+                              _supplierPriority,
+                            ),
                           ),
                         ),
-                      );
-                    },
+                    ],
                   ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildReorderTable(List<ReorderSuggestion> items) {
+    final l10n = AppLocalizations.of(context)!;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return HorizontalScrollTable(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+            child: DataTable(
+              columns: [
+                DataColumn(label: Text(l10n.colProduct)),
+                DataColumn(label: Text(l10n.colCurrentStock), numeric: true),
+                DataColumn(label: Text(l10n.colDaysLeft), numeric: true),
+                DataColumn(label: Text(l10n.colSuggestedQty), numeric: true),
+                DataColumn(label: Text(l10n.colSupplier)),
+              ],
+              rows: items.map((s) {
+                return DataRow(
+                  cells: [
+                    DataCell(
+                      Tooltip(
+                        message: s.productName,
+                        child: SizedBox(
+                          width: 200,
+                          child: Text(
+                            s.productName,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Text(formatQuantity(s.currentStock, s.unitType)),
+                    ),
+                    DataCell(
+                      Text(
+                        s.daysOfStockLeft.toStringAsFixed(1),
+                        style: TextStyle(
+                          color: s.daysOfStockLeft < 7
+                              ? const Color(0xFFE4572E)
+                              : null,
+                          fontWeight: s.daysOfStockLeft < 7
+                              ? FontWeight.w700
+                              : null,
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Text(formatQuantity(s.suggestedReorderQty, s.unitType)),
+                    ),
+                    DataCell(
+                      Tooltip(
+                        message: s.suggestedSupplierName ?? '—',
+                        child: SizedBox(
+                          width: 160,
+                          child: Text(
+                            s.suggestedSupplierName ?? '—',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildStagnantProductsList(List<Product> items, ThemeData theme) {
+    return Column(
+      children: items.map((p) {
+        return ListTile(
+          leading: const Icon(Icons.inventory_2_outlined),
+          title: Text(productDisplayName(p)),
+          trailing: Text(
+            formatQuantity(p.stockQuantity, p.unitType),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildOldDebtTable(
+    List<({Customer customer, double balance, DateTime lastActivity})> items,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return HorizontalScrollTable(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+            child: DataTable(
+              columns: [
+                DataColumn(label: Text(l10n.colName)),
+                DataColumn(label: Text(l10n.colBalance), numeric: true),
+                DataColumn(label: Text(l10n.lastActivityLabel)),
+              ],
+              rows: items.map((entry) {
+                return DataRow(
+                  onSelectChanged: (_) => _openCustomer(entry.customer.id),
+                  mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
+                  cells: [
+                    DataCell(
+                      Tooltip(
+                        message: entry.customer.name,
+                        child: SizedBox(
+                          width: 200,
+                          child: Text(
+                            entry.customer.name,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      MoneyText(
+                        formatMoney(entry.balance),
+                        style: const TextStyle(
+                          color: Color(0xFFE4572E),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        l10n.daysAgo(
+                          DateTime.now()
+                              .difference(entry.lastActivity)
+                              .inDays,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSupplierPriorityTable(
+    List<({Supplier supplier, double owed})> items,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return HorizontalScrollTable(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: constraints.maxWidth),
+            child: DataTable(
+              showCheckboxColumn: false,
+              columns: [
+                DataColumn(label: Text(l10n.colSupplier)),
+                DataColumn(label: Text(l10n.colOwed), numeric: true),
+              ],
+              rows: items.map((entry) {
+                return DataRow(
+                  onSelectChanged: (_) => _openSupplier(entry.supplier.id),
+                  mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
+                  cells: [
+                    DataCell(
+                      Tooltip(
+                        message: entry.supplier.name,
+                        child: SizedBox(
+                          width: 200,
+                          child: Text(
+                            entry.supplier.name,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      MoneyText(
+                        formatMoney(entry.owed),
+                        style: const TextStyle(
+                          color: Color(0xFFE4572E),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
     );
   }
 }
